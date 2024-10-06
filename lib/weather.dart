@@ -19,6 +19,11 @@ class _WeatherState extends State<Weather> {
   late Config config;
 
   Future<Map<String, String>> _fetchWeather() async {
+    print("Refreshing weather");
+    if (config.weather.apiKey.isEmpty || config.weather.postcode.isEmpty || config.weather.country.isEmpty || config.weather.units.isEmpty) {
+      throw Exception("Weather API Key, Postcode, Country, and Units must be set in the config file.");
+    }
+
     try {
       Response response = await Dio().get(
         "https://api.openweathermap.org/data/2.5/weather?zip=${config.weather.postcode},${config.weather.country}&appid=${config.weather.apiKey}&units=${config.weather.units}",
@@ -58,8 +63,8 @@ class _WeatherState extends State<Weather> {
 
   @override
   void dispose() {
-    _subscription?.cancel();
     super.dispose();
+    _subscription?.cancel();
   }
 
   @override
@@ -70,7 +75,7 @@ class _WeatherState extends State<Weather> {
     return FutureBuilder(
       future: _weather,
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done || snapshot.data == null) {
+        if (!snapshot.hasData && snapshot.connectionState != ConnectionState.done) {
           return const SizedBox.shrink();
         }
 

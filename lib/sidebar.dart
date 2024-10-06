@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smartclock/calendar.dart';
 import 'package:provider/provider.dart';
+import 'package:smartclock/info_widget.dart';
 import 'package:smartclock/now_playing.dart';
 import 'package:smartclock/notifications.dart';
 import 'package:smartclock/util/config.dart' show Config;
@@ -20,12 +21,15 @@ class Sidebar extends StatelessWidget {
       height: dimensions[3],
       child: Container(
         padding: EdgeInsets.all(config.sidebar.padding),
-        child: const SingleChildScrollView(
+        child: SingleChildScrollView(
           child: Column(
             children: [
-              NowPlaying(),
-              Notifications(),
-              Calendar(),
+              if (config.alexa.enabled) ...[
+                const NowPlaying(),
+                const Notifications(),
+              ],
+              if (config.calendar.enabled) const Calendar(),
+              if (!config.alexa.enabled && !config.calendar.enabled) const InfoWidget(),
             ],
           ),
         ),

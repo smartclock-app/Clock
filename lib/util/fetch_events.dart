@@ -66,6 +66,12 @@ String? eventColor(String? colorId) {
 }
 
 Future<Map<String, List<CalendarItem>>> fetchEvents(Config config, http.Client httpClient) async {
+  print("Refreshing calendar");
+
+  if (config.calendar.accessToken.isEmpty || config.calendar.refreshToken.isEmpty || config.calendar.clientId.isEmpty || config.calendar.clientSecret.isEmpty) {
+    throw Exception("Calendar API credentials must be set in the config file.");
+  }
+
   // Create Google auth client with credentials from config
   final client = auth.autoRefreshingClient(
     auth.ClientId(config.calendar.clientId, config.calendar.clientSecret),

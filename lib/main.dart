@@ -11,23 +11,44 @@ import 'package:smartclock/Weather.dart';
 import 'package:smartclock/util/config.dart' show Config;
 import 'package:smartclock/sidebar.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+import 'package:json_schema/json_schema.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final appDir = await getApplicationDocumentsDirectory();
+  final appDir = await getApplicationSupportDirectory();
 
   final confFile = File("${appDir.path}/config.json");
-  if (!confFile.existsSync()) {
-    final confData = await rootBundle.loadString("assets/default_config.json");
-    confFile.writeAsStringSync(confData);
-  }
-  final config = Config.fromJson(json.decode(confFile.readAsStringSync()));
+  if (!confFile.existsSync()) confFile.writeAsStringSync(await rootBundle.loadString("assets/default_config.json"));
+  print("Loaded Config File: ${confFile.path}");
 
   final cookieFile = File("${appDir.path}/cookies.json");
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
+  print("Loaded Cookie File: ${cookieFile.path}");
+
+  const schemaUrl = "https://auth.smartclock.app/schema/v1";
+  final configSchema = await JsonSchema.createFromUrl(schemaUrl);
+  final results = configSchema.validate(confFile.readAsStringSync(), parseJson: true);
+  if (!results.isValid) {
+    print("Config file is invalid. Please check the schema at $schemaUrl");
+    print("Warnings:" + results.warnings.join("\n"));
+    print("Errors: " + results.errors.join("\n"));
+    exit(1);
+  }
+
+  final config = Config.fromJson(json.decode(confFile.readAsStringSync()));
   final client = alexa.QueryClient(cookieFile);
-  if (!await client.checkStatus(config.alexa.userId)) {
-    await client.login(config.alexa.userId, config.alexa.token);
+
+  if (config.alexa.enabled) {
+    if (!await client.checkStatus(config.alexa.userId)) {
+      try {
+        if (config.alexa.userId.isEmpty || config.alexa.token.isEmpty) {
+          throw Exception("Alexa User ID and Token must be set in the config file.");
+        }
+        await client.login(config.alexa.userId, config.alexa.token);
+      } catch (e) {
+        print("Failed to login to Alexa: $e");
+      }
+    }
   }
 
   runApp(MultiProvider(
@@ -57,12 +78,12 @@ class SmartClock extends StatelessWidget {
           width: resolution.first.toDouble(),
           height: resolution.last.toDouble(),
           color: Colors.white,
-          child: const Center(
+          child: Center(
             child: Stack(
               children: [
-                Clock(),
-                Sidebar(),
-                Weather(),
+                const Clock(),
+                const Sidebar(),
+                if (config.weather.enabled) const Weather(),
               ],
             ),
           ),

@@ -28,12 +28,16 @@ class _NotificationsState extends State<Notifications> {
     final config = Provider.of<Config>(context, listen: false);
     final client = Provider.of<alexa.QueryClient>(context, listen: false);
     final ns = await client.getNotifications(config.alexa.userId);
+
+    final allDevices = await client.getDeviceList(config.alexa.userId);
+    final devices = allDevices.where((d) => config.alexa.devices.contains(d.accountName));
+
     List<alexa.Notification> timers = [];
     List<alexa.Notification> alarms = [];
 
     for (var n in ns) {
       if (n.status != "ON") continue;
-      if (!config.alexa.devices.contains(n.deviceName)) continue;
+      if (!devices.any((d) => d.serialNumber == n.deviceSerialNumber)) continue;
 
       switch (n.type) {
         case "Timer":
@@ -75,8 +79,8 @@ class _NotificationsState extends State<Notifications> {
 
   @override
   void dispose() {
-    _subscription?.cancel();
     super.dispose();
+    _subscription?.cancel();
   }
 
   @override

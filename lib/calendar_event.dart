@@ -61,7 +61,7 @@ class CalendarEvent extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8, top: 8),
+      margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.only(left: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),

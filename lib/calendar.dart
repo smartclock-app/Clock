@@ -41,8 +41,8 @@ class _CalendarState extends State<Calendar> {
 
   @override
   void dispose() {
-    _subscription?.cancel();
     super.dispose();
+    _subscription?.cancel();
   }
 
   @override
@@ -50,7 +50,31 @@ class _CalendarState extends State<Calendar> {
     return FutureBuilder(
       future: _futureEvents,
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
+        if (snapshot.hasError) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xfff8f8f8),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Calendar",
+                    style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const Divider(),
+                Text(snapshot.error.toString()),
+              ],
+            ),
+          );
+        }
+
+        if (!snapshot.hasData && snapshot.connectionState != ConnectionState.done) {
           return Container(
             padding: const EdgeInsets.all(16),
             margin: const EdgeInsets.only(bottom: 16),
@@ -75,30 +99,6 @@ class _CalendarState extends State<Calendar> {
                     style: TextStyle(fontSize: config.calendar.eventTitleSize),
                   ),
                 ),
-              ],
-            ),
-          );
-        }
-
-        if (snapshot.hasError) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xfff8f8f8),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Calendar",
-                    style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                Text(snapshot.error.toString()),
               ],
             ),
           );

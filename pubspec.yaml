@@ -24,6 +24,7 @@ dependencies:
   googleapis_auth: ^1.6.0
   http: ^1.2.2
   dio: ^5.7.0
+  json_schema: ^5.2.0
 
 dev_dependencies:
   flutter_test:
