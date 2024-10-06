@@ -12,26 +12,24 @@ import 'package:smartclock/util/config.dart' show Config;
 import 'package:smartclock/sidebar.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:json_schema/json_schema.dart';
+import 'package:bonsoir/bonsoir.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final appDir = await getApplicationSupportDirectory();
+  print("Config Directory: ${appDir.path}");
 
   final confFile = File("${appDir.path}/config.json");
   if (!confFile.existsSync()) confFile.writeAsStringSync(await rootBundle.loadString("assets/default_config.json"));
-  print("Loaded Config File: ${confFile.path}");
 
   final cookieFile = File("${appDir.path}/cookies.json");
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
-  print("Loaded Cookie File: ${cookieFile.path}");
 
   const schemaUrl = "https://auth.smartclock.app/schema/v1";
   final configSchema = await JsonSchema.createFromUrl(schemaUrl);
   final results = configSchema.validate(confFile.readAsStringSync(), parseJson: true);
   if (!results.isValid) {
     print("Config file is invalid. Please check the schema at $schemaUrl");
-    print("Warnings:" + results.warnings.join("\n"));
-    print("Errors: " + results.errors.join("\n"));
     exit(1);
   }
 
@@ -50,6 +48,17 @@ void main() async {
       }
     }
   }
+
+  // LINUX BONJOUR DEPENDENCIES:
+  // avahi-daemon avahi-discover avahi-utils libnss-mdns mdns-scan
+  BonsoirService service = BonsoirService(
+    name: "SC@${Platform.localHostname}",
+    type: '_smartclock._tcp',
+    port: 3030,
+  );
+  final broadcast = BonsoirBroadcast(service: service);
+  await broadcast.ready;
+  await broadcast.start();
 
   runApp(MultiProvider(
     providers: [

@@ -25,6 +25,7 @@ dependencies:
   http: ^1.2.2
   dio: ^5.7.0
   json_schema: ^5.2.0
+  bonsoir: ^5.1.10
 
 dev_dependencies:
   flutter_test:
