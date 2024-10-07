@@ -118,8 +118,8 @@ class Calendar {
   final bool enabled;
   final String clientId;
   final String clientSecret;
-  final String accessToken;
-  final String refreshToken;
+  String accessToken;
+  String refreshToken;
   final double monthTitleSize;
   final double eventTitleSize;
   final double eventTimeSize;

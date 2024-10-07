@@ -7,7 +7,7 @@ class InfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = Provider.of<Config>(context);
+    final config = Provider.of<Config>(context, listen: false);
 
     return Container(
       padding: const EdgeInsets.all(16),

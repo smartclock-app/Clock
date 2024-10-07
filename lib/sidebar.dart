@@ -11,7 +11,7 @@ class Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = Provider.of<Config>(context);
+    final config = Provider.of<Config>(context, listen: false);
     final dimensions = config.dimensions.sidebar.split(",").map((e) => double.parse(e)).toList();
 
     return Positioned(

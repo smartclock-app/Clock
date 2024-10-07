@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:googleapis_auth/googleapis_auth.dart' as auth;
+import 'package:smartclock/main.dart';
 import 'package:smartclock/util/config.dart' show Config;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -161,6 +162,11 @@ Future<Map<String, List<CalendarItem>>> fetchEvents(Config config, http.Client h
     if (!sortedEvents.containsKey(key)) sortedEvents[key] = [];
     sortedEvents[key]!.add(event);
   }
+
+  config.calendar.accessToken = client.credentials.accessToken.data;
+  config.calendar.refreshToken = client.credentials.refreshToken!;
+
+  saveConfig(config);
 
   return sortedEvents;
 }

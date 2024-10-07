@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:math' show min;
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
+import 'package:smartclock/util/fetch_lyrics.dart';
 import 'package:smartclock/util/lrc.dart';
 import 'package:smartclock/now_playing_lyrics.dart';
 import 'package:provider/provider.dart';
 import 'package:smartclock/util/config.dart' show Config;
+import 'package:sqflite/sqflite.dart';
 
 const radioProviders = ["Unknown Provider", "TuneIn Live Radio", "Global Player"];
 
@@ -25,26 +26,12 @@ class _NowPlayingState extends State<NowPlaying> {
 
   alexa.Queue? queue;
 
-  void getLyrics(String title, String artist) async {
-    final response = await Dio().get("https://lrclib.net/api/search?q=$title+$artist");
-    final data = response.data as List<dynamic>;
-    final lyrics = data[0]["syncedLyrics"];
-    if (Lrc.isValid(lyrics)) {
-      setState(() {
-        this.lyrics = Lrc.parse(lyrics);
-      });
-    } else {
-      setState(() {
-        this.lyrics = null;
-      });
-    }
-  }
-
   void getQueue() async {
     if (queue?.state == "REFRESHING") return;
 
     print("Refreshing queue");
     final config = Provider.of<Config>(context, listen: false);
+    final database = Provider.of<Future<Database>>(context, listen: false);
     final client = Provider.of<alexa.QueryClient>(context, listen: false);
     alexa.Queue q = alexa.Queue(state: "STOPPED");
     for (final device in config.alexa.devices) {
@@ -65,7 +52,12 @@ class _NowPlayingState extends State<NowPlaying> {
     }
 
     if (q.infoText?.title != null && q.infoText?.subText1 != null) {
-      getLyrics(q.infoText!.title!, q.infoText!.subText1!);
+      final lyricResult = await fetchLyrics(await database, q.infoText!.title!, q.infoText!.subText1!);
+      if (lyricResult != null) {
+        setState(() {
+          lyrics = lyricResult;
+        });
+      }
     }
     final difference = DateTime.now().toUtc().difference(q.timestamp!).inMilliseconds;
     setState(() {
@@ -125,7 +117,7 @@ class _NowPlayingState extends State<NowPlaying> {
 
   @override
   Widget build(BuildContext context) {
-    if (queue == null || queue?.state == null || queue!.state != "PLAYING") return const SizedBox.shrink();
+    if (queue == null || queue?.state == null || !(queue!.state == "PLAYING" || queue!.state == "REFRESHING")) return const SizedBox.shrink();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
