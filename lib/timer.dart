@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:flutter/material.dart';
+import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
 class TimerCard extends StatefulWidget {
   const TimerCard({super.key, required this.timer});

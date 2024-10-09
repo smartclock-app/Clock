@@ -1,4 +1,5 @@
 class Config {
+  static const String schema = "https://auth.smartclock.app/schema/v1";
   final String resolution;
   final Alexa alexa;
   final Clock clock;
@@ -28,6 +29,7 @@ class Config {
       );
 
   Map<String, dynamic> toJson() => {
+        "\$schema": schema,
         "resolution": resolution,
         "alexa": alexa.toJson(),
         "clock": clock.toJson(),
@@ -120,6 +122,7 @@ class Calendar {
   final String clientSecret;
   String accessToken;
   String refreshToken;
+  final int maxEvents;
   final double monthTitleSize;
   final double eventTitleSize;
   final double eventTimeSize;
@@ -131,6 +134,7 @@ class Calendar {
     required this.clientSecret,
     required this.accessToken,
     required this.refreshToken,
+    required this.maxEvents,
     required this.monthTitleSize,
     required this.eventTitleSize,
     required this.eventTimeSize,
@@ -143,6 +147,7 @@ class Calendar {
         clientSecret: json["clientSecret"],
         accessToken: json["accessToken"],
         refreshToken: json["refreshToken"],
+        maxEvents: json["maxEvents"],
         monthTitleSize: double.parse(json["monthTitleSize"].toString()),
         eventTitleSize: double.parse(json["eventTitleSize"].toString()),
         eventTimeSize: double.parse(json["eventTimeSize"].toString()),
@@ -155,6 +160,7 @@ class Calendar {
         "clientSecret": clientSecret,
         "accessToken": accessToken,
         "refreshToken": refreshToken,
+        "maxEvents": maxEvents,
         "monthTitleSize": monthTitleSize,
         "eventTitleSize": eventTitleSize,
         "eventTimeSize": eventTimeSize,

@@ -17,7 +17,7 @@ dependencies:
     sdk: flutter
 
   path_provider: ^2.1.4
-  alexaquery_dart: ^2.1.0
+  alexaquery_dart: ^2.2.0
   provider: ^6.1.2
   intl: ^0.19.0
   googleapis: ^13.2.0
@@ -28,6 +28,7 @@ dependencies:
   bonsoir: ^5.1.10
   sqflite: ^2.3.3+1
   path: ^1.9.0
+  logger: ^2.4.0
 
 dev_dependencies:
   flutter_test:

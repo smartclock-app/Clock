@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:smartclock/calendar_event.dart';
-import 'package:smartclock/util/fetch_events.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+
+import 'package:smartclock/calendar_event.dart';
+import 'package:smartclock/util/fetch_events.dart';
 import 'package:smartclock/util/config.dart' show Config;
 
 class Calendar extends StatefulWidget {

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:smartclock/util/fetch_events.dart';
 import 'package:provider/provider.dart';
-import 'package:smartclock/util/config.dart' show Config;
+
+import 'package:smartclock/util/fetch_events.dart';
 import 'package:smartclock/util/get_ordinal.dart';
+import 'package:smartclock/util/config.dart' show Config;
 
 class CalendarEvent extends StatelessWidget {
   const CalendarEvent({super.key, required this.event});
@@ -46,15 +47,15 @@ class CalendarEvent extends StatelessWidget {
       dateString = startDay;
     } else if (isAllDay(oneDay: false)) {
       if (_start.month != _end.month) {
-        dateString = "$startDay — ${DateFormat("EEEE d'${getOrdinal(_end.day)}' MMM").format(_end.subtract(const Duration(days: 1)))}";
+        dateString = "$startDay — ${DateFormat("EEEE d'${getOrdinal(_end.day - 1)}' MMM").format(_end.subtract(const Duration(days: 1)))}";
       } else {
-        dateString = "$startDay - ${formatDate(_end.subtract(const Duration(days: 1)), "EEEE d'${getOrdinal(_start.day)}'")}";
+        dateString = "$startDay - ${formatDate(_end.subtract(const Duration(days: 1)), "EEEE d'${getOrdinal(_end.day - 1)}'")}";
       }
     } else if (_duration.inDays > 1) {
       if (_start.month != _end.month) {
         dateString = "$startDay (HH:mm) - ${DateFormat("EEEE d'${getOrdinal(_end.day)}' MMM").format(_end)}";
       } else {
-        dateString = "$startDay (HH:mm) - ${formatDate(_end, "EEEE d'${getOrdinal(_start.day)}'")}";
+        dateString = "$startDay (HH:mm) - ${formatDate(_end, "EEEE d'${getOrdinal(_end.day)}'")}";
       }
     } else {
       dateString = startDay + DateFormat(" (HH:mm)").format(_start);

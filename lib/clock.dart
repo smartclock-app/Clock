@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smartclock/util/config.dart' show Config;
 import 'package:smartclock/util/get_ordinal.dart';
+import 'package:smartclock/util/logger.dart';
 
 class Clock extends StatefulWidget {
   const Clock({super.key});
@@ -28,7 +29,7 @@ class _ClockState extends State<Clock> {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final newNow = DateTime.now();
       if (newNow.second % 30 == 0) {
-        print("Updating...");
+        logger.t("Refetching Content...");
         Provider.of<StreamController<void>>(context, listen: false).add(null);
       }
 

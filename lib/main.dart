@@ -3,58 +3,80 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
 import 'package:provider/provider.dart';
-import 'package:smartclock/clock.dart';
-import 'package:smartclock/Weather.dart';
-import 'package:smartclock/util/config.dart' show Config;
-import 'package:smartclock/sidebar.dart';
-import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 import 'package:json_schema/json_schema.dart';
 import 'package:bonsoir/bonsoir.dart';
-import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
+
+import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+import 'package:smartclock/clock.dart';
+import 'package:smartclock/Weather.dart';
+import 'package:smartclock/sidebar.dart';
+import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/util/config.dart' show Config;
 
 late void Function(Config config) saveConfig;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   final appDir = await getApplicationSupportDirectory();
-  print("Config Directory: ${appDir.path}");
+  logger.i("Config Directory: ${appDir.path}");
 
   final confFile = File(path.join(appDir.path, "config.json"));
   saveConfig = (Config config) {
     const encoder = JsonEncoder.withIndent("  ");
     confFile.writeAsStringSync(encoder.convert(config));
   };
-  if (!confFile.existsSync()) confFile.writeAsStringSync(await rootBundle.loadString("assets/default_config.json"));
+  final exampleConf = await rootBundle.loadString("assets/config.example.json");
+  if (!confFile.existsSync()) confFile.writeAsStringSync(exampleConf);
 
   final cookieFile = File(path.join(appDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
 
-  const schemaUrl = "https://auth.smartclock.app/schema/v1";
-  final configSchema = await JsonSchema.createFromUrl(schemaUrl);
+  final configSchema = await JsonSchema.createFromUrl(Config.schema);
   final results = configSchema.validate(confFile.readAsStringSync(), parseJson: true);
   if (!results.isValid) {
-    print("Config file is invalid. Please check the schema at $schemaUrl");
+    final exampleConfFile = File(path.join(appDir.path, "config.example.json"));
+    exampleConfFile.writeAsStringSync(exampleConf);
+    logger.e("Config file is invalid. Please check the schema at ${Config.schema}\n\nAn example config has been created at ${exampleConfFile.path}");
     exit(1);
   }
 
   Future<Database> database = openDatabase(
     path.join(appDir.path, 'database.db'),
-    onUpgrade: (db, _, __) async {
-      final batch = db.batch();
-      batch.execute("CREATE TABLE IF NOT EXISTS tokens(id INTEGER PRIMARY KEY, original TEXT, accessToken TEXT, refreshToken TEXT)");
-      batch.execute("CREATE TABLE IF NOT EXISTS lyrics(id TEXT PRIMARY KEY, lyrics TEXT)");
-      await batch.commit();
-      return;
+    onCreate: (db, _) async {
+      return db.execute("CREATE TABLE IF NOT EXISTS lyrics(id TEXT PRIMARY KEY, lyrics TEXT)");
     },
     version: 2,
   );
 
   final config = Config.fromJson(json.decode(confFile.readAsStringSync()));
-  final client = alexa.QueryClient(cookieFile);
+  final client = alexa.QueryClient(
+    cookieFile,
+    logger: (log, level) {
+      switch (level) {
+        case "trace":
+          logger.t(log);
+          break;
+        case "info":
+          logger.i(log);
+          break;
+        case "warn":
+          logger.w(log);
+          break;
+        case "error":
+          logger.e(log);
+          break;
+        default:
+          logger.i(log);
+      }
+    },
+  );
 
   if (config.alexa.enabled) {
     if (!await client.checkStatus(config.alexa.userId)) {
@@ -64,7 +86,7 @@ void main() async {
         }
         await client.login(config.alexa.userId, config.alexa.token);
       } catch (e) {
-        print("Failed to login to Alexa: $e");
+        logger.w("Failed to login to Alexa: $e");
       }
     }
   }

@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/alarm.dart';
 import 'package:smartclock/timer.dart';
-import 'package:provider/provider.dart';
-import 'package:smartclock/util/config.dart';
+import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/util/config.dart' show Config;
 
 enum NotificationType {
   timer,
@@ -24,7 +26,7 @@ class _NotificationsState extends State<Notifications> {
   StreamSubscription<void>? _subscription;
 
   void getNotifications() async {
-    print("Refreshing notifications");
+    logger.t("Refetching notifications");
     final config = Provider.of<Config>(context, listen: false);
     final client = Provider.of<alexa.QueryClient>(context, listen: false);
     final ns = await client.getNotifications(config.alexa.userId);

@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
-import 'package:smartclock/util/config.dart';
+
+import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/weather_icons.dart';
+import 'package:smartclock/util/config.dart' show Config;
 
 class Weather extends StatefulWidget {
   const Weather({super.key});
@@ -19,7 +21,7 @@ class _WeatherState extends State<Weather> {
   late Config config;
 
   Future<Map<String, String>> _fetchWeather() async {
-    print("Refreshing weather");
+    logger.t("Refetching weather");
     if (config.weather.apiKey.isEmpty || config.weather.postcode.isEmpty || config.weather.country.isEmpty || config.weather.units.isEmpty) {
       throw Exception("Weather API Key, Postcode, Country, and Units must be set in the config file.");
     }
@@ -37,7 +39,7 @@ class _WeatherState extends State<Weather> {
         "windSpeed": "${windSpeed.round()} mph",
       };
     } catch (e) {
-      print(e);
+      logger.e(e);
       return {};
     }
   }

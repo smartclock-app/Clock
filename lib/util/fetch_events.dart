@@ -6,6 +6,7 @@ import 'package:smartclock/main.dart';
 import 'package:smartclock/util/config.dart' show Config;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:smartclock/util/logger.dart';
 
 class CalendarItem {
   final String id;
@@ -67,7 +68,7 @@ String? eventColor(String? colorId) {
 }
 
 Future<Map<String, List<CalendarItem>>> fetchEvents(Config config, http.Client httpClient) async {
-  print("Refreshing calendar");
+  logger.t("Refetching calendar");
 
   if (config.calendar.accessToken.isEmpty || config.calendar.refreshToken.isEmpty || config.calendar.clientId.isEmpty || config.calendar.clientSecret.isEmpty) {
     throw Exception("Calendar API credentials must be set in the config file.");
@@ -145,7 +146,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents(Config config, http.Client h
   // Sort events by month
   final Map<String, List<CalendarItem>> sortedEvents = {};
   final currentWeek = weekNumber(DateTime.now());
-  for (final event in allEvents.getRange(0, 8)) {
+  for (final event in allEvents.getRange(0, config.calendar.maxEvents)) {
     final eventMonth = months[event.start.month - 1];
     final eventYear = event.start.year;
     final eventWeek = weekNumber(event.start);

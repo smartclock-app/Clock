@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'dart:math' show min;
-import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
+
+import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/util/fetch_lyrics.dart';
+import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/lrc.dart';
 import 'package:smartclock/now_playing_lyrics.dart';
-import 'package:provider/provider.dart';
 import 'package:smartclock/util/config.dart' show Config;
-import 'package:sqflite/sqflite.dart';
 
 const radioProviders = ["Unknown Provider", "TuneIn Live Radio", "Global Player"];
 
@@ -29,7 +32,7 @@ class _NowPlayingState extends State<NowPlaying> {
   void getQueue() async {
     if (queue?.state == "REFRESHING") return;
 
-    print("Refreshing queue");
+    logger.t("Refetching queue");
     final config = Provider.of<Config>(context, listen: false);
     final database = Provider.of<Future<Database>>(context, listen: false);
     final client = Provider.of<alexa.QueryClient>(context, listen: false);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:smartclock/calendar.dart';
 import 'package:provider/provider.dart';
+
+import 'package:smartclock/calendar.dart';
 import 'package:smartclock/info_widget.dart';
 import 'package:smartclock/now_playing.dart';
 import 'package:smartclock/notifications.dart';
