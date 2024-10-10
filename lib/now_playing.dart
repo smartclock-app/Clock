@@ -33,9 +33,9 @@ class _NowPlayingState extends State<NowPlaying> {
     if (queue?.state == "REFRESHING") return;
 
     logger.t("Refetching queue");
-    final config = Provider.of<Config>(context, listen: false);
-    final database = Provider.of<Future<Database>>(context, listen: false);
-    final client = Provider.of<alexa.QueryClient>(context, listen: false);
+    final config = context.read<Config>();
+    final database = context.read<Future<Database>>();
+    final client = context.read<alexa.QueryClient>();
     alexa.Queue q = alexa.Queue(state: "STOPPED");
     for (final device in config.alexa.devices) {
       final queue = await client.getQueue(config.alexa.userId, device);

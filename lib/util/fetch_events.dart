@@ -164,10 +164,14 @@ Future<Map<String, List<CalendarItem>>> fetchEvents(Config config, http.Client h
     sortedEvents[key]!.add(event);
   }
 
-  config.calendar.accessToken = client.credentials.accessToken.data;
-  config.calendar.refreshToken = client.credentials.refreshToken!;
+  // Update credentials in config if they have changed
+  if (client.credentials.accessToken.data != config.calendar.accessToken || client.credentials.refreshToken != config.calendar.refreshToken) {
+    logger.t("Updating calendar credentials");
 
-  saveConfig(config);
+    config.calendar.accessToken = client.credentials.accessToken.data;
+    config.calendar.refreshToken = client.credentials.refreshToken!;
+    saveConfig(config);
+  }
 
   return sortedEvents;
 }

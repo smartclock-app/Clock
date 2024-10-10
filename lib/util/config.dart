@@ -1,5 +1,5 @@
 class Config {
-  static const String schema = "https://auth.smartclock.app/schema/v1";
+  static const String schema = "https://auth.smartclock.app/schema/v2";
   final String resolution;
   final Alexa alexa;
   final Clock clock;
@@ -17,6 +17,18 @@ class Config {
     required this.weather,
     required this.dimensions,
   });
+
+  static Map<String, dynamic> merge(Map<String, dynamic> base, Map<String, dynamic> updates) {
+    updates.forEach((key, value) {
+      if (value is Map<String, dynamic> && base[key] is Map<String, dynamic>) {
+        merge(base[key], value);
+      } else if (!base.containsKey(key)) {
+        base[key] = value;
+      }
+    });
+
+    return base;
+  }
 
   factory Config.fromJson(Map<String, dynamic> json) => Config(
         resolution: json["resolution"],
@@ -169,17 +181,21 @@ class Calendar {
 }
 
 class Sidebar {
+  final bool enabled;
   final double padding;
 
   Sidebar({
+    required this.enabled,
     required this.padding,
   });
 
   factory Sidebar.fromJson(Map<String, dynamic> json) => Sidebar(
+        enabled: json["enabled"],
         padding: double.parse(json["padding"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
+        "enabled": enabled,
         "padding": padding,
       };
 }

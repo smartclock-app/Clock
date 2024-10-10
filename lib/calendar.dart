@@ -24,7 +24,7 @@ class _CalendarState extends State<Calendar> {
   @override
   void initState() {
     super.initState();
-    config = Provider.of<Config>(context, listen: false);
+    config = context.read<Config>();
     _futureEvents = fetchEvents(config, _client);
   }
 

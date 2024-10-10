@@ -47,7 +47,7 @@ class _ClockState extends State<Clock> {
 
   @override
   Widget build(BuildContext context) {
-    final config = Provider.of<Config>(context, listen: false);
+    final config = context.read<Config>();
     // x,y,width,height
     final dimensions = config.dimensions.clock.split(",").map((e) => double.parse(e)).toList();
     final clockConf = config.clock;

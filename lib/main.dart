@@ -32,8 +32,10 @@ void main() async {
     const encoder = JsonEncoder.withIndent("  ");
     confFile.writeAsStringSync(encoder.convert(config));
   };
+  final exampleConfFile = File(path.join(appDir.path, "config.example.json"));
   final exampleConf = await rootBundle.loadString("assets/config.example.json");
   if (!confFile.existsSync()) confFile.writeAsStringSync(exampleConf);
+  if (!exampleConfFile.existsSync()) exampleConfFile.writeAsStringSync(exampleConf);
 
   final cookieFile = File(path.join(appDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
@@ -41,10 +43,13 @@ void main() async {
   final configSchema = await JsonSchema.createFromUrl(Config.schema);
   final results = configSchema.validate(confFile.readAsStringSync(), parseJson: true);
   if (!results.isValid) {
-    final exampleConfFile = File(path.join(appDir.path, "config.example.json"));
-    exampleConfFile.writeAsStringSync(exampleConf);
-    logger.e("Config file is invalid. Please check the schema at ${Config.schema}\n\nAn example config has been created at ${exampleConfFile.path}");
-    exit(1);
+    logger.w("Config file is invalid. Created missing keys.");
+    logger.t(results.errors);
+
+    Map<String, dynamic> config = json.decode(confFile.readAsStringSync());
+    final exampleConfig = json.decode(exampleConf);
+    config = Config.merge(config, exampleConfig);
+    saveConfig(Config.fromJson(config));
   }
 
   Future<Database> database = openDatabase(
@@ -119,7 +124,7 @@ class SmartClock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = Provider.of<Config>(context, listen: false);
+    final config = context.read<Config>();
     final resolution = config.resolution.split("x").map((e) => int.parse(e));
 
     return MaterialApp(
@@ -134,7 +139,7 @@ class SmartClock extends StatelessWidget {
             child: Stack(
               children: [
                 const Clock(),
-                const Sidebar(),
+                if (config.sidebar.enabled) const Sidebar(),
                 if (config.weather.enabled) const Weather(),
               ],
             ),

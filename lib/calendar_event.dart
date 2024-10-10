@@ -37,7 +37,7 @@ class CalendarEvent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = Provider.of<Config>(context, listen: false);
+    final config = context.read<Config>();
 
     late final String dateString;
     final startDay = formatDate(_start, "EEEE d'${getOrdinal(_start.day)}'");

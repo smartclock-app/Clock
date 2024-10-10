@@ -27,8 +27,8 @@ class _NotificationsState extends State<Notifications> {
 
   void getNotifications() async {
     logger.t("Refetching notifications");
-    final config = Provider.of<Config>(context, listen: false);
-    final client = Provider.of<alexa.QueryClient>(context, listen: false);
+    final config = context.read<Config>();
+    final client = context.read<alexa.QueryClient>();
     final ns = await client.getNotifications(config.alexa.userId);
 
     final allDevices = await client.getDeviceList(config.alexa.userId);

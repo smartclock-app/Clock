@@ -47,7 +47,7 @@ class _WeatherState extends State<Weather> {
   @override
   void initState() {
     super.initState();
-    config = Provider.of<Config>(context, listen: false);
+    config = context.read<Config>();
     _weather = _fetchWeather();
   }
 
@@ -71,7 +71,7 @@ class _WeatherState extends State<Weather> {
 
   @override
   Widget build(BuildContext context) {
-    Config config = Provider.of<Config>(context, listen: false);
+    Config config = context.read<Config>();
     final dimensions = config.dimensions.weather.split(",").map((e) => double.parse(e)).toList();
 
     return FutureBuilder(
