@@ -54,7 +54,7 @@ class _WeatherState extends State<Weather> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<void>>(context).stream;
+    final stream = Provider.of<StreamController<DateTime>>(context).stream;
     _subscription?.cancel();
     _subscription = stream.listen((_) {
       setState(() {

@@ -7,12 +7,7 @@ import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/alarm.dart';
 import 'package:smartclock/timer.dart';
 import 'package:smartclock/util/logger.dart';
-import 'package:smartclock/util/config.dart' show Config;
-
-enum NotificationType {
-  timer,
-  alarm,
-}
+import 'package:smartclock/util/config.dart' show Config, AlexaFeatures;
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
@@ -22,7 +17,7 @@ class Notifications extends StatefulWidget {
 }
 
 class _NotificationsState extends State<Notifications> {
-  Map<NotificationType, List<alexa.Notification>> notifications = {};
+  Map<AlexaFeatures, List<alexa.Notification>> notifications = {};
   StreamSubscription<void>? _subscription;
 
   void getNotifications() async {
@@ -39,11 +34,11 @@ class _NotificationsState extends State<Notifications> {
 
     for (var n in ns) {
       if (n.status != "ON") continue;
-      if (!devices.any((d) => d.serialNumber == n.deviceSerialNumber)) continue;
+      if (devices.isNotEmpty && !devices.any((d) => d.serialNumber == n.deviceSerialNumber)) continue;
 
       switch (n.type) {
         case "Timer":
-          timers.add(n);
+          if (config.alexa.features[AlexaFeatures.timers]!) timers.add(n);
           break;
         case "Alarm":
         case "MusicAlarm":
@@ -52,15 +47,15 @@ class _NotificationsState extends State<Notifications> {
           if (DateTime.parse("${n.originalDate!}T${(n.snoozedToTime ?? n.originalTime!)}").difference(DateTime.now()).inHours > 12) {
             continue;
           }
-          alarms.add(n);
+          if (config.alexa.features[AlexaFeatures.alarms]!) alarms.add(n);
           break;
       }
     }
 
     setState(() {
       notifications = {
-        NotificationType.timer: timers,
-        NotificationType.alarm: alarms,
+        AlexaFeatures.timers: timers,
+        AlexaFeatures.alarms: alarms,
       };
     });
   }
@@ -74,7 +69,7 @@ class _NotificationsState extends State<Notifications> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<void>>(context).stream;
+    final stream = Provider.of<StreamController<DateTime>>(context).stream;
     _subscription?.cancel();
     _subscription = stream.listen((_) => getNotifications());
   }
@@ -89,10 +84,10 @@ class _NotificationsState extends State<Notifications> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        for (var timer in notifications[NotificationType.timer] ?? []) ...[
+        for (var timer in notifications[AlexaFeatures.timers] ?? []) ...[
           TimerCard(timer: timer),
         ],
-        for (var alarm in notifications[NotificationType.alarm] ?? []) ...[
+        for (var alarm in notifications[AlexaFeatures.alarms] ?? []) ...[
           AlarmCard(alarm: alarm),
         ],
       ],

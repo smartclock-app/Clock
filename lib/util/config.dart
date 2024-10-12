@@ -1,10 +1,11 @@
 class Config {
-  static const String schema = "https://auth.smartclock.app/schema/v2";
+  static const String schema = "https://www.smartclock.app/schema/v3.json";
   final String resolution;
   final Alexa alexa;
   final Clock clock;
   final Calendar calendar;
   final Sidebar sidebar;
+  final Watchlist watchlist;
   final Weather weather;
   final Dimensions dimensions;
 
@@ -14,6 +15,7 @@ class Config {
     required this.clock,
     required this.calendar,
     required this.sidebar,
+    required this.watchlist,
     required this.weather,
     required this.dimensions,
   });
@@ -36,6 +38,7 @@ class Config {
         clock: Clock.fromJson(json["clock"]),
         calendar: Calendar.fromJson(json["calendar"]),
         sidebar: Sidebar.fromJson(json["sidebar"]),
+        watchlist: Watchlist.fromJson(json["watchlist"]),
         weather: Weather.fromJson(json["weather"]),
         dimensions: Dimensions.fromJson(json["dimensions"]),
       );
@@ -47,19 +50,28 @@ class Config {
         "clock": clock.toJson(),
         "calendar": calendar.toJson(),
         "sidebar": sidebar.toJson(),
+        "watchlist": watchlist.toJson(),
         "weather": weather.toJson(),
         "dimensions": dimensions.toJson(),
       };
 }
 
+enum AlexaFeatures {
+  nowplaying,
+  alarms,
+  timers,
+}
+
 class Alexa {
   final bool enabled;
+  final Map<AlexaFeatures, bool> features;
   final String userId;
   final String token;
   final List<String> devices;
 
   Alexa({
     required this.enabled,
+    required this.features,
     required this.userId,
     required this.token,
     required this.devices,
@@ -67,6 +79,11 @@ class Alexa {
 
   factory Alexa.fromJson(Map<String, dynamic> json) => Alexa(
         enabled: json["enabled"],
+        features: {
+          AlexaFeatures.nowplaying: json["features"]["nowplaying"],
+          AlexaFeatures.alarms: json["features"]["alarms"],
+          AlexaFeatures.timers: json["features"]["timers"],
+        },
         userId: json["userId"],
         token: json["token"],
         devices: List<String>.from(json["devices"].map((x) => x)),
@@ -74,6 +91,11 @@ class Alexa {
 
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
+        "features": {
+          "nowplaying": features[AlexaFeatures.nowplaying],
+          "alarms": features[AlexaFeatures.alarms],
+          "timers": features[AlexaFeatures.timers],
+        },
         "userId": userId,
         "token": token,
         "devices": List<dynamic>.from(devices.map((x) => x)),
@@ -128,6 +150,30 @@ class Dimensions {
       };
 }
 
+class Titles {
+  final bool enabled;
+  final String odd;
+  final String even;
+
+  Titles({
+    required this.enabled,
+    required this.odd,
+    required this.even,
+  });
+
+  factory Titles.fromJson(Map<String, dynamic> json) => Titles(
+        enabled: json["enabled"],
+        odd: json["odd"],
+        even: json["even"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "enabled": enabled,
+        "odd": odd,
+        "even": even,
+      };
+}
+
 class Calendar {
   final bool enabled;
   final String clientId;
@@ -135,6 +181,8 @@ class Calendar {
   String accessToken;
   String refreshToken;
   final int maxEvents;
+  final Titles titles;
+
   final double monthTitleSize;
   final double eventTitleSize;
   final double eventTimeSize;
@@ -147,6 +195,7 @@ class Calendar {
     required this.accessToken,
     required this.refreshToken,
     required this.maxEvents,
+    required this.titles,
     required this.monthTitleSize,
     required this.eventTitleSize,
     required this.eventTimeSize,
@@ -160,6 +209,7 @@ class Calendar {
         accessToken: json["accessToken"],
         refreshToken: json["refreshToken"],
         maxEvents: json["maxEvents"],
+        titles: Titles.fromJson(json["titles"]),
         monthTitleSize: double.parse(json["monthTitleSize"].toString()),
         eventTitleSize: double.parse(json["eventTitleSize"].toString()),
         eventTimeSize: double.parse(json["eventTimeSize"].toString()),
@@ -173,6 +223,7 @@ class Calendar {
         "accessToken": accessToken,
         "refreshToken": refreshToken,
         "maxEvents": maxEvents,
+        "titles": titles.toJson(),
         "monthTitleSize": monthTitleSize,
         "eventTitleSize": eventTitleSize,
         "eventTimeSize": eventTimeSize,
@@ -197,6 +248,58 @@ class Sidebar {
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
         "padding": padding,
+      };
+}
+
+class WatchlistItem {
+  final String type;
+  final String id;
+
+  WatchlistItem({
+    required this.type,
+    required this.id,
+  });
+
+  factory WatchlistItem.fromJson(Map<String, dynamic> json) => WatchlistItem(
+        type: json["type"],
+        id: json["id"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "type": type,
+        "id": id,
+      };
+}
+
+class Watchlist {
+  final bool enabled;
+  final String apiKey;
+  final String prefix;
+  final String color;
+  final List<WatchlistItem> items;
+
+  Watchlist({
+    required this.enabled,
+    required this.apiKey,
+    required this.prefix,
+    required this.color,
+    required this.items,
+  });
+
+  factory Watchlist.fromJson(Map<String, dynamic> json) => Watchlist(
+        enabled: json["enabled"],
+        apiKey: json["apiKey"],
+        prefix: json["prefix"],
+        color: json["color"],
+        items: List<WatchlistItem>.from(json["items"].map((x) => WatchlistItem.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "enabled": enabled,
+        "apiKey": apiKey,
+        "prefix": prefix,
+        "color": color,
+        "items": List<dynamic>.from(items.map((x) => x.toJson())),
       };
 }
 

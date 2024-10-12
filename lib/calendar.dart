@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'package:smartclock/calendar_event.dart';
 import 'package:smartclock/util/fetch_events.dart';
@@ -18,6 +19,7 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   StreamSubscription<void>? _subscription;
   late Config config;
+  late Database database;
   late Future<Map<String, List<CalendarItem>>> _futureEvents;
   final _client = http.Client();
 
@@ -25,17 +27,28 @@ class _CalendarState extends State<Calendar> {
   void initState() {
     super.initState();
     config = context.read<Config>();
-    _futureEvents = fetchEvents(config, _client);
+    database = context.read<Database>();
+    _futureEvents = fetchEvents(
+      config: config,
+      httpClient: _client,
+      database: database,
+      updateWl: true,
+    );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<void>>(context).stream;
+    final stream = Provider.of<StreamController<DateTime>>(context).stream;
     _subscription?.cancel();
-    _subscription = stream.listen((_) {
+    _subscription = stream.listen((time) {
       setState(() {
-        _futureEvents = fetchEvents(config, _client);
+        _futureEvents = fetchEvents(
+          config: config,
+          httpClient: _client,
+          database: database,
+          updateWl: time.hour == 0 && time.minute == 0,
+        );
       });
     });
   }

@@ -34,7 +34,7 @@ class _NowPlayingState extends State<NowPlaying> {
 
     logger.t("Refetching queue");
     final config = context.read<Config>();
-    final database = context.read<Future<Database>>();
+    final database = context.read<Database>();
     final client = context.read<alexa.QueryClient>();
     alexa.Queue q = alexa.Queue(state: "STOPPED");
     for (final device in config.alexa.devices) {
@@ -55,7 +55,7 @@ class _NowPlayingState extends State<NowPlaying> {
     }
 
     if (q.infoText?.title != null && q.infoText?.subText1 != null) {
-      final lyricResult = await fetchLyrics(await database, q.infoText!.title!, q.infoText!.subText1!);
+      final lyricResult = await fetchLyrics(database, q.infoText!.title!, q.infoText!.subText1!);
       if (lyricResult != null) {
         setState(() {
           lyrics = lyricResult;
@@ -101,7 +101,7 @@ class _NowPlayingState extends State<NowPlaying> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<void>>(context).stream;
+    final stream = Provider.of<StreamController<DateTime>>(context).stream;
     _subscription?.cancel();
     _subscription = stream.listen((_) => getQueue());
   }

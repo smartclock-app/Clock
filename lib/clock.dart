@@ -30,7 +30,7 @@ class _ClockState extends State<Clock> {
       final newNow = DateTime.now();
       if (newNow.second % 30 == 0) {
         logger.t("Refetching Content...");
-        Provider.of<StreamController<void>>(context, listen: false).add(null);
+        Provider.of<StreamController<DateTime>>(context, listen: false).add(now);
       }
 
       setState(() {

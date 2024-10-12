@@ -3,7 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:smartclock/util/config.dart' show Config;
 
 class InfoWidget extends StatelessWidget {
-  const InfoWidget({super.key});
+  const InfoWidget({super.key, required this.title, required this.message});
+
+  final String title;
+  final String message;
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +29,14 @@ class InfoWidget extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              "Widgets",
+              title,
               style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const Divider(),
             const SizedBox(height: 16),
             Text(
-              "No widgets enabled.\n\nYou can enable widgets in the conf file.\n\nTo hide this message, enable at least one widget, or disable the sidebar.",
+              message,
               style: TextStyle(fontSize: config.calendar.eventTimeSize),
               textAlign: TextAlign.center,
             ),

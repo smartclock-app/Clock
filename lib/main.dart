@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -42,7 +43,7 @@ void main() async {
 
   final configSchema = await JsonSchema.createFromUrl(Config.schema);
   final results = configSchema.validate(confFile.readAsStringSync(), parseJson: true);
-  if (!results.isValid) {
+  if (!results.isValid && !kDebugMode) {
     logger.w("Config file is invalid. Created missing keys.");
     logger.t(results.errors);
 
@@ -52,12 +53,16 @@ void main() async {
     saveConfig(Config.fromJson(config));
   }
 
-  Future<Database> database = openDatabase(
+  Database database = await openDatabase(
     path.join(appDir.path, 'database.db'),
-    onCreate: (db, _) async {
-      return db.execute("CREATE TABLE IF NOT EXISTS lyrics(id TEXT PRIMARY KEY, lyrics TEXT)");
+    onUpgrade: (db, _, __) async {
+      final batch = db.batch();
+      batch.execute("CREATE TABLE IF NOT EXISTS lyrics (id TEXT PRIMARY KEY, lyrics TEXT)");
+      batch.execute("CREATE TABLE IF NOT EXISTS watchlist (id TEXT PRIMARY KEY UNIQUE, name TEXT, status TEXT, nextAirDate DATE)");
+      await batch.commit();
+      return;
     },
-    version: 2,
+    version: 3,
   );
 
   final config = Config.fromJson(json.decode(confFile.readAsStringSync()));
@@ -110,10 +115,10 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       Provider<Config>.value(value: config),
-      Provider<Future<Database>>.value(value: database),
+      Provider<Database>.value(value: database),
       Provider<alexa.QueryClient>.value(value: client),
       // Push events to this stream to tell widgets to update
-      Provider<StreamController<void>>.value(value: StreamController<int?>.broadcast()),
+      Provider<StreamController<DateTime>>.value(value: StreamController<DateTime>.broadcast()),
     ],
     child: const SmartClock(),
   ));

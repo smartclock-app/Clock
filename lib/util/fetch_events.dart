@@ -7,6 +7,8 @@ import 'package:smartclock/util/config.dart' show Config;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/util/update_watchlist.dart';
+import 'package:sqflite/sqflite.dart';
 
 class CalendarItem {
   final String id;
@@ -67,7 +69,7 @@ String? eventColor(String? colorId) {
   return colours[id - 1];
 }
 
-Future<Map<String, List<CalendarItem>>> fetchEvents(Config config, http.Client httpClient) async {
+Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, required http.Client httpClient, required Database database, bool updateWl = false}) async {
   logger.t("Refetching calendar");
 
   if (config.calendar.accessToken.isEmpty || config.calendar.refreshToken.isEmpty || config.calendar.clientId.isEmpty || config.calendar.clientSecret.isEmpty) {
@@ -140,22 +142,46 @@ Future<Map<String, List<CalendarItem>>> fetchEvents(Config config, http.Client h
     }
   }
 
+  // Get watchlist
+  if (updateWl) await updateWatchlist(config: config, database: database);
+  final watchlist = await database.query("watchlist");
+  for (final item in watchlist) {
+    if ((item["nextAirDate"] as String?) == null) continue;
+
+    final DateTime start = DateTime.parse(item["nextAirDate"] as String);
+    if (start.isBefore(DateTime.now())) continue;
+    final end = start.add(const Duration(days: 1));
+
+    final event = CalendarItem(
+      id: item["id"] as String,
+      title: "${config.watchlist.prefix} ${item["name"] as String}".trim(),
+      start: start,
+      end: end,
+      recurringEventId: null,
+      color: config.watchlist.color,
+    );
+    allEvents.add(event);
+  }
+
   // Sort events by start date
   allEvents.sort((a, b) => a.start.compareTo(b.start));
 
   // Sort events by month
   final Map<String, List<CalendarItem>> sortedEvents = {};
   final currentWeek = weekNumber(DateTime.now());
+  final weekReference = DateTime(2024, 1, 1);
   for (final event in allEvents.getRange(0, config.calendar.maxEvents)) {
     final eventMonth = months[event.start.month - 1];
     final eventYear = event.start.year;
     final eventWeek = weekNumber(event.start);
 
     String key;
+    bool isEven = weekReference.difference(event.start).inDays.isEven;
+    final title = isEven ? config.calendar.titles.even : config.calendar.titles.odd;
     if (eventWeek <= currentWeek) {
-      key = "This Week";
+      key = config.calendar.titles.enabled && title.isNotEmpty ? "This Week - $title" : "This Week";
     } else if (eventWeek == currentWeek + 1) {
-      key = "Next Week";
+      key = config.calendar.titles.enabled && title.isNotEmpty ? "Next Week - $title" : "Next Week";
     } else {
       key = "$eventMonth $eventYear";
     }
