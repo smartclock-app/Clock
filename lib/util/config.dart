@@ -182,6 +182,7 @@ class Calendar {
   String refreshToken;
   final int maxEvents;
   final Titles titles;
+  final List<String> eventFilter;
 
   final double monthTitleSize;
   final double eventTitleSize;
@@ -196,6 +197,7 @@ class Calendar {
     required this.refreshToken,
     required this.maxEvents,
     required this.titles,
+    required this.eventFilter,
     required this.monthTitleSize,
     required this.eventTitleSize,
     required this.eventTimeSize,
@@ -210,6 +212,7 @@ class Calendar {
         refreshToken: json["refreshToken"],
         maxEvents: json["maxEvents"],
         titles: Titles.fromJson(json["titles"]),
+        eventFilter: List<String>.from(json["eventFilter"].map((x) => x)),
         monthTitleSize: double.parse(json["monthTitleSize"].toString()),
         eventTitleSize: double.parse(json["eventTitleSize"].toString()),
         eventTimeSize: double.parse(json["eventTimeSize"].toString()),
@@ -224,6 +227,7 @@ class Calendar {
         "refreshToken": refreshToken,
         "maxEvents": maxEvents,
         "titles": titles.toJson(),
+        "eventFilter": List<dynamic>.from(eventFilter.map((x) => x)),
         "monthTitleSize": monthTitleSize,
         "eventTitleSize": eventTitleSize,
         "eventTimeSize": eventTimeSize,
@@ -251,55 +255,75 @@ class Sidebar {
       };
 }
 
-class WatchlistItem {
-  final String type;
-  final String id;
+class Trakt {
+  final String clientId;
+  final String clientSecret;
+  String accessToken;
+  String refreshToken;
+  final String redirectUri;
+  final String listId;
 
-  WatchlistItem({
-    required this.type,
-    required this.id,
+  Trakt({
+    required this.clientId,
+    required this.clientSecret,
+    required this.accessToken,
+    required this.refreshToken,
+    required this.redirectUri,
+    required this.listId,
   });
 
-  factory WatchlistItem.fromJson(Map<String, dynamic> json) => WatchlistItem(
-        type: json["type"],
-        id: json["id"],
+  factory Trakt.fromJson(Map<String, dynamic> json) => Trakt(
+        clientId: json["clientId"],
+        clientSecret: json["clientSecret"],
+        accessToken: json["accessToken"],
+        refreshToken: json["refreshToken"],
+        redirectUri: json["redirectUri"],
+        listId: json["listId"],
       );
 
   Map<String, dynamic> toJson() => {
-        "type": type,
-        "id": id,
+        "clientId": clientId,
+        "clientSecret": clientSecret,
+        "accessToken": accessToken,
+        "refreshToken": refreshToken,
+        "redirectUri": redirectUri,
+        "listId": listId,
       };
 }
 
 class Watchlist {
   final bool enabled;
-  final String apiKey;
+  final Trakt trakt;
+  final String tmdbApiKey;
   final String prefix;
   final String color;
-  final List<WatchlistItem> items;
+  final int maxItems;
 
   Watchlist({
     required this.enabled,
-    required this.apiKey,
+    required this.trakt,
+    required this.tmdbApiKey,
     required this.prefix,
     required this.color,
-    required this.items,
+    required this.maxItems,
   });
 
   factory Watchlist.fromJson(Map<String, dynamic> json) => Watchlist(
         enabled: json["enabled"],
-        apiKey: json["apiKey"],
+        trakt: Trakt.fromJson(json["trakt"]),
+        tmdbApiKey: json["tmdbApiKey"],
         prefix: json["prefix"],
         color: json["color"],
-        items: List<WatchlistItem>.from(json["items"].map((x) => WatchlistItem.fromJson(x))),
+        maxItems: json["maxItems"],
       );
 
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
-        "apiKey": apiKey,
+        "trakt": trakt.toJson(),
+        "tmdbApiKey": tmdbApiKey,
         "prefix": prefix,
         "color": color,
-        "items": List<dynamic>.from(items.map((x) => x.toJson())),
+        "maxItems": maxItems,
       };
 }
 

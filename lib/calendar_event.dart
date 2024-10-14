@@ -58,7 +58,7 @@ class CalendarEvent extends StatelessWidget {
         dateString = "$startDay (HH:mm) - ${formatDate(_end, "EEEE d'${getOrdinal(_end.day)}'")}";
       }
     } else {
-      dateString = startDay + DateFormat(" (HH:mm)").format(_start);
+      dateString = "$startDay (${DateFormat("HH:mm").format(_start)} - ${DateFormat("HH:mm").format(_end)})";
     }
 
     return Container(

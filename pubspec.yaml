@@ -30,6 +30,8 @@ dependencies:
   sqflite: ^2.3.3+1
   path: ^1.9.0
   logger: ^2.4.0
+  trakt_dart:
+    path: ../trakt_dart
 
 dev_dependencies:
   flutter_test:

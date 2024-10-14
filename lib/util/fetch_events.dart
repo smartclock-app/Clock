@@ -2,20 +2,22 @@ import 'dart:collection';
 
 import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:googleapis_auth/googleapis_auth.dart' as auth;
-import 'package:smartclock/main.dart';
-import 'package:smartclock/util/config.dart' show Config;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:trakt_dart/trakt_dart.dart';
+
+import 'package:smartclock/main.dart';
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/update_watchlist.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:smartclock/util/fetch_trakt_list.dart';
+import 'package:smartclock/util/config.dart' show Config;
 
 class CalendarItem {
   final String id;
   final String title;
   final DateTime start;
   final DateTime end;
-  final String? recurringEventId;
   final String color;
 
   const CalendarItem({
@@ -23,7 +25,6 @@ class CalendarItem {
     required this.title,
     required this.start,
     required this.end,
-    required this.recurringEventId,
     required this.color,
   });
 }
@@ -92,13 +93,13 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   List<CalendarItem> allEvents = [];
-  Set<String> recurringEvents = HashSet();
 
   // Fetch all calendar lists
   final calendarList = await calendarApi.calendarList.list();
 
   // For each calendar list, fetch all events
   for (final calendarListEntry in calendarList.items!) {
+    final Set<String> recurringEvents = HashSet();
     final color = calendarListEntry.backgroundColor ?? "#1a1a1a";
     final events = await calendarApi.events.list(
       calendarListEntry.id!,
@@ -121,12 +122,17 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
         endDate = event.end!.dateTime!.toLocal();
       }
 
-      // If the event is a recurring event, skip it if we've already added it
-      if (event.recurringEventId != null) {
-        if (recurringEvents.contains(event.recurringEventId!)) {
-          continue;
-        }
-        recurringEvents.add(event.recurringEventId!);
+      // Skip event if it's summary matches a filter
+      if (config.calendar.eventFilter.any((filter) => event.summary != null ? RegExp(filter).hasMatch(event.summary!) : false)) {
+        continue;
+      }
+
+      // Skip event if event in this calendar already has same name
+      // Doesn't skip if event in another calendar has same name
+      if (recurringEvents.contains(event.summary)) {
+        continue;
+      } else {
+        recurringEvents.add(event.summary!);
       }
 
       final calendarItem = CalendarItem(
@@ -134,7 +140,6 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
         title: event.summary!,
         start: startDate,
         end: endDate,
-        recurringEventId: event.recurringEventId,
         color: eventColor(event.colorId) ?? color,
       );
 
@@ -143,24 +148,52 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   }
 
   // Get watchlist
-  if (updateWl) await updateWatchlist(config: config, database: database);
-  final watchlist = await database.query("watchlist");
-  for (final item in watchlist) {
-    if ((item["nextAirDate"] as String?) == null) continue;
+  (String, String)? newTraktTokens;
+  if (config.watchlist.enabled) {
+    if (config.watchlist.trakt.accessToken.isEmpty ||
+        config.watchlist.trakt.refreshToken.isEmpty ||
+        config.watchlist.trakt.clientId.isEmpty ||
+        config.watchlist.trakt.clientSecret.isEmpty ||
+        config.watchlist.trakt.redirectUri.isEmpty) {
+      throw Exception("Trakt API credentials must be set in the config file.");
+    }
 
-    final DateTime start = DateTime.parse(item["nextAirDate"] as String);
-    if (start.isBefore(DateTime.now())) continue;
-    final end = start.add(const Duration(days: 1));
+    if (config.watchlist.tmdbApiKey.isEmpty) {
+      throw Exception("TMDB API key must be set in the config file.");
+    }
 
-    final event = CalendarItem(
-      id: item["id"] as String,
-      title: "${config.watchlist.prefix} ${item["name"] as String}".trim(),
-      start: start,
-      end: end,
-      recurringEventId: null,
-      color: config.watchlist.color,
-    );
-    allEvents.add(event);
+    final trakt = TraktManager(
+      clientId: config.watchlist.trakt.clientId,
+      clientSecret: config.watchlist.trakt.clientSecret,
+      redirectURI: config.watchlist.trakt.redirectUri,
+    )..authentication.authorizeApplicationWithTokens(
+        accessToken: config.watchlist.trakt.accessToken,
+        refreshToken: config.watchlist.trakt.refreshToken,
+      );
+
+    final (watchlistChanged, itemIds, tokens) = await fetchTraktList(config: config, trakt: trakt, database: database);
+    if (watchlistChanged || updateWl) await updateWatchlist(config: config, items: itemIds, database: database);
+    if (tokens != null) newTraktTokens = (tokens.accessToken, tokens.refreshToken);
+
+    int count = 0;
+    final watchlist = await database.query("watchlist", orderBy: "nextAirDate");
+    for (final item in watchlist) {
+      if (++count > config.watchlist.maxItems) break;
+      if ((item["nextAirDate"] as String?) == null) continue;
+
+      final DateTime start = DateTime.parse(item["nextAirDate"] as String);
+      if (start.isBefore(DateTime.now())) continue;
+      final end = start.add(const Duration(days: 1));
+
+      final event = CalendarItem(
+        id: item["id"] as String,
+        title: "${config.watchlist.prefix} ${item["name"] as String}".trim(),
+        start: start,
+        end: end,
+        color: config.watchlist.color,
+      );
+      allEvents.add(event);
+    }
   }
 
   // Sort events by start date
@@ -191,11 +224,35 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   }
 
   // Update credentials in config if they have changed
-  if (client.credentials.accessToken.data != config.calendar.accessToken || client.credentials.refreshToken != config.calendar.refreshToken) {
-    logger.t("Updating calendar credentials");
+  bool updated = false;
 
+  if (client.credentials.accessToken.data != config.calendar.accessToken) {
+    logger.t("Updating calendar access token");
     config.calendar.accessToken = client.credentials.accessToken.data;
+    updated = true;
+  }
+
+  if (client.credentials.refreshToken != config.calendar.refreshToken) {
+    logger.t("Updating calendar refresh token");
     config.calendar.refreshToken = client.credentials.refreshToken!;
+    updated = true;
+  }
+
+  if (newTraktTokens != null) {
+    if (newTraktTokens.$1 != config.watchlist.trakt.accessToken) {
+      logger.t("Updating Trakt access token");
+      config.watchlist.trakt.accessToken = newTraktTokens.$1;
+      updated = true;
+    }
+
+    if (newTraktTokens.$2 != config.watchlist.trakt.refreshToken) {
+      logger.t("Updating Trakt refresh token");
+      config.watchlist.trakt.refreshToken = newTraktTokens.$2;
+      updated = true;
+    }
+  }
+
+  if (updated) {
     saveConfig(config);
   }
 

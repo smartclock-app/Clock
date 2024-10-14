@@ -1,0 +1,31 @@
+import 'package:smartclock/util/config.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:trakt_dart/trakt_dart.dart';
+
+/// Fetches the Trakt list and compares it to the watchlist database.
+/// Returns a tuple of a boolean indicating if the list has changed and a set of item IDs.
+Future<(bool, Set<String>, AccessTokenResponse?)> fetchTraktList({required Config config, required TraktManager trakt, required Database database}) async {
+  final watchlist = await database.query("watchlist");
+  late List<ListItem> items;
+  AccessTokenResponse? tokens;
+
+  final String listId = config.watchlist.trakt.listId;
+  try {
+    items = await trakt.users.getListItems("me", listId, useOAuth: true);
+  } catch (e) {
+    if ((e as TraktManagerAPIError).statusCode != 401) rethrow;
+    tokens = await trakt.authentication.refreshAccessToken();
+    items = await trakt.users.getListItems("me", listId, useOAuth: true);
+  }
+
+  final watchlistIds = watchlist.map((e) => "${e["type"]}-${e["id"]}").toSet();
+
+  final itemIds = items.where((e) => e.type == "show" || e.type == "movie").map((e) {
+    final type = e.type == "show" ? "tv" : "movie";
+    final tmdbId = e.movie?.ids.tmdb ?? e.show?.ids.tmdb;
+
+    return "$type-$tmdbId";
+  }).toSet();
+
+  return (itemIds.difference(watchlistIds).isNotEmpty, itemIds, tokens);
+}
