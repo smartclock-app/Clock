@@ -13,13 +13,12 @@ class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = context.read<Config>();
-    final dimensions = config.dimensions.sidebar.split(",").map((e) => double.parse(e)).toList();
 
     return Positioned(
-      left: dimensions[0],
-      top: dimensions[1],
-      width: dimensions[2],
-      height: dimensions[3],
+      left: config.dimensions.sidebar.x,
+      top: config.dimensions.sidebar.y,
+      width: config.dimensions.sidebar.width,
+      height: config.dimensions.sidebar.height,
       child: Container(
         padding: EdgeInsets.all(config.sidebar.padding),
         child: SingleChildScrollView(

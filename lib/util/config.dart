@@ -126,10 +126,37 @@ class Clock {
       };
 }
 
+class Dimension {
+  final double x;
+  final double y;
+  final double width;
+  final double height;
+
+  Dimension({
+    required this.x,
+    required this.y,
+    required this.width,
+    required this.height,
+  });
+
+  factory Dimension.parse(String json) {
+    final csv = json.split(',');
+    return Dimension(
+      x: double.parse(csv[0]),
+      y: double.parse(csv[1]),
+      width: double.parse(csv[2]),
+      height: double.parse(csv[3]),
+    );
+  }
+
+  @override
+  String toString() => "${x.toInt()},${y.toInt()},${width.toInt()},${height.toInt()}";
+}
+
 class Dimensions {
-  final String clock;
-  final String sidebar;
-  final String weather;
+  final Dimension clock;
+  final Dimension sidebar;
+  final Dimension weather;
 
   Dimensions({
     required this.clock,
@@ -138,15 +165,15 @@ class Dimensions {
   });
 
   factory Dimensions.fromJson(Map<String, dynamic> json) => Dimensions(
-        clock: json["clock"],
-        sidebar: json["sidebar"],
-        weather: json["weather"],
+        clock: Dimension.parse(json["clock"]),
+        sidebar: Dimension.parse(json["sidebar"]),
+        weather: Dimension.parse(json["weather"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "clock": clock,
-        "sidebar": sidebar,
-        "weather": weather,
+        "clock": clock.toString(),
+        "sidebar": sidebar.toString(),
+        "weather": weather.toString(),
       };
 }
 

@@ -72,7 +72,6 @@ class _WeatherState extends State<Weather> {
   @override
   Widget build(BuildContext context) {
     Config config = context.read<Config>();
-    final dimensions = config.dimensions.weather.split(",").map((e) => double.parse(e)).toList();
 
     return FutureBuilder(
       future: _weather,
@@ -84,10 +83,10 @@ class _WeatherState extends State<Weather> {
         final weather = snapshot.data as Map<String, String>;
 
         return Positioned(
-          left: dimensions[0],
-          top: dimensions[1],
-          width: dimensions[2],
-          height: dimensions[3],
+          left: config.dimensions.weather.x,
+          top: config.dimensions.weather.y,
+          width: config.dimensions.weather.width,
+          height: config.dimensions.weather.height,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,

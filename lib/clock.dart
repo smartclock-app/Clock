@@ -48,15 +48,13 @@ class _ClockState extends State<Clock> {
   @override
   Widget build(BuildContext context) {
     final config = context.read<Config>();
-    // x,y,width,height
-    final dimensions = config.dimensions.clock.split(",").map((e) => double.parse(e)).toList();
     final clockConf = config.clock;
 
     return Positioned(
-      left: dimensions[0],
-      top: dimensions[1],
-      width: dimensions[2],
-      height: dimensions[3],
+      left: config.dimensions.clock.x,
+      top: config.dimensions.clock.y,
+      width: config.dimensions.clock.width,
+      height: config.dimensions.clock.height,
       child: Container(
         margin: const EdgeInsets.only(top: 16, left: 16, bottom: 16),
         decoration: BoxDecoration(
