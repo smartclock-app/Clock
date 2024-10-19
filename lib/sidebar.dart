@@ -8,7 +8,9 @@ import 'package:smartclock/notifications.dart';
 import 'package:smartclock/util/config.dart' show Config, AlexaFeatures;
 
 class Sidebar extends StatelessWidget {
-  const Sidebar({super.key});
+  const Sidebar({super.key, required this.networkAvailable});
+
+  final bool networkAvailable;
 
   @override
   Widget build(BuildContext context) {
@@ -23,25 +25,29 @@ class Sidebar extends StatelessWidget {
         padding: EdgeInsets.all(config.sidebar.padding),
         child: SingleChildScrollView(
           child: Column(
-            children: [
-              if (config.alexa.enabled) ...[
-                if (config.alexa.features[AlexaFeatures.nowplaying]!)
-                  if (config.alexa.devices.isNotEmpty)
-                    const NowPlaying()
-                  else
-                    const InfoWidget(
-                      title: "Now Playing",
-                      message: "You have enabled Now Playing, but not entered any devices.\n\nTo hide this message, enter at least one device, or disable Now Playing.",
-                    ),
-                const Notifications(),
-              ],
-              if (config.calendar.enabled) const Calendar(),
-              if (!config.alexa.enabled && !config.calendar.enabled)
-                const InfoWidget(
-                  title: "Widgets",
-                  message: "No widgets enabled.\n\nYou can enable widgets in the conf file.\n\nTo hide this message, enable at least one widget, or disable the sidebar.",
-                ),
-            ],
+            children: !networkAvailable
+                ? [
+                    const InfoWidget(title: "Network", message: "No network connection available."),
+                  ]
+                : [
+                    if (config.alexa.enabled) ...[
+                      if (config.alexa.features[AlexaFeatures.nowplaying]!)
+                        if (config.alexa.devices.isNotEmpty)
+                          const NowPlaying()
+                        else
+                          const InfoWidget(
+                            title: "Now Playing",
+                            message: "You have enabled Now Playing, but not entered any devices.\n\nTo hide this message, enter at least one device, or disable Now Playing.",
+                          ),
+                      const Notifications(),
+                    ],
+                    if (config.calendar.enabled) const Calendar(),
+                    if (!config.alexa.enabled && !config.calendar.enabled)
+                      const InfoWidget(
+                        title: "Widgets",
+                        message: "No widgets enabled.\n\nYou can enable widgets in the conf file.\n\nTo hide this message, enable at least one widget, or disable the sidebar.",
+                      ),
+                  ],
           ),
         ),
       ),

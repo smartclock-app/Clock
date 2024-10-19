@@ -2,16 +2,15 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show rootBundle, PlatformException;
 
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
-import 'package:json_schema/json_schema.dart';
 import 'package:bonsoir/bonsoir.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/clock.dart';
@@ -21,6 +20,7 @@ import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/config.dart' show Config;
 
 late void Function(Config config) saveConfig;
+late Future<void> Function() loginAlexa;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,12 +41,11 @@ void main() async {
   final cookieFile = File(path.join(appDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
 
-  final configSchema = await JsonSchema.createFromUrl(Config.schema);
-  final results = configSchema.validate(confFile.readAsStringSync(), parseJson: true);
-  if (!results.isValid && !kDebugMode) {
-    logger.w("Config file is invalid. Created missing keys.");
-    logger.t(results.errors);
-
+  // Validate the config file, and merge with the example config if necessary
+  Config config;
+  try {
+    config = Config.fromJson(json.decode(confFile.readAsStringSync()));
+  } catch (_) {
     Map<String, dynamic> config = json.decode(confFile.readAsStringSync());
     final exampleConfig = json.decode(exampleConf);
     config = Config.merge(config, exampleConfig);
@@ -65,7 +64,7 @@ void main() async {
     version: 3,
   );
 
-  final config = Config.fromJson(json.decode(confFile.readAsStringSync()));
+  config = Config.fromJson(json.decode(confFile.readAsStringSync()));
   final client = alexa.QueryClient(
     cookieFile,
     logger: (log, level) {
@@ -89,16 +88,20 @@ void main() async {
   );
 
   if (config.alexa.enabled) {
-    if (!await client.checkStatus(config.alexa.userId)) {
+    loginAlexa = () async {
       try {
-        if (config.alexa.userId.isEmpty || config.alexa.token.isEmpty) {
-          throw Exception("Alexa User ID and Token must be set in the config file.");
+        if (!await client.checkStatus(config.alexa.userId)) {
+          if (config.alexa.userId.isEmpty || config.alexa.token.isEmpty) {
+            throw Exception("Alexa User ID and Token must be set in the config file.");
+          }
+          await client.login(config.alexa.userId, config.alexa.token);
         }
-        await client.login(config.alexa.userId, config.alexa.token);
       } catch (e) {
         logger.w("Failed to login to Alexa: $e");
       }
-    }
+    };
+
+    await loginAlexa();
   }
 
   // LINUX BONJOUR DEPENDENCIES:
@@ -124,8 +127,65 @@ void main() async {
   ));
 }
 
-class SmartClock extends StatelessWidget {
+class SmartClock extends StatefulWidget {
   const SmartClock({super.key});
+
+  @override
+  State<SmartClock> createState() => _SmartClockState();
+}
+
+class _SmartClockState extends State<SmartClock> {
+  bool networkAvailable = false;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    initConnectivity();
+
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initConnectivity() async {
+    late List<ConnectivityResult> result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      logger.w('Couldn\'t check connectivity status', error: e);
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
+    if (result.contains(ConnectivityResult.none)) {
+      networkAvailable = false;
+    } else {
+      networkAvailable = true;
+      loginAlexa();
+    }
+    setState(() {
+      networkAvailable = networkAvailable;
+    });
+    logger.i('Connectivity changed: $result');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,8 +204,8 @@ class SmartClock extends StatelessWidget {
             child: Stack(
               children: [
                 const Clock(),
-                if (config.sidebar.enabled) const Sidebar(),
-                if (config.weather.enabled) const Weather(),
+                if (config.sidebar.enabled && config.networkEnabled) Sidebar(networkAvailable: networkAvailable),
+                if (config.weather.enabled && config.networkEnabled && networkAvailable) const Weather(),
               ],
             ),
           ),

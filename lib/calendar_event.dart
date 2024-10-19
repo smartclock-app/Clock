@@ -42,7 +42,6 @@ class CalendarEvent extends StatelessWidget {
     late final String dateString;
     final startDay = formatDate(_start, "EEEE d'${getOrdinal(_start.day)}'");
 
-    // prettier-ignore
     if (isAllDay()) {
       dateString = startDay;
     } else if (isAllDay(oneDay: false)) {
@@ -53,10 +52,12 @@ class CalendarEvent extends StatelessWidget {
       }
     } else if (_duration.inDays > 1) {
       if (_start.month != _end.month) {
-        dateString = "$startDay (HH:mm) - ${DateFormat("EEEE d'${getOrdinal(_end.day)}' MMM").format(_end)}";
+        dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${DateFormat("EEEE d'${getOrdinal(_end.day)}' MMM").format(_end)}";
       } else {
-        dateString = "$startDay (HH:mm) - ${formatDate(_end, "EEEE d'${getOrdinal(_end.day)}'")}";
+        dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${formatDate(_end, "EEEE d'${getOrdinal(_end.day)}'")}";
       }
+    } else if (_start.isAtSameMomentAs(_end)) {
+      dateString = "$startDay (${DateFormat("HH:mm").format(_start)})";
     } else {
       dateString = "$startDay (${DateFormat("HH:mm").format(_start)} - ${DateFormat("HH:mm").format(_end)})";
     }

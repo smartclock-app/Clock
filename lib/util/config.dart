@@ -1,6 +1,7 @@
 class Config {
   static const String schema = "https://www.smartclock.app/schema/v3.json";
   final String resolution;
+  final bool networkEnabled;
   final Alexa alexa;
   final Clock clock;
   final Calendar calendar;
@@ -11,6 +12,7 @@ class Config {
 
   Config({
     required this.resolution,
+    required this.networkEnabled,
     required this.alexa,
     required this.clock,
     required this.calendar,
@@ -34,6 +36,7 @@ class Config {
 
   factory Config.fromJson(Map<String, dynamic> json) => Config(
         resolution: json["resolution"],
+        networkEnabled: json["networkEnabled"],
         alexa: Alexa.fromJson(json["alexa"]),
         clock: Clock.fromJson(json["clock"]),
         calendar: Calendar.fromJson(json["calendar"]),
@@ -46,6 +49,7 @@ class Config {
   Map<String, dynamic> toJson() => {
         "\$schema": schema,
         "resolution": resolution,
+        "networkEnabled": networkEnabled,
         "alexa": alexa.toJson(),
         "clock": clock.toJson(),
         "calendar": calendar.toJson(),
