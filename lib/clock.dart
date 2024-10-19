@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smartclock/util/config.dart' show Config;
+import 'package:smartclock/util/config.dart' show ConfigModel;
 import 'package:smartclock/util/get_ordinal.dart';
 import 'package:smartclock/util/logger.dart';
 
@@ -47,7 +47,7 @@ class _ClockState extends State<Clock> {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.read<Config>();
+    final config = context.read<ConfigModel>().config;
     final clockConf = config.clock;
 
     return Positioned(

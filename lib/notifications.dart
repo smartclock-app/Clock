@@ -7,7 +7,7 @@ import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/alarm.dart';
 import 'package:smartclock/timer.dart';
 import 'package:smartclock/util/logger.dart';
-import 'package:smartclock/util/config.dart' show Config, AlexaFeatures;
+import 'package:smartclock/util/config.dart' show ConfigModel, AlexaFeatures;
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
@@ -22,7 +22,7 @@ class _NotificationsState extends State<Notifications> {
 
   void getNotifications() async {
     logger.t("Refetching notifications");
-    final config = context.read<Config>();
+    final config = context.read<ConfigModel>().config;
     final client = context.read<alexa.QueryClient>();
     final ns = await client.getNotifications(config.alexa.userId);
 

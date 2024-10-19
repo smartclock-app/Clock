@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/weather_icons.dart';
-import 'package:smartclock/util/config.dart' show Config;
+import 'package:smartclock/util/config.dart' show ConfigModel, Config;
 
 class Weather extends StatefulWidget {
   const Weather({super.key});
@@ -47,7 +47,7 @@ class _WeatherState extends State<Weather> {
   @override
   void initState() {
     super.initState();
-    config = context.read<Config>();
+    config = context.read<ConfigModel>().config;
     _weather = _fetchWeather();
   }
 
@@ -71,7 +71,7 @@ class _WeatherState extends State<Weather> {
 
   @override
   Widget build(BuildContext context) {
-    Config config = context.read<Config>();
+    Config config = context.read<ConfigModel>().config;
 
     return FutureBuilder(
       future: _weather,

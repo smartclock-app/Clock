@@ -10,7 +10,7 @@ import 'package:smartclock/util/fetch_lyrics.dart';
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/lrc.dart';
 import 'package:smartclock/now_playing_lyrics.dart';
-import 'package:smartclock/util/config.dart' show Config;
+import 'package:smartclock/util/config.dart' show ConfigModel;
 
 const radioProviders = ["Unknown Provider", "TuneIn Live Radio", "Global Player"];
 
@@ -33,7 +33,7 @@ class _NowPlayingState extends State<NowPlaying> {
     if (queue?.state == "REFRESHING") return;
 
     logger.t("Refetching queue");
-    final config = context.read<Config>();
+    final config = context.read<ConfigModel>().config;
     final database = context.read<Database>();
     final client = context.read<alexa.QueryClient>();
     alexa.Queue q = alexa.Queue(state: "STOPPED");

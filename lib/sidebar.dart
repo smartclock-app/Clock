@@ -5,7 +5,7 @@ import 'package:smartclock/calendar.dart';
 import 'package:smartclock/info_widget.dart';
 import 'package:smartclock/now_playing.dart';
 import 'package:smartclock/notifications.dart';
-import 'package:smartclock/util/config.dart' show Config, AlexaFeatures;
+import 'package:smartclock/util/config.dart' show ConfigModel, AlexaFeatures;
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key, required this.networkAvailable});
@@ -14,7 +14,7 @@ class Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.read<Config>();
+    final config = context.read<ConfigModel>().config;
 
     return Positioned(
       left: config.dimensions.sidebar.x,

@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:trakt_dart/trakt_dart.dart';
 
-import 'package:smartclock/main.dart';
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/update_watchlist.dart';
 import 'package:smartclock/util/fetch_trakt_list.dart';
@@ -253,7 +252,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   }
 
   if (updated) {
-    saveConfig(config);
+    config.save();
   }
 
   return sortedEvents;

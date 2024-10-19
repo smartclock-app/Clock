@@ -1,5 +1,35 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:smartclock/util/logger.dart';
+
+class ConfigModel extends ChangeNotifier {
+  late StreamSubscription<FileSystemEvent> _fileWatcher;
+  Config config;
+
+  ConfigModel(this.config) {
+    _fileWatcher = config.file.watch().listen((event) {
+      logger.i("Config file changed: ${event.path}");
+
+      if (event.type == FileSystemEvent.modify) {
+        final json = jsonDecode(config.file.readAsStringSync());
+        config = Config.fromJson(config.file, json);
+        notifyListeners();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _fileWatcher.cancel();
+    super.dispose();
+  }
+}
+
 class Config {
-  static const String schema = "https://www.smartclock.app/schema/v3.json";
+  final File file;
   final String resolution;
   final bool networkEnabled;
   final Alexa alexa;
@@ -11,6 +41,7 @@ class Config {
   final Dimensions dimensions;
 
   Config({
+    required this.file,
     required this.resolution,
     required this.networkEnabled,
     required this.alexa,
@@ -34,7 +65,26 @@ class Config {
     return base;
   }
 
-  factory Config.fromJson(Map<String, dynamic> json) => Config(
+  void save() {
+    const encoder = JsonEncoder.withIndent("  ");
+    file.writeAsStringSync(encoder.convert(this));
+  }
+
+  factory Config.empty(File file) => Config(
+        file: file,
+        resolution: "1280x800",
+        networkEnabled: true,
+        alexa: Alexa.empty(),
+        clock: Clock.empty(),
+        calendar: Calendar.empty(),
+        sidebar: Sidebar.empty(),
+        watchlist: Watchlist.empty(),
+        weather: Weather.empty(),
+        dimensions: Dimensions.empty(),
+      );
+
+  factory Config.fromJson(File file, Map<String, dynamic> json) => Config(
+        file: file,
         resolution: json["resolution"],
         networkEnabled: json["networkEnabled"],
         alexa: Alexa.fromJson(json["alexa"]),
@@ -47,7 +97,7 @@ class Config {
       );
 
   Map<String, dynamic> toJson() => {
-        "\$schema": schema,
+        "\$schema": "./schema.json",
         "resolution": resolution,
         "networkEnabled": networkEnabled,
         "alexa": alexa.toJson(),
@@ -80,6 +130,18 @@ class Alexa {
     required this.token,
     required this.devices,
   });
+
+  factory Alexa.empty() => Alexa(
+        enabled: false,
+        features: {
+          AlexaFeatures.nowplaying: false,
+          AlexaFeatures.alarms: false,
+          AlexaFeatures.timers: false,
+        },
+        userId: "",
+        token: "",
+        devices: [],
+      );
 
   factory Alexa.fromJson(Map<String, dynamic> json) => Alexa(
         enabled: json["enabled"],
@@ -116,6 +178,12 @@ class Clock {
     required this.smallSize,
     required this.dateSize,
   });
+
+  factory Clock.empty() => Clock(
+        mainSize: 200,
+        smallSize: 85,
+        dateSize: 48,
+      );
 
   factory Clock.fromJson(Map<String, dynamic> json) => Clock(
         mainSize: double.parse(json["mainSize"].toString()),
@@ -168,6 +236,12 @@ class Dimensions {
     required this.weather,
   });
 
+  factory Dimensions.empty() => Dimensions(
+        clock: Dimension.parse("0,0,800,800"),
+        sidebar: Dimension.parse("800,0,480,800"),
+        weather: Dimension.parse("64,64,672,100"),
+      );
+
   factory Dimensions.fromJson(Map<String, dynamic> json) => Dimensions(
         clock: Dimension.parse(json["clock"]),
         sidebar: Dimension.parse(json["sidebar"]),
@@ -191,6 +265,12 @@ class Titles {
     required this.odd,
     required this.even,
   });
+
+  factory Titles.empty() => Titles(
+        enabled: false,
+        odd: "",
+        even: "",
+      );
 
   factory Titles.fromJson(Map<String, dynamic> json) => Titles(
         enabled: json["enabled"],
@@ -235,6 +315,21 @@ class Calendar {
     required this.eventColorSize,
   });
 
+  factory Calendar.empty() => Calendar(
+        enabled: false,
+        clientId: "",
+        clientSecret: "",
+        accessToken: "",
+        refreshToken: "",
+        maxEvents: 0,
+        titles: Titles.empty(),
+        eventFilter: [],
+        monthTitleSize: 36,
+        eventTitleSize: 34,
+        eventTimeSize: 28,
+        eventColorSize: 8,
+      );
+
   factory Calendar.fromJson(Map<String, dynamic> json) => Calendar(
         enabled: json["enabled"],
         clientId: json["clientId"],
@@ -275,6 +370,11 @@ class Sidebar {
     required this.padding,
   });
 
+  factory Sidebar.empty() => Sidebar(
+        enabled: true,
+        padding: 16,
+      );
+
   factory Sidebar.fromJson(Map<String, dynamic> json) => Sidebar(
         enabled: json["enabled"],
         padding: double.parse(json["padding"].toString()),
@@ -302,6 +402,15 @@ class Trakt {
     required this.redirectUri,
     required this.listId,
   });
+
+  factory Trakt.empty() => Trakt(
+        clientId: "",
+        clientSecret: "",
+        accessToken: "",
+        refreshToken: "",
+        redirectUri: "",
+        listId: "",
+      );
 
   factory Trakt.fromJson(Map<String, dynamic> json) => Trakt(
         clientId: json["clientId"],
@@ -339,6 +448,15 @@ class Watchlist {
     required this.maxItems,
   });
 
+  factory Watchlist.empty() => Watchlist(
+        enabled: false,
+        trakt: Trakt.empty(),
+        tmdbApiKey: "",
+        prefix: "Watchlist: ",
+        color: "#f5511d",
+        maxItems: 4,
+      );
+
   factory Watchlist.fromJson(Map<String, dynamic> json) => Watchlist(
         enabled: json["enabled"],
         trakt: Trakt.fromJson(json["trakt"]),
@@ -372,6 +490,14 @@ class Weather {
     required this.country,
     required this.units,
   });
+
+  factory Weather.empty() => Weather(
+        enabled: false,
+        apiKey: "",
+        postcode: "",
+        country: "",
+        units: "metric",
+      );
 
   factory Weather.fromJson(Map<String, dynamic> json) => Weather(
         enabled: json["enabled"],

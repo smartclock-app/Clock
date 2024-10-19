@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:smartclock/util/fetch_events.dart';
 import 'package:smartclock/util/get_ordinal.dart';
-import 'package:smartclock/util/config.dart' show Config;
+import 'package:smartclock/util/config.dart' show ConfigModel;
 
 class CalendarEvent extends StatelessWidget {
   const CalendarEvent({super.key, required this.event});
@@ -37,7 +37,7 @@ class CalendarEvent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.read<Config>();
+    final config = context.read<ConfigModel>().config;
 
     late final String dateString;
     final startDay = formatDate(_start, "EEEE d'${getOrdinal(_start.day)}'");

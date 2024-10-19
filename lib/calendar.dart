@@ -7,7 +7,7 @@ import 'package:sqflite/sqflite.dart';
 
 import 'package:smartclock/calendar_event.dart';
 import 'package:smartclock/util/fetch_events.dart';
-import 'package:smartclock/util/config.dart' show Config;
+import 'package:smartclock/util/config.dart' show ConfigModel, Config;
 
 class Calendar extends StatefulWidget {
   const Calendar({super.key});
@@ -26,7 +26,7 @@ class _CalendarState extends State<Calendar> {
   @override
   void initState() {
     super.initState();
-    config = context.read<Config>();
+    config = context.read<ConfigModel>().config;
     database = context.read<Database>();
     _futureEvents = fetchEvents(
       config: config,
