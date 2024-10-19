@@ -37,33 +37,35 @@ class _NowPlayingState extends State<NowPlaying> {
     final database = context.read<Database>();
     final client = context.read<alexa.QueryClient>();
     alexa.Queue q = alexa.Queue(state: "STOPPED");
-    for (final device in config.alexa.devices) {
-      final queue = await client.getQueue(config.alexa.userId, device);
-      if (queue.state == "PLAYING") {
-        q = queue;
-        break;
+    try {
+      for (final device in config.alexa.devices) {
+        final queue = await client.getQueue(config.alexa.userId, device);
+        if (queue.state == "PLAYING") {
+          q = queue;
+          break;
+        }
       }
+    } catch (e) {
+      return logger.e("Failed to fetch queue: $e");
     }
 
     if (radioProviders.contains(q.provider?.providerDisplayName ?? "Unknown Provider")) {
-      setState(() {
+      if (!mounted) return;
+      return setState(() {
         lyrics = null;
         progress = 0;
         queue = q;
       });
-      return;
     }
 
+    Lrc? lyricResult;
     if (q.infoText?.title != null && q.infoText?.subText1 != null) {
-      final lyricResult = await fetchLyrics(database, q.infoText!.title!, q.infoText!.subText1!);
-      if (lyricResult != null) {
-        setState(() {
-          lyrics = lyricResult;
-        });
-      }
+      lyricResult = await fetchLyrics(database, q.infoText!.title!, q.infoText!.subText1!);
     }
     final difference = DateTime.now().toUtc().difference(q.timestamp!).inMilliseconds;
+    if (!mounted) return;
     setState(() {
+      lyrics = lyricResult;
       queue = q;
       progress = (q.progress?.mediaProgress ?? 0).toDouble() + difference / 900;
     });
@@ -109,6 +111,7 @@ class _NowPlayingState extends State<NowPlaying> {
   @override
   void dispose() {
     timer?.cancel();
+    _subscription?.cancel();
     super.dispose();
   }
 

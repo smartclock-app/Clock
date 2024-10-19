@@ -56,10 +56,11 @@ class _SmartClockState extends State<SmartClock> {
     } else {
       networkAvailable = true;
     }
+    if (!mounted) return;
     setState(() {
       networkAvailable = networkAvailable;
     });
-    logger.i('Connectivity changed: $result');
+    logger.t('Connectivity changed: $result');
   }
 
   @override

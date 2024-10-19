@@ -15,8 +15,15 @@ class ConfigModel extends ChangeNotifier {
 
       if (event.type == FileSystemEvent.modify) {
         final json = jsonDecode(config.file.readAsStringSync());
-        config = Config.fromJson(config.file, json);
-        notifyListeners();
+
+        final updatedConfig = Config.fromJson(config.file, json);
+
+        if (config != updatedConfig) {
+          config = Config.fromJson(config.file, json);
+          notifyListeners();
+        } else {
+          logger.i("Config hash unchanged");
+        }
       }
     });
   }
@@ -69,6 +76,12 @@ class Config {
     const encoder = JsonEncoder.withIndent("  ");
     file.writeAsStringSync(encoder.convert(this));
   }
+
+  @override
+  int get hashCode => toJson().toString().hashCode;
+
+  @override
+  bool operator ==(Object other) => other is Config && other.hashCode == hashCode;
 
   factory Config.empty(File file) => Config(
         file: file,

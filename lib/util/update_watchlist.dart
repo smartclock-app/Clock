@@ -17,14 +17,14 @@ Future<void> updateWatchlist({required Config config, required Set<String> items
     late final Map<String, dynamic> data;
     if (type == 'movie') {
       data = {
-        "id": "$id-$type",
+        "id": "$type-$id",
         "name": response.data["title"],
         "status": response.data["status"],
         "nextAirDate": response.data["release_date"],
       };
     } else {
       data = {
-        "id": "$id-$type",
+        "id": "$type-$id",
         "name": response.data["name"],
         "status": response.data["status"],
         "nextAirDate": response.data["next_episode_to_air"]?["air_date"],

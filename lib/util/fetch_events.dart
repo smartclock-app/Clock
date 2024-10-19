@@ -177,12 +177,13 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
     int count = 0;
     final watchlist = await database.query("watchlist", orderBy: "nextAirDate");
     for (final item in watchlist) {
-      if (++count > config.watchlist.maxItems) break;
       if ((item["nextAirDate"] as String?) == null) continue;
 
       final DateTime start = DateTime.parse(item["nextAirDate"] as String);
       if (start.isBefore(DateTime.now())) continue;
       final end = start.add(const Duration(days: 1));
+
+      if (++count > config.watchlist.maxItems) break;
 
       final event = CalendarItem(
         id: item["id"] as String,
@@ -226,9 +227,10 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   bool updated = false;
 
   if (client.credentials.accessToken.data != config.calendar.accessToken) {
-    logger.t("Updating calendar access token");
     config.calendar.accessToken = client.credentials.accessToken.data;
-    updated = true;
+    // Don't trigger save to file if only the access token has changed
+    // as access token is updated every time the calendar is fetched
+    // and writing to file every time will cause ConfigModel ChangeNotifier to trigger every time
   }
 
   if (client.credentials.refreshToken != config.calendar.refreshToken) {

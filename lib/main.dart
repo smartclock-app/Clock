@@ -41,7 +41,7 @@ void main() async {
     logger.w("Config file is invalid. Created missing keys.");
     logger.t(results.errors);
 
-    Map<String, dynamic> config = json.decode(confFile.readAsStringSync());
+    Map<String, dynamic> config = jsonDecode(confFile.readAsStringSync());
     final exampleConfig = Config.empty(File("")).toJson();
     config = Config.merge(config, exampleConfig);
     Config.fromJson(confFile, config).save();
@@ -59,7 +59,7 @@ void main() async {
     version: 3,
   );
 
-  final config = Config.fromJson(confFile, json.decode(confFile.readAsStringSync()));
+  final config = Config.fromJson(confFile, jsonDecode(confFile.readAsStringSync()));
   final client = alexa.QueryClient(
     cookieFile,
     logger: (log, level) {
@@ -119,6 +119,8 @@ void main() async {
       // Push events to this stream to tell widgets to update
       Provider<StreamController<DateTime>>.value(value: StreamController<DateTime>.broadcast()),
     ],
-    child: const SmartClock(),
+    child: Consumer<ConfigModel>(
+      builder: (context, value, child) => SmartClock(key: UniqueKey()),
+    ),
   ));
 }

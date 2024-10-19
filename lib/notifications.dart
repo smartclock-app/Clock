@@ -24,7 +24,12 @@ class _NotificationsState extends State<Notifications> {
     logger.t("Refetching notifications");
     final config = context.read<ConfigModel>().config;
     final client = context.read<alexa.QueryClient>();
-    final ns = await client.getNotifications(config.alexa.userId);
+    late List<alexa.Notification> ns;
+    try {
+      ns = await client.getNotifications(config.alexa.userId);
+    } catch (e) {
+      return logger.e("Failed to fetch notifications: $e");
+    }
 
     final allDevices = await client.getDeviceList(config.alexa.userId);
     final devices = allDevices.where((d) => config.alexa.devices.contains(d.accountName));
@@ -52,6 +57,7 @@ class _NotificationsState extends State<Notifications> {
       }
     }
 
+    if (!mounted) return;
     setState(() {
       notifications = {
         AlexaFeatures.timers: timers,

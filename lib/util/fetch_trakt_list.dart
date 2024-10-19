@@ -18,7 +18,7 @@ Future<(bool, Set<String>, AccessTokenResponse?)> fetchTraktList({required Confi
     items = await trakt.users.getListItems("me", listId, useOAuth: true);
   }
 
-  final watchlistIds = watchlist.map((e) => "${e["type"]}-${e["id"]}").toSet();
+  final watchlistIds = watchlist.map((e) => e["id"]).toSet();
 
   final itemIds = items.where((e) => e.type == "show" || e.type == "movie").map((e) {
     final type = e.type == "show" ? "tv" : "movie";
