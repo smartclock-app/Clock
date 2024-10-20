@@ -22,17 +22,19 @@ late Future<void> Function() loginAlexa;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final appDir = await getApplicationSupportDirectory();
-  logger.i("Config Directory: ${appDir.path}");
+  final supportDir = await getApplicationSupportDirectory();
+  final dataDir = await getApplicationDocumentsDirectory();
+  logger.i("Support Directory: ${supportDir.path}");
+  logger.i("Config Directory: ${dataDir.path}");
 
-  final schemaFile = File(path.join(appDir.path, "schema.json"));
+  final schemaFile = File(path.join(dataDir.path, "schema.json"));
   final schema = await rootBundle.loadString("assets/schema.json");
   schemaFile.writeAsStringSync(schema);
 
-  final confFile = File(path.join(appDir.path, "config.json"));
+  final confFile = File(path.join(dataDir.path, "config.json"));
   if (!confFile.existsSync()) Config.empty(confFile).save();
 
-  final cookieFile = File(path.join(appDir.path, "cookies.json"));
+  final cookieFile = File(path.join(supportDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
 
   final configSchema = JsonSchema.create(schema);
@@ -48,7 +50,7 @@ void main() async {
   }
 
   Database database = await openDatabase(
-    path.join(appDir.path, 'database.db'),
+    path.join(supportDir.path, 'database.db'),
     onUpgrade: (db, _, __) async {
       final batch = db.batch();
       batch.execute("CREATE TABLE IF NOT EXISTS lyrics (id TEXT PRIMARY KEY, lyrics TEXT)");

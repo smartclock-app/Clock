@@ -26,7 +26,7 @@ dependencies:
   http: ^1.2.2
   dio: ^5.7.0
   json_schema: ^5.2.0
-  bonsoir: ^5.1.10
+  # bonsoir: ^5.1.10
   sqflite: ^2.3.3+1
   path: ^1.9.0
   logger: ^2.4.0
@@ -37,12 +37,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
 platforms:
   android:
   linux:
   macos:
+  ios:
   windows:
 
 flutter:
