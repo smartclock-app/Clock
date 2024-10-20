@@ -79,6 +79,7 @@ class CalendarEvent extends StatelessWidget {
             style: TextStyle(
               fontSize: config.calendar.eventTitleSize,
               fontWeight: FontWeight.bold,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           Text(dateString, style: TextStyle(fontSize: config.calendar.eventTimeSize)),

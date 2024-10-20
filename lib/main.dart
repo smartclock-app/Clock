@@ -23,16 +23,24 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final supportDir = await getApplicationSupportDirectory();
-  final dataDir = await getApplicationDocumentsDirectory();
+  final docsDir = await getApplicationDocumentsDirectory();
+  final confDir = Directory(path.join(docsDir.path, 'SmartClock'));
+  if (!confDir.existsSync()) confDir.createSync(recursive: true);
   logger.i("Support Directory: ${supportDir.path}");
-  logger.i("Config Directory: ${dataDir.path}");
+  logger.i("Config Directory: ${confDir.path}");
 
-  final schemaFile = File(path.join(dataDir.path, "schema.json"));
+  final schemaFile = File(path.join(confDir.path, "schema.json"));
   final schema = await rootBundle.loadString("assets/schema.json");
   schemaFile.writeAsStringSync(schema);
 
-  final confFile = File(path.join(dataDir.path, "config.json"));
+  final confFile = File(path.join(confDir.path, "config.json"));
   if (!confFile.existsSync()) Config.empty(confFile).save();
+
+  // try {
+  //   final bundledConfig = await rootBundle.loadString("assets/config.json");
+  //   confFile.writeAsStringSync(bundledConfig);
+  // } catch (_) {
+  // }
 
   final cookieFile = File(path.join(supportDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");

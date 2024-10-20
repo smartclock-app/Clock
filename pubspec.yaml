@@ -43,7 +43,6 @@ platforms:
   android:
   linux:
   macos:
-  ios:
   windows:
 
 flutter:

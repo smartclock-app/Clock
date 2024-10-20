@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
 import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:googleapis_auth/googleapis_auth.dart' as auth;
 import 'package:http/http.dart' as http;
@@ -80,7 +81,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   final client = auth.autoRefreshingClient(
     auth.ClientId(config.calendar.clientId, config.calendar.clientSecret),
     auth.AccessCredentials(
-      auth.AccessToken("Bearer", config.calendar.accessToken, DateTime.now().toUtc()),
+      auth.AccessToken("Bearer", config.calendar.accessToken, config.calendar.tokenExpiry),
       config.calendar.refreshToken,
       [calendar.CalendarApi.calendarReadonlyScope],
     ),
@@ -176,18 +177,27 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
 
     int count = 0;
     final watchlist = await database.query("watchlist", orderBy: "nextAirDate");
+    Map<DateTime, List<String>> watchlistEvents = {};
     for (final item in watchlist) {
       if ((item["nextAirDate"] as String?) == null) continue;
 
       final DateTime start = DateTime.parse(item["nextAirDate"] as String);
       if (start.isBefore(DateTime.now())) continue;
-      final end = start.add(const Duration(days: 1));
 
-      if (++count > config.watchlist.maxItems) break;
+      if (!watchlistEvents.containsKey(start)) {
+        if (++count > config.watchlist.maxItems) break;
+        watchlistEvents[start] = [];
+      }
+      watchlistEvents[start]!.add(item["name"] as String);
+    }
+
+    for (final item in watchlistEvents.entries) {
+      final DateTime start = item.key;
+      final DateTime end = start.add(const Duration(days: 1));
 
       final event = CalendarItem(
-        id: item["id"] as String,
-        title: "${config.watchlist.prefix} ${item["name"] as String}".trim(),
+        id: UniqueKey().toString(),
+        title: "${config.watchlist.prefix}\n${item.value.join("\n")}",
         start: start,
         end: end,
         color: config.watchlist.color,
@@ -227,15 +237,20 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   bool updated = false;
 
   if (client.credentials.accessToken.data != config.calendar.accessToken) {
+    logger.t("Updating calendar access token");
     config.calendar.accessToken = client.credentials.accessToken.data;
-    // Don't trigger save to file if only the access token has changed
-    // as access token is updated every time the calendar is fetched
-    // and writing to file every time will cause ConfigModel ChangeNotifier to trigger every time
+    updated = true;
   }
 
   if (client.credentials.refreshToken != config.calendar.refreshToken) {
     logger.t("Updating calendar refresh token");
     config.calendar.refreshToken = client.credentials.refreshToken!;
+    updated = true;
+  }
+
+  if (client.credentials.accessToken.expiry != config.calendar.tokenExpiry) {
+    logger.t("Updating calendar token expiry");
+    config.calendar.tokenExpiry = client.credentials.accessToken.expiry;
     updated = true;
   }
 

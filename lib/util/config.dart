@@ -304,6 +304,7 @@ class Calendar {
   final String clientSecret;
   String accessToken;
   String refreshToken;
+  DateTime tokenExpiry;
   final int maxEvents;
   final Titles titles;
   final List<String> eventFilter;
@@ -319,6 +320,7 @@ class Calendar {
     required this.clientSecret,
     required this.accessToken,
     required this.refreshToken,
+    required this.tokenExpiry,
     required this.maxEvents,
     required this.titles,
     required this.eventFilter,
@@ -334,6 +336,7 @@ class Calendar {
         clientSecret: "",
         accessToken: "",
         refreshToken: "",
+        tokenExpiry: DateTime.now(),
         maxEvents: 0,
         titles: Titles.empty(),
         eventFilter: [],
@@ -349,6 +352,7 @@ class Calendar {
         clientSecret: json["clientSecret"],
         accessToken: json["accessToken"],
         refreshToken: json["refreshToken"],
+        tokenExpiry: DateTime.parse(json["tokenExpiry"]).toUtc(),
         maxEvents: json["maxEvents"],
         titles: Titles.fromJson(json["titles"]),
         eventFilter: List<String>.from(json["eventFilter"].map((x) => x)),
@@ -364,6 +368,7 @@ class Calendar {
         "clientSecret": clientSecret,
         "accessToken": accessToken,
         "refreshToken": refreshToken,
+        "tokenExpiry": tokenExpiry.toIso8601String(),
         "maxEvents": maxEvents,
         "titles": titles.toJson(),
         "eventFilter": List<dynamic>.from(eventFilter.map((x) => x)),
