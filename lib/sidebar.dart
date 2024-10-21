@@ -5,7 +5,7 @@ import 'package:smartclock/calendar.dart';
 import 'package:smartclock/info_widget.dart';
 import 'package:smartclock/now_playing.dart';
 import 'package:smartclock/notifications.dart';
-import 'package:smartclock/util/config.dart' show ConfigModel, AlexaFeatures;
+import 'package:smartclock/util/config.dart' show ConfigModel;
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key, required this.networkAvailable});
@@ -31,7 +31,7 @@ class Sidebar extends StatelessWidget {
                   ]
                 : [
                     if (config.alexa.enabled) ...[
-                      if (config.alexa.features[AlexaFeatures.nowplaying]!)
+                      if (config.alexa.features.nowplaying)
                         if (config.alexa.devices.isNotEmpty)
                           const NowPlaying()
                         else

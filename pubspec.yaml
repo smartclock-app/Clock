@@ -33,6 +33,7 @@ dependencies:
   trakt_dart:
     path: ../trakt_dart
   connectivity_plus: ^6.1.0
+  bonsoir: ^5.1.10
 
 dev_dependencies:
   flutter_test:

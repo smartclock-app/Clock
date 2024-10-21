@@ -7,7 +7,7 @@ import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/alarm.dart';
 import 'package:smartclock/timer.dart';
 import 'package:smartclock/util/logger.dart';
-import 'package:smartclock/util/config.dart' show ConfigModel, AlexaFeatures;
+import 'package:smartclock/util/config.dart' show ConfigModel;
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
@@ -17,7 +17,7 @@ class Notifications extends StatefulWidget {
 }
 
 class _NotificationsState extends State<Notifications> {
-  Map<AlexaFeatures, List<alexa.Notification>> notifications = {};
+  ({List<alexa.Notification> alarms, List<alexa.Notification> timers}) notifications = (alarms: [], timers: []);
   StreamSubscription<void>? _subscription;
 
   void getNotifications() async {
@@ -43,7 +43,7 @@ class _NotificationsState extends State<Notifications> {
 
       switch (n.type) {
         case "Timer":
-          if (config.alexa.features[AlexaFeatures.timers]!) timers.add(n);
+          if (config.alexa.features.timers) timers.add(n);
           break;
         case "Alarm":
         case "MusicAlarm":
@@ -52,17 +52,14 @@ class _NotificationsState extends State<Notifications> {
           if (DateTime.parse("${n.originalDate!}T${(n.snoozedToTime ?? n.originalTime!)}").difference(DateTime.now()).inHours > 12) {
             continue;
           }
-          if (config.alexa.features[AlexaFeatures.alarms]!) alarms.add(n);
+          if (config.alexa.features.alarms) alarms.add(n);
           break;
       }
     }
 
     if (!mounted) return;
     setState(() {
-      notifications = {
-        AlexaFeatures.timers: timers,
-        AlexaFeatures.alarms: alarms,
-      };
+      notifications = (timers: timers, alarms: alarms);
     });
   }
 
@@ -90,10 +87,10 @@ class _NotificationsState extends State<Notifications> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        for (var timer in notifications[AlexaFeatures.timers] ?? []) ...[
+        for (var timer in notifications.timers) ...[
           TimerCard(timer: timer),
         ],
-        for (var alarm in notifications[AlexaFeatures.alarms] ?? []) ...[
+        for (var alarm in notifications.alarms) ...[
           AlarmCard(alarm: alarm),
         ],
       ],

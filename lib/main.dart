@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 import 'package:json_schema/json_schema.dart';
+import 'package:bonsoir/bonsoir.dart';
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
@@ -32,21 +33,22 @@ void main() async {
   schemaFile.writeAsStringSync(schema);
 
   final confFile = File(path.join(confDir.path, "config.json"));
-  if (!confFile.existsSync()) Config.empty(confFile).save();
+  if (!confFile.existsSync()) Config.asDefault(confFile).save();
 
   final cookieFile = File(path.join(supportDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
 
+  final configJson = jsonDecode(confFile.readAsStringSync());
   final configSchema = JsonSchema.create(schema);
-  final results = configSchema.validate(confFile.readAsStringSync(), parseJson: true);
+  final results = configSchema.validate(configJson);
+
   if (!results.isValid) {
     logger.w("Config file is invalid. Created missing keys.");
     logger.t(results.errors);
 
-    Map<String, dynamic> config = jsonDecode(confFile.readAsStringSync());
-    final exampleConfig = Config.empty(File("")).toJson();
-    config = Config.merge(config, exampleConfig);
-    Config.fromJson(confFile, config).save();
+    final exampleConfig = Config.asDefault(File("")).toJson();
+    final mergedJson = Config.merge(configJson, exampleConfig);
+    Config.fromJson(confFile, mergedJson).save();
   }
 
   Database database = await openDatabase(
@@ -85,20 +87,21 @@ void main() async {
     },
   );
 
-  // // LINUX BONJOUR DEPENDENCIES:
-  // // avahi-daemon avahi-discover avahi-utils libnss-mdns mdns-scan
-  // BonsoirService service = BonsoirService(
-  //   name: "SC@${Platform.localHostname}",
-  //   type: '_smartclock._tcp',
-  //   port: 3030,
-  // );
-  // final broadcast = BonsoirBroadcast(service: service);
-  // await broadcast.ready;
-  // await broadcast.start();
+  // LINUX BONJOUR DEPENDENCIES:
+  // avahi-daemon avahi-discover avahi-utils libnss-mdns mdns-scan
+  if (config.remoteConfig.enabled && config.remoteConfig.useBonjour) {
+    BonsoirService service = BonsoirService(
+      name: Platform.localHostname,
+      type: '_smartclock._tcp',
+      port: config.remoteConfig.port,
+    );
+    final broadcast = BonsoirBroadcast(service: service);
+    await broadcast.ready;
+    await broadcast.start();
+  }
 
   runApp(MultiProvider(
     providers: [
-      // Provider<Config>.value(value: config),
       ChangeNotifierProvider(create: (context) => ConfigModel(config)),
       Provider<Database>.value(value: database),
       Provider<alexa.QueryClient>.value(value: client),

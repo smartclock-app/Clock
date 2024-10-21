@@ -28,6 +28,12 @@ class ConfigModel extends ChangeNotifier {
     });
   }
 
+  void setConfig(Config config) {
+    config.file = this.config.file;
+    this.config = config;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _fileWatcher.cancel();
@@ -36,9 +42,10 @@ class ConfigModel extends ChangeNotifier {
 }
 
 class Config {
-  final File file;
+  File file;
   final String resolution;
   final bool networkEnabled;
+  final RemoteConfig remoteConfig;
   final Alexa alexa;
   final Clock clock;
   final Calendar calendar;
@@ -51,6 +58,7 @@ class Config {
     required this.file,
     required this.resolution,
     required this.networkEnabled,
+    required this.remoteConfig,
     required this.alexa,
     required this.clock,
     required this.calendar,
@@ -63,7 +71,7 @@ class Config {
   static Map<String, dynamic> merge(Map<String, dynamic> base, Map<String, dynamic> updates) {
     updates.forEach((key, value) {
       if (value is Map<String, dynamic> && base[key] is Map<String, dynamic>) {
-        merge(base[key], value);
+        merge(base[key] ?? {}, value);
       } else if (!base.containsKey(key)) {
         base[key] = value;
       }
@@ -83,23 +91,25 @@ class Config {
   @override
   bool operator ==(Object other) => other is Config && other.hashCode == hashCode;
 
-  factory Config.empty(File file) => Config(
+  factory Config.asDefault(File file) => Config(
         file: file,
         resolution: "1280x800",
         networkEnabled: true,
-        alexa: Alexa.empty(),
-        clock: Clock.empty(),
-        calendar: Calendar.empty(),
-        sidebar: Sidebar.empty(),
-        watchlist: Watchlist.empty(),
-        weather: Weather.empty(),
-        dimensions: Dimensions.empty(),
+        remoteConfig: RemoteConfig.asDefault(),
+        alexa: Alexa.asDefault(),
+        clock: Clock.asDefault(),
+        calendar: Calendar.asDefault(),
+        sidebar: Sidebar.asDefault(),
+        watchlist: Watchlist.asDefault(),
+        weather: Weather.asDefault(),
+        dimensions: Dimensions.asDefault(),
       );
 
   factory Config.fromJson(File file, Map<String, dynamic> json) => Config(
         file: file,
         resolution: json["resolution"],
         networkEnabled: json["networkEnabled"],
+        remoteConfig: RemoteConfig.fromJson(json["remoteConfig"]),
         alexa: Alexa.fromJson(json["alexa"]),
         clock: Clock.fromJson(json["clock"]),
         calendar: Calendar.fromJson(json["calendar"]),
@@ -113,6 +123,7 @@ class Config {
         "\$schema": "./schema.json",
         "resolution": resolution,
         "networkEnabled": networkEnabled,
+        "remoteConfig": remoteConfig.toJson(),
         "alexa": alexa.toJson(),
         "clock": clock.toJson(),
         "calendar": calendar.toJson(),
@@ -123,15 +134,49 @@ class Config {
       };
 }
 
-enum AlexaFeatures {
-  nowplaying,
-  alarms,
-  timers,
+class RemoteConfig {
+  final bool enabled;
+  final int port;
+  final String password;
+  final String salt;
+  final bool useBonjour;
+
+  RemoteConfig({
+    required this.enabled,
+    required this.port,
+    required this.password,
+    required this.salt,
+    required this.useBonjour,
+  });
+
+  factory RemoteConfig.asDefault() => RemoteConfig(
+        enabled: false,
+        port: 8080,
+        password: "",
+        salt: "",
+        useBonjour: true,
+      );
+
+  factory RemoteConfig.fromJson(Map<String, dynamic> json) => RemoteConfig(
+        enabled: json["enabled"],
+        port: json["port"],
+        password: json["password"],
+        salt: json["salt"],
+        useBonjour: json["useBonjour"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "enabled": enabled,
+        "port": port,
+        "password": password,
+        "salt": salt,
+        "useBonjour": useBonjour,
+      };
 }
 
 class Alexa {
   final bool enabled;
-  final Map<AlexaFeatures, bool> features;
+  final ({bool nowplaying, bool alarms, bool timers}) features;
   final String userId;
   final String token;
   final List<String> devices;
@@ -144,13 +189,13 @@ class Alexa {
     required this.devices,
   });
 
-  factory Alexa.empty() => Alexa(
+  factory Alexa.asDefault() => Alexa(
         enabled: false,
-        features: {
-          AlexaFeatures.nowplaying: false,
-          AlexaFeatures.alarms: false,
-          AlexaFeatures.timers: false,
-        },
+        features: (
+          nowplaying: false,
+          alarms: false,
+          timers: false,
+        ),
         userId: "",
         token: "",
         devices: [],
@@ -158,11 +203,11 @@ class Alexa {
 
   factory Alexa.fromJson(Map<String, dynamic> json) => Alexa(
         enabled: json["enabled"],
-        features: {
-          AlexaFeatures.nowplaying: json["features"]["nowplaying"],
-          AlexaFeatures.alarms: json["features"]["alarms"],
-          AlexaFeatures.timers: json["features"]["timers"],
-        },
+        features: (
+          nowplaying: json["features"]["nowplaying"],
+          alarms: json["features"]["alarms"],
+          timers: json["features"]["timers"],
+        ),
         userId: json["userId"],
         token: json["token"],
         devices: List<String>.from(json["devices"].map((x) => x)),
@@ -171,9 +216,9 @@ class Alexa {
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
         "features": {
-          "nowplaying": features[AlexaFeatures.nowplaying],
-          "alarms": features[AlexaFeatures.alarms],
-          "timers": features[AlexaFeatures.timers],
+          "nowplaying": features.nowplaying,
+          "alarms": features.alarms,
+          "timers": features.timers,
         },
         "userId": userId,
         "token": token,
@@ -192,7 +237,7 @@ class Clock {
     required this.dateSize,
   });
 
-  factory Clock.empty() => Clock(
+  factory Clock.asDefault() => Clock(
         mainSize: 200,
         smallSize: 85,
         dateSize: 48,
@@ -249,7 +294,7 @@ class Dimensions {
     required this.weather,
   });
 
-  factory Dimensions.empty() => Dimensions(
+  factory Dimensions.asDefault() => Dimensions(
         clock: Dimension.parse("0,0,800,800"),
         sidebar: Dimension.parse("800,0,480,800"),
         weather: Dimension.parse("64,64,672,100"),
@@ -268,36 +313,6 @@ class Dimensions {
       };
 }
 
-class Titles {
-  final bool enabled;
-  final String odd;
-  final String even;
-
-  Titles({
-    required this.enabled,
-    required this.odd,
-    required this.even,
-  });
-
-  factory Titles.empty() => Titles(
-        enabled: false,
-        odd: "",
-        even: "",
-      );
-
-  factory Titles.fromJson(Map<String, dynamic> json) => Titles(
-        enabled: json["enabled"],
-        odd: json["odd"],
-        even: json["even"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "enabled": enabled,
-        "odd": odd,
-        "even": even,
-      };
-}
-
 class Calendar {
   final bool enabled;
   final String clientId;
@@ -306,7 +321,7 @@ class Calendar {
   String refreshToken;
   DateTime tokenExpiry;
   final int maxEvents;
-  final Titles titles;
+  final ({bool enabled, String odd, String even}) titles;
   final List<String> eventFilter;
 
   final double monthTitleSize;
@@ -328,7 +343,7 @@ class Calendar {
     required this.eventTimeSize,
   });
 
-  factory Calendar.empty() => Calendar(
+  factory Calendar.asDefault() => Calendar(
         enabled: false,
         clientId: "",
         clientSecret: "",
@@ -336,7 +351,11 @@ class Calendar {
         refreshToken: "",
         tokenExpiry: DateTime.now(),
         maxEvents: 0,
-        titles: Titles.empty(),
+        titles: (
+          enabled: false,
+          odd: "",
+          even: "",
+        ),
         eventFilter: [],
         monthTitleSize: 36,
         eventTitleSize: 34,
@@ -351,7 +370,11 @@ class Calendar {
         refreshToken: json["refreshToken"],
         tokenExpiry: DateTime.parse(json["tokenExpiry"]).toUtc(),
         maxEvents: json["maxEvents"],
-        titles: Titles.fromJson(json["titles"]),
+        titles: (
+          enabled: json["titles"]["enabled"],
+          odd: json["titles"]["odd"],
+          even: json["titles"]["even"],
+        ),
         eventFilter: List<String>.from(json["eventFilter"].map((x) => x)),
         monthTitleSize: double.parse(json["monthTitleSize"].toString()),
         eventTitleSize: double.parse(json["eventTitleSize"].toString()),
@@ -366,7 +389,11 @@ class Calendar {
         "refreshToken": refreshToken,
         "tokenExpiry": tokenExpiry.toIso8601String(),
         "maxEvents": maxEvents,
-        "titles": titles.toJson(),
+        "titles": {
+          "enabled": titles.enabled,
+          "odd": titles.odd,
+          "even": titles.even,
+        },
         "eventFilter": List<dynamic>.from(eventFilter.map((x) => x)),
         "monthTitleSize": monthTitleSize,
         "eventTitleSize": eventTitleSize,
@@ -383,7 +410,7 @@ class Sidebar {
     required this.padding,
   });
 
-  factory Sidebar.empty() => Sidebar(
+  factory Sidebar.asDefault() => Sidebar(
         enabled: true,
         padding: 16,
       );
@@ -416,7 +443,7 @@ class Trakt {
     required this.listId,
   });
 
-  factory Trakt.empty() => Trakt(
+  factory Trakt.asDefault() => Trakt(
         clientId: "",
         clientSecret: "",
         accessToken: "",
@@ -461,9 +488,9 @@ class Watchlist {
     required this.maxItems,
   });
 
-  factory Watchlist.empty() => Watchlist(
+  factory Watchlist.asDefault() => Watchlist(
         enabled: false,
-        trakt: Trakt.empty(),
+        trakt: Trakt.asDefault(),
         tmdbApiKey: "",
         prefix: "Watchlist: ",
         color: "#f5511d",
@@ -504,7 +531,7 @@ class Weather {
     required this.units,
   });
 
-  factory Weather.empty() => Weather(
+  factory Weather.asDefault() => Weather(
         enabled: false,
         apiKey: "",
         postcode: "",
