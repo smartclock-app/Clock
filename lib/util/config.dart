@@ -312,7 +312,6 @@ class Calendar {
   final double monthTitleSize;
   final double eventTitleSize;
   final double eventTimeSize;
-  final double eventColorSize;
 
   Calendar({
     required this.enabled,
@@ -327,7 +326,6 @@ class Calendar {
     required this.monthTitleSize,
     required this.eventTitleSize,
     required this.eventTimeSize,
-    required this.eventColorSize,
   });
 
   factory Calendar.empty() => Calendar(
@@ -343,7 +341,6 @@ class Calendar {
         monthTitleSize: 36,
         eventTitleSize: 34,
         eventTimeSize: 28,
-        eventColorSize: 8,
       );
 
   factory Calendar.fromJson(Map<String, dynamic> json) => Calendar(
@@ -359,7 +356,6 @@ class Calendar {
         monthTitleSize: double.parse(json["monthTitleSize"].toString()),
         eventTitleSize: double.parse(json["eventTitleSize"].toString()),
         eventTimeSize: double.parse(json["eventTimeSize"].toString()),
-        eventColorSize: double.parse(json["eventColorSize"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
@@ -375,7 +371,6 @@ class Calendar {
         "monthTitleSize": monthTitleSize,
         "eventTitleSize": eventTitleSize,
         "eventTimeSize": eventTimeSize,
-        "eventColorSize": eventColorSize,
       };
 }
 

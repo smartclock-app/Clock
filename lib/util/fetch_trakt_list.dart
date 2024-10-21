@@ -27,5 +27,6 @@ Future<(bool, Set<String>, AccessTokenResponse?)> fetchTraktList({required Confi
     return "$type-$tmdbId";
   }).toSet();
 
-  return (itemIds.difference(watchlistIds).isNotEmpty, itemIds, tokens);
+  final setsHaveChanged = itemIds.difference(watchlistIds).isNotEmpty || watchlistIds.difference(itemIds).isNotEmpty;
+  return (setsHaveChanged, itemIds, tokens);
 }

@@ -17,8 +17,6 @@ import 'package:smartclock/smart_clock.dart';
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel, Config;
 
-late Future<void> Function() loginAlexa;
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -35,12 +33,6 @@ void main() async {
 
   final confFile = File(path.join(confDir.path, "config.json"));
   if (!confFile.existsSync()) Config.empty(confFile).save();
-
-  // try {
-  //   final bundledConfig = await rootBundle.loadString("assets/config.json");
-  //   confFile.writeAsStringSync(bundledConfig);
-  // } catch (_) {
-  // }
 
   final cookieFile = File(path.join(supportDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
@@ -72,6 +64,7 @@ void main() async {
   final config = Config.fromJson(confFile, jsonDecode(confFile.readAsStringSync()));
   final client = alexa.QueryClient(
     cookieFile,
+    loginToken: config.alexa.token,
     logger: (log, level) {
       switch (level) {
         case "trace":
@@ -91,23 +84,6 @@ void main() async {
       }
     },
   );
-
-  if (config.alexa.enabled) {
-    loginAlexa = () async {
-      try {
-        if (!await client.checkStatus(config.alexa.userId)) {
-          if (config.alexa.userId.isEmpty || config.alexa.token.isEmpty) {
-            throw Exception("Alexa User ID and Token must be set in the config file.");
-          }
-          await client.login(config.alexa.userId, config.alexa.token);
-        }
-      } catch (e) {
-        logger.w("Failed to login to Alexa: $e");
-      }
-    };
-
-    await loginAlexa();
-  }
 
   // // LINUX BONJOUR DEPENDENCIES:
   // // avahi-daemon avahi-discover avahi-utils libnss-mdns mdns-scan

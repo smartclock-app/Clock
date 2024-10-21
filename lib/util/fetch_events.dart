@@ -195,6 +195,8 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
       final DateTime start = item.key;
       final DateTime end = start.add(const Duration(days: 1));
 
+      item.value.sort();
+
       final event = CalendarItem(
         id: UniqueKey().toString(),
         title: "${config.watchlist.prefix}\n${item.value.join("\n")}",

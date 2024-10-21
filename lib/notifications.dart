@@ -31,7 +31,7 @@ class _NotificationsState extends State<Notifications> {
       return logger.e("Failed to fetch notifications: $e");
     }
 
-    final allDevices = await client.getDeviceList(config.alexa.userId);
+    final allDevices = await client.getDevices(config.alexa.userId);
     final devices = allDevices.where((d) => config.alexa.devices.contains(d.accountName));
 
     List<alexa.Notification> timers = [];
