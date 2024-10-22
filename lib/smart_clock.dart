@@ -71,6 +71,7 @@ class _SmartClockState extends State<SmartClock> {
     return MaterialApp(
       title: 'SmartClock',
       theme: ThemeData(scaffoldBackgroundColor: Colors.black, fontFamily: "Poppins"),
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
           width: resolution.first.toDouble(),

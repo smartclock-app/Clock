@@ -18,18 +18,22 @@ Future<void> updateWatchlist({required Config config, required Set<String> items
       Response response = await dio.get("/$type/$id");
 
       if (type == 'movie') {
+        // Set the date to the release date, ensuring the time is 00:00:00Z
+        final date = response.data["release_date"].split("T")[0];
         data = {
           "id": item,
           "name": response.data["title"],
           "status": response.data["status"],
-          "nextAirDate": response.data["release_date"],
+          "nextAirDate": "${date}T00:00:00Z",
         };
       } else {
+        // Set the date to the next episode air date, ensuring the time is 00:00:00Z
+        final date = response.data["next_episode_to_air"]?["air_date"].split("T")[0];
         data = {
           "id": item,
           "name": response.data["name"],
           "status": response.data["status"],
-          "nextAirDate": response.data["next_episode_to_air"]?["air_date"],
+          "nextAirDate": "${date}T00:00:00Z",
         };
       }
     } on DioException catch (e) {

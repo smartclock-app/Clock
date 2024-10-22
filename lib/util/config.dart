@@ -3,13 +3,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/util/logger.dart';
 
 class ConfigModel extends ChangeNotifier {
   late StreamSubscription<FileSystemEvent> _fileWatcher;
+  late alexa.QueryClient _client;
   Config config;
 
-  ConfigModel(this.config) {
+  ConfigModel(this.config, {required alexa.QueryClient client}) {
+    _client = client;
+
     _fileWatcher = config.file.watch().listen((event) {
       logger.i("Config file changed: ${event.path}");
 
@@ -38,6 +42,15 @@ class ConfigModel extends ChangeNotifier {
   void dispose() {
     _fileWatcher.cancel();
     super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (_client.loginToken != config.alexa.token) {
+      _client.loginToken = config.alexa.token;
+      logger.i("Updated Alexa loginToken: ${_client.loginToken}");
+    }
+    super.notifyListeners();
   }
 }
 
@@ -138,22 +151,19 @@ class RemoteConfig {
   final bool enabled;
   final int port;
   final String password;
-  final String salt;
   final bool useBonjour;
 
   RemoteConfig({
     required this.enabled,
     required this.port,
     required this.password,
-    required this.salt,
     required this.useBonjour,
   });
 
   factory RemoteConfig.asDefault() => RemoteConfig(
-        enabled: false,
+        enabled: true,
         port: 8080,
         password: "",
-        salt: "",
         useBonjour: true,
       );
 
@@ -161,7 +171,6 @@ class RemoteConfig {
         enabled: json["enabled"],
         port: json["port"],
         password: json["password"],
-        salt: json["salt"],
         useBonjour: json["useBonjour"],
       );
 
@@ -169,7 +178,6 @@ class RemoteConfig {
         "enabled": enabled,
         "port": port,
         "password": password,
-        "salt": salt,
         "useBonjour": useBonjour,
       };
 }

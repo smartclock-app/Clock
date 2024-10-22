@@ -20,6 +20,7 @@ import 'package:smartclock/util/config.dart' show ConfigModel, Config;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   final supportDir = await getApplicationSupportDirectory();
   final docsDir = await getApplicationDocumentsDirectory();
@@ -27,6 +28,11 @@ void main() async {
   if (!confDir.existsSync()) confDir.createSync(recursive: true);
   logger.i("Support Directory: ${supportDir.path}");
   logger.i("Config Directory: ${confDir.path}");
+
+  final display = WidgetsBinding.instance.platformDispatcher.views.first.display;
+  final width = (display.size.width / display.devicePixelRatio).toInt();
+  final height = (display.size.height / display.devicePixelRatio).toInt();
+  logger.i("Device Resolution: ${width}x$height");
 
   final schemaFile = File(path.join(confDir.path, "schema.json"));
   final schema = await rootBundle.loadString("assets/schema.json");
@@ -94,6 +100,7 @@ void main() async {
       name: Platform.localHostname,
       type: '_smartclock._tcp',
       port: config.remoteConfig.port,
+      attributes: {'protected': config.remoteConfig.password.isNotEmpty.toString()},
     );
     final broadcast = BonsoirBroadcast(service: service);
     await broadcast.ready;
@@ -102,7 +109,7 @@ void main() async {
 
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => ConfigModel(config)),
+      ChangeNotifierProvider(create: (context) => ConfigModel(config, client: client)),
       Provider<Database>.value(value: database),
       Provider<alexa.QueryClient>.value(value: client),
       // Push events to this stream to tell widgets to update
