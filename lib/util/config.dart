@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+
+import 'package:smartclock/util/color_from_hex.dart';
 import 'package:smartclock/util/logger.dart';
 
 class ConfigModel extends ChangeNotifier {
@@ -56,7 +59,7 @@ class ConfigModel extends ChangeNotifier {
 
 class Config {
   File file;
-  final String resolution;
+  final ({double x, double y}) resolution;
   final bool networkEnabled;
   final RemoteConfig remoteConfig;
   final Alexa alexa;
@@ -106,7 +109,7 @@ class Config {
 
   factory Config.asDefault(File file) => Config(
         file: file,
-        resolution: "1280x800",
+        resolution: (x: 1280, y: 800),
         networkEnabled: true,
         remoteConfig: RemoteConfig.asDefault(),
         alexa: Alexa.asDefault(),
@@ -120,7 +123,10 @@ class Config {
 
   factory Config.fromJson(File file, Map<String, dynamic> json) => Config(
         file: file,
-        resolution: json["resolution"],
+        resolution: (
+          x: double.parse(json["resolution"].split("x")[0]),
+          y: double.parse(json["resolution"].split("x")[1]),
+        ),
         networkEnabled: json["networkEnabled"],
         remoteConfig: RemoteConfig.fromJson(json["remoteConfig"]),
         alexa: Alexa.fromJson(json["alexa"]),
@@ -134,7 +140,7 @@ class Config {
 
   Map<String, dynamic> toJson() => {
         "\$schema": "./schema.json",
-        "resolution": resolution,
+        "resolution": "${resolution.x}x${resolution.y}",
         "networkEnabled": networkEnabled,
         "remoteConfig": remoteConfig.toJson(),
         "alexa": alexa.toJson(),
@@ -238,29 +244,34 @@ class Clock {
   final double mainSize;
   final double smallSize;
   final double dateSize;
+  final double padding;
 
   Clock({
     required this.mainSize,
     required this.smallSize,
     required this.dateSize,
+    required this.padding,
   });
 
   factory Clock.asDefault() => Clock(
         mainSize: 200,
         smallSize: 85,
         dateSize: 48,
+        padding: 16,
       );
 
   factory Clock.fromJson(Map<String, dynamic> json) => Clock(
         mainSize: double.parse(json["mainSize"].toString()),
         smallSize: double.parse(json["smallSize"].toString()),
         dateSize: double.parse(json["dateSize"].toString()),
+        padding: double.parse(json["padding"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
         "mainSize": mainSize,
         "smallSize": smallSize,
         "dateSize": dateSize,
+        "padding": padding,
       };
 }
 
@@ -335,6 +346,7 @@ class Calendar {
   final double monthTitleSize;
   final double eventTitleSize;
   final double eventTimeSize;
+  final double eventColorWidth;
 
   Calendar({
     required this.enabled,
@@ -349,6 +361,7 @@ class Calendar {
     required this.monthTitleSize,
     required this.eventTitleSize,
     required this.eventTimeSize,
+    required this.eventColorWidth,
   });
 
   factory Calendar.asDefault() => Calendar(
@@ -368,6 +381,7 @@ class Calendar {
         monthTitleSize: 36,
         eventTitleSize: 34,
         eventTimeSize: 28,
+        eventColorWidth: 8,
       );
 
   factory Calendar.fromJson(Map<String, dynamic> json) => Calendar(
@@ -387,6 +401,7 @@ class Calendar {
         monthTitleSize: double.parse(json["monthTitleSize"].toString()),
         eventTitleSize: double.parse(json["eventTitleSize"].toString()),
         eventTimeSize: double.parse(json["eventTimeSize"].toString()),
+        eventColorWidth: double.parse(json["eventColorWidth"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
@@ -406,31 +421,42 @@ class Calendar {
         "monthTitleSize": monthTitleSize,
         "eventTitleSize": eventTitleSize,
         "eventTimeSize": eventTimeSize,
+        "eventColorWidth": eventColorWidth,
       };
 }
 
 class Sidebar {
   final bool enabled;
-  final double padding;
+  final double cardRadius;
+  final double cardSpacing;
+  final Color cardColor;
 
   Sidebar({
     required this.enabled,
-    required this.padding,
+    required this.cardRadius,
+    required this.cardSpacing,
+    required this.cardColor,
   });
 
   factory Sidebar.asDefault() => Sidebar(
         enabled: true,
-        padding: 16,
+        cardRadius: 10,
+        cardSpacing: 16,
+        cardColor: "#f8f8f8".toColor(),
       );
 
   factory Sidebar.fromJson(Map<String, dynamic> json) => Sidebar(
         enabled: json["enabled"],
-        padding: double.parse(json["padding"].toString()),
+        cardRadius: double.parse(json["cardRadius"].toString()),
+        cardSpacing: double.parse(json["cardSpacing"].toString()),
+        cardColor: (json["cardColor"] as String).toColor(),
       );
 
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
-        "padding": padding,
+        "cardRadius": cardRadius,
+        "cardSpacing": cardSpacing,
+        "cardColor": cardColor.toHex(),
       };
 }
 
@@ -484,7 +510,7 @@ class Watchlist {
   final Trakt trakt;
   final String tmdbApiKey;
   final String prefix;
-  final String color;
+  final Color color;
   final int maxItems;
 
   Watchlist({
@@ -501,7 +527,7 @@ class Watchlist {
         trakt: Trakt.asDefault(),
         tmdbApiKey: "",
         prefix: "Watchlist: ",
-        color: "#f5511d",
+        color: "#f5511d".toColor(),
         maxItems: 4,
       );
 
@@ -510,7 +536,7 @@ class Watchlist {
         trakt: Trakt.fromJson(json["trakt"]),
         tmdbApiKey: json["tmdbApiKey"],
         prefix: json["prefix"],
-        color: json["color"],
+        color: (json["color"] as String).toColor(),
         maxItems: json["maxItems"],
       );
 
@@ -519,7 +545,7 @@ class Watchlist {
         "trakt": trakt.toJson(),
         "tmdbApiKey": tmdbApiKey,
         "prefix": prefix,
-        "color": color,
+        "color": color.toHex(),
         "maxItems": maxItems,
       };
 }
@@ -530,6 +556,8 @@ class Weather {
   final String postcode;
   final String country;
   final String units;
+  final double fontSize;
+  final double iconSize;
 
   Weather({
     required this.enabled,
@@ -537,6 +565,8 @@ class Weather {
     required this.postcode,
     required this.country,
     required this.units,
+    required this.fontSize,
+    required this.iconSize,
   });
 
   factory Weather.asDefault() => Weather(
@@ -545,6 +575,8 @@ class Weather {
         postcode: "",
         country: "",
         units: "metric",
+        fontSize: 32,
+        iconSize: 50,
       );
 
   factory Weather.fromJson(Map<String, dynamic> json) => Weather(
@@ -553,6 +585,8 @@ class Weather {
         postcode: json["postcode"],
         country: json["country"],
         units: json["units"],
+        fontSize: double.parse(json["fontSize"].toString()),
+        iconSize: double.parse(json["iconSize"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
@@ -561,5 +595,7 @@ class Weather {
         "postcode": postcode,
         "country": country,
         "units": units,
+        "fontSize": fontSize,
+        "iconSize": iconSize,
       };
 }

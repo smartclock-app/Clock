@@ -66,7 +66,6 @@ class _SmartClockState extends State<SmartClock> {
   @override
   Widget build(BuildContext context) {
     final config = context.read<ConfigModel>().config;
-    final resolution = config.resolution.split("x").map((e) => int.parse(e));
 
     return MaterialApp(
       title: 'SmartClock',
@@ -74,8 +73,8 @@ class _SmartClockState extends State<SmartClock> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
-          width: resolution.first.toDouble(),
-          height: resolution.last.toDouble(),
+          width: config.resolution.x,
+          height: config.resolution.y,
           color: Colors.white,
           child: Center(
             child: Stack(

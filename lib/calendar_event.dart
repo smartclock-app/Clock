@@ -15,8 +15,6 @@ class CalendarEvent extends StatelessWidget {
   DateTime get _end => event.end;
   Duration get _duration => _end.difference(_start);
 
-  Color hexToColor(String hex) => Color(int.parse(hex.replaceAll(RegExp(r'#'), '0xff')));
-
   bool isAllDay({bool oneDay = true}) {
     final bool isOneDay = _duration.inDays > 0 && _duration.inDays < 2;
     final bool startsMidnight = _start.hour == 0 && _start.minute == 0;
@@ -66,9 +64,9 @@ class CalendarEvent extends StatelessWidget {
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.only(left: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(config.calendar.eventColorWidth * (4 / 5)),
         border: Border(
-          left: BorderSide(color: hexToColor(event.color), width: 8),
+          left: BorderSide(color: event.color, width: config.calendar.eventColorWidth),
         ),
       ),
       child: Column(

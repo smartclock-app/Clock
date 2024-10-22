@@ -22,7 +22,11 @@ class Sidebar extends StatelessWidget {
       width: config.dimensions.sidebar.width,
       height: config.dimensions.sidebar.height,
       child: Container(
-        padding: EdgeInsets.all(config.sidebar.padding),
+        margin: EdgeInsets.all(config.clock.padding),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        clipBehavior: Clip.hardEdge,
         child: SingleChildScrollView(
           child: Column(
             children: !networkAvailable

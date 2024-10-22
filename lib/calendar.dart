@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'package:smartclock/sidebar_card.dart';
 import 'package:smartclock/calendar_event.dart';
 import 'package:smartclock/util/fetch_events.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel, Config;
@@ -121,13 +122,7 @@ class _CalendarState extends State<Calendar> {
         return Column(
           children: [
             for (var month in snapshot.data!.entries) ...[
-              Container(
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xfff8f8f8),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              SidebarCard(
                 child: Column(
                   children: [
                     Align(

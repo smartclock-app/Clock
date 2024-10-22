@@ -5,6 +5,7 @@ import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:googleapis_auth/googleapis_auth.dart' as auth;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:smartclock/util/color_from_hex.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:trakt_dart/trakt_dart.dart';
 
@@ -18,7 +19,7 @@ class CalendarItem {
   final String title;
   final DateTime start;
   final DateTime end;
-  final String color;
+  final Color color;
 
   const CalendarItem({
     required this.id,
@@ -140,7 +141,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
         title: event.summary!,
         start: startDate,
         end: endDate,
-        color: eventColor(event.colorId) ?? color,
+        color: (eventColor(event.colorId) ?? color).toColor(),
       );
 
       allEvents.add(calendarItem);

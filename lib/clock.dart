@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smartclock/util/config.dart' show ConfigModel;
+
 import 'package:smartclock/util/get_ordinal.dart';
 import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/util/config.dart' show ConfigModel;
 
 class Clock extends StatefulWidget {
   const Clock({super.key});
@@ -48,7 +49,6 @@ class _ClockState extends State<Clock> {
   @override
   Widget build(BuildContext context) {
     final config = context.read<ConfigModel>().config;
-    final clockConf = config.clock;
 
     return Positioned(
       left: config.dimensions.clock.x,
@@ -56,9 +56,9 @@ class _ClockState extends State<Clock> {
       width: config.dimensions.clock.width,
       height: config.dimensions.clock.height,
       child: Container(
-        margin: const EdgeInsets.only(top: 16, left: 16, bottom: 16),
+        margin: EdgeInsets.all(config.clock.padding),
         decoration: BoxDecoration(
-          color: const Color(0xfff8f8f8),
+          color: config.sidebar.cardColor,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
@@ -72,7 +72,7 @@ class _ClockState extends State<Clock> {
                 children: [
                   Text(
                     "$_hour:$_minute",
-                    style: TextStyle(fontSize: clockConf.mainSize, height: 0.8, color: Colors.black),
+                    style: TextStyle(fontSize: config.clock.mainSize, height: 0.8, color: Colors.black),
                     softWrap: false,
                   ),
                   const SizedBox(width: 10),
@@ -81,13 +81,13 @@ class _ClockState extends State<Clock> {
                     children: [
                       Text(
                         _second,
-                        style: TextStyle(fontSize: clockConf.smallSize, height: 0.8, color: Colors.black),
+                        style: TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.black),
                         softWrap: false,
                       ),
                       const SizedBox(height: 15),
                       Text(
                         _period,
-                        style: TextStyle(fontSize: clockConf.smallSize, height: 0.8, color: Colors.black),
+                        style: TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.black),
                         softWrap: false,
                       ),
                     ],
@@ -97,7 +97,7 @@ class _ClockState extends State<Clock> {
               const SizedBox(height: 50),
               Text(
                 DateFormat("EEEE d'${getOrdinal(now.day)}' MMMM yyyy").format(now),
-                style: TextStyle(fontSize: clockConf.dateSize, height: 0.8, color: Colors.black),
+                style: TextStyle(fontSize: config.clock.dateSize, height: 0.8, color: Colors.black),
                 textAlign: TextAlign.center,
                 softWrap: false,
               )

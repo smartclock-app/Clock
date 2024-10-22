@@ -23,12 +23,12 @@ class WeatherIcons {
     "50n": "\uea13",
   };
 
-  static Widget getIcon(String icon) {
+  static Widget getIcon(String icon, {required double size}) {
     return Text(
       icons[icon] ?? "",
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: "WeatherIcons",
-        fontSize: 50,
+        fontSize: size,
         height: 1,
       ),
     );

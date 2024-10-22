@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+import 'package:smartclock/sidebar_card.dart';
 
 class TimerCard extends StatefulWidget {
   const TimerCard({super.key, required this.timer});
@@ -36,14 +37,7 @@ class _TimerCardState extends State<TimerCard> {
     Duration remaining = DateTime.fromMillisecondsSinceEpoch(widget.timer.triggerTime!).difference(now);
     String remainingString = "${remaining.inHours}:${remaining.inMinutes.remainder(60).toString().padLeft(2, '0')}:${remaining.inSeconds.remainder(60).toString().padLeft(2, '0')}";
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xfff8f8f8),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      clipBehavior: Clip.hardEdge,
+    return SidebarCard(
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

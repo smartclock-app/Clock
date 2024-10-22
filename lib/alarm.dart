@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:smartclock/sidebar_card.dart';
 
 class AlarmCard extends StatefulWidget {
   const AlarmCard({super.key, required this.alarm});
@@ -37,14 +38,7 @@ class _AlarmCardState extends State<AlarmCard> {
     String triggerTime = "${widget.alarm.originalDate!}T${(widget.alarm.snoozedToTime ?? widget.alarm.originalTime!)}";
     DateTime trigger = DateTime.parse(triggerTime);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xfff8f8f8),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      clipBehavior: Clip.hardEdge,
+    return SidebarCard(
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

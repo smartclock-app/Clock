@@ -6,10 +6,11 @@ import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+import 'package:smartclock/now_playing_lyrics.dart';
+import 'package:smartclock/sidebar_card.dart';
 import 'package:smartclock/util/fetch_lyrics.dart';
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/lrc.dart';
-import 'package:smartclock/now_playing_lyrics.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
 
 const radioProviders = ["Unknown Provider", "TuneIn Live Radio", "Global Player"];
@@ -125,13 +126,7 @@ class _NowPlayingState extends State<NowPlaying> {
   Widget build(BuildContext context) {
     if (queue == null || queue?.state == null || !(queue!.state == "PLAYING" || queue!.state == "REFRESHING")) return const SizedBox.shrink();
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xfff8f8f8),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      clipBehavior: Clip.hardEdge,
+    return SidebarCard(
       child: Column(
         children: [
           Column(
