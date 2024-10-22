@@ -21,6 +21,10 @@ import 'package:smartclock/util/config.dart' show ConfigModel, Config;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+  ]);
 
   final supportDir = await getApplicationSupportDirectory();
   final docsDir = await getApplicationDocumentsDirectory();
@@ -29,17 +33,17 @@ void main() async {
   logger.i("Support Directory: ${supportDir.path}");
   logger.i("Config Directory: ${confDir.path}");
 
-  final display = WidgetsBinding.instance.platformDispatcher.views.first.display;
-  final width = (display.size.width / display.devicePixelRatio).toInt();
-  final height = (display.size.height / display.devicePixelRatio).toInt();
-  logger.i("Device Resolution: ${width}x$height");
-
   final schemaFile = File(path.join(confDir.path, "schema.json"));
   final schema = await rootBundle.loadString("assets/schema.json");
   schemaFile.writeAsStringSync(schema);
 
   final confFile = File(path.join(confDir.path, "config.json"));
-  if (!confFile.existsSync()) Config.asDefault(confFile).save();
+  if (Platform.isIOS) {
+    final confJson = await rootBundle.loadString("assets/iphone13_example.json");
+    confFile.writeAsStringSync(confJson);
+  } else if (!confFile.existsSync()) {
+    Config.asDefault(confFile).save();
+  }
 
   final cookieFile = File(path.join(supportDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");

@@ -77,12 +77,24 @@ class _SmartClockState extends State<SmartClock> {
           height: config.resolution.y,
           color: Colors.white,
           child: Center(
-            child: Stack(
-              children: [
-                const Clock(),
-                if (config.sidebar.enabled && config.networkEnabled) Sidebar(networkAvailable: networkAvailable),
-                if (config.weather.enabled && config.networkEnabled && networkAvailable) const Weather(),
-              ],
+            child: SafeArea(
+              bottom: false,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final resolution = constraints.biggest;
+                  final width = (resolution.width).toInt();
+                  final height = (resolution.height).toInt();
+                  logger.i("Safe Area Resolution: ${width}x$height");
+
+                  return Stack(
+                    children: [
+                      const Clock(),
+                      if (config.sidebar.enabled && config.networkEnabled) Sidebar(networkAvailable: networkAvailable),
+                      if (config.weather.enabled && config.networkEnabled && networkAvailable) const Weather(),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),

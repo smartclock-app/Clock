@@ -84,7 +84,7 @@ class _ClockState extends State<Clock> {
                         style: TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.black),
                         softWrap: false,
                       ),
-                      const SizedBox(height: 15),
+                      SizedBox(height: config.clock.smallGap),
                       Text(
                         _period,
                         style: TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.black),
@@ -94,7 +94,7 @@ class _ClockState extends State<Clock> {
                   )
                 ],
               ),
-              const SizedBox(height: 50),
+              SizedBox(height: config.clock.dateGap),
               Text(
                 DateFormat("EEEE d'${getOrdinal(now.day)}' MMMM yyyy").format(now),
                 style: TextStyle(fontSize: config.clock.dateSize, height: 0.8, color: Colors.black),

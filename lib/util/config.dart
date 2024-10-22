@@ -10,29 +10,31 @@ import 'package:smartclock/util/color_from_hex.dart';
 import 'package:smartclock/util/logger.dart';
 
 class ConfigModel extends ChangeNotifier {
-  late StreamSubscription<FileSystemEvent> _fileWatcher;
+  StreamSubscription<FileSystemEvent>? _fileWatcher;
   late alexa.QueryClient _client;
   Config config;
 
   ConfigModel(this.config, {required alexa.QueryClient client}) {
     _client = client;
 
-    _fileWatcher = config.file.watch().listen((event) {
-      logger.i("Config file changed: ${event.path}");
+    if (!Platform.isIOS) {
+      _fileWatcher = config.file.watch().listen((event) {
+        logger.i("Config file changed: ${event.path}");
 
-      if (event.type == FileSystemEvent.modify) {
-        final json = jsonDecode(config.file.readAsStringSync());
+        if (event.type == FileSystemEvent.modify) {
+          final json = jsonDecode(config.file.readAsStringSync());
 
-        final updatedConfig = Config.fromJson(config.file, json);
+          final updatedConfig = Config.fromJson(config.file, json);
 
-        if (config != updatedConfig) {
-          config = Config.fromJson(config.file, json);
-          notifyListeners();
-        } else {
-          logger.i("Config hash unchanged");
+          if (config != updatedConfig) {
+            config = Config.fromJson(config.file, json);
+            notifyListeners();
+          } else {
+            logger.i("Config hash unchanged");
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   void setConfig(Config config) {
@@ -43,7 +45,7 @@ class ConfigModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    _fileWatcher.cancel();
+    _fileWatcher?.cancel();
     super.dispose();
   }
 
@@ -243,34 +245,44 @@ class Alexa {
 class Clock {
   final double mainSize;
   final double smallSize;
+  final double smallGap;
   final double dateSize;
+  final double dateGap;
   final double padding;
 
   Clock({
     required this.mainSize,
     required this.smallSize,
+    required this.smallGap,
     required this.dateSize,
+    required this.dateGap,
     required this.padding,
   });
 
   factory Clock.asDefault() => Clock(
         mainSize: 200,
         smallSize: 85,
+        smallGap: 15,
         dateSize: 48,
+        dateGap: 50,
         padding: 16,
       );
 
   factory Clock.fromJson(Map<String, dynamic> json) => Clock(
         mainSize: double.parse(json["mainSize"].toString()),
         smallSize: double.parse(json["smallSize"].toString()),
+        smallGap: double.parse(json["smallGap"].toString()),
         dateSize: double.parse(json["dateSize"].toString()),
+        dateGap: double.parse(json["dateGap"].toString()),
         padding: double.parse(json["padding"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
         "mainSize": mainSize,
         "smallSize": smallSize,
+        "smallGap": smallGap,
         "dateSize": dateSize,
+        "dateGap": dateGap,
         "padding": padding,
       };
 }
