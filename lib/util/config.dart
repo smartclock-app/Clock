@@ -142,7 +142,7 @@ class Config {
 
   Map<String, dynamic> toJson() => {
         "\$schema": "./schema.json",
-        "resolution": "${resolution.x}x${resolution.y}",
+        "resolution": "${resolution.x.toInt()}x${resolution.y.toInt()}",
         "networkEnabled": networkEnabled,
         "remoteConfig": remoteConfig.toJson(),
         "alexa": alexa.toJson(),

@@ -7,10 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:smartclock/util/color_from_hex.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:trakt_dart/trakt_dart.dart';
+// import 'package:trakt_dart/trakt_dart.dart';
 
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/update_watchlist.dart';
+import 'package:smartclock/util/trakt_manager.dart';
 import 'package:smartclock/util/fetch_trakt_list.dart';
 import 'package:smartclock/util/config.dart' show Config;
 
@@ -167,10 +168,9 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
       clientId: config.watchlist.trakt.clientId,
       clientSecret: config.watchlist.trakt.clientSecret,
       redirectURI: config.watchlist.trakt.redirectUri,
-    )..authentication.authorizeApplicationWithTokens(
-        accessToken: config.watchlist.trakt.accessToken,
-        refreshToken: config.watchlist.trakt.refreshToken,
-      );
+      accessToken: config.watchlist.trakt.accessToken,
+      refreshToken: config.watchlist.trakt.refreshToken,
+    );
 
     final (watchlistChanged, itemIds, tokens) = await fetchTraktList(config: config, trakt: trakt, database: database);
     if (watchlistChanged || updateWl) await updateWatchlist(config: config, items: itemIds, database: database);

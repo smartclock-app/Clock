@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -84,6 +85,7 @@ class _CalendarState extends State<Calendar> {
                 ),
                 const Divider(),
                 Text(snapshot.error.toString()),
+                if (kDebugMode) Text(snapshot.stackTrace.toString()),
               ],
             ),
           );
