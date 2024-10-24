@@ -10,7 +10,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 import 'package:json_schema/json_schema.dart';
-import 'package:bonsoir/bonsoir.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
 import 'package:smartclock/smart_clock.dart';
@@ -91,20 +90,6 @@ void main() async {
       }
     },
   );
-
-  // LINUX BONJOUR DEPENDENCIES:
-  // avahi-daemon avahi-discover avahi-utils libnss-mdns mdns-scan
-  if (config.remoteConfig.enabled && config.remoteConfig.useBonjour) {
-    BonsoirService service = BonsoirService(
-      name: Platform.localHostname,
-      type: '_smartclock._tcp',
-      port: config.remoteConfig.port,
-      attributes: {'protected': config.remoteConfig.password.isNotEmpty.toString()},
-    );
-    final broadcast = BonsoirBroadcast(service: service);
-    await broadcast.ready;
-    await broadcast.start();
-  }
 
   if (config.orientation == Orientation.landscape) {
     await SystemChrome.setPreferredOrientations([

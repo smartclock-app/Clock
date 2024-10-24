@@ -156,12 +156,14 @@ class RemoteConfig {
   final int port;
   final String password;
   final bool useBonjour;
+  String? bonjourName;
 
   RemoteConfig({
     required this.enabled,
     required this.port,
     required this.password,
     required this.useBonjour,
+    this.bonjourName,
   });
 
   factory RemoteConfig.asDefault() => RemoteConfig(
@@ -176,6 +178,7 @@ class RemoteConfig {
         port: json["port"],
         password: json["password"],
         useBonjour: json["useBonjour"],
+        bonjourName: json["bonjourName"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -183,6 +186,7 @@ class RemoteConfig {
         "port": port,
         "password": password,
         "useBonjour": useBonjour,
+        if (bonjourName != null && bonjourName!.isNotEmpty) 'bonjourName': bonjourName,
       };
 }
 
@@ -513,7 +517,7 @@ class Trakt {
         "refreshToken": refreshToken,
         "redirectUri": redirectUri,
         "listId": listId,
-        "includeEpisodesAsShow": includeEpisodesAsShow,
+        if (includeEpisodesAsShow != null) 'includeEpisodesAsShow': includeEpisodesAsShow,
       };
 }
 
