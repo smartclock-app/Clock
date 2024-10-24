@@ -24,7 +24,7 @@ Future<void> updateWatchlist({required Config config, required Set<String> items
           "id": item,
           "name": response.data["title"],
           "status": response.data["status"],
-          "nextAirDate": "${date}T00:00:00Z",
+          "nextAirDate": date != null ? "${date}T00:00:00Z" : null,
         };
       } else {
         // Set the date to the next episode air date, ensuring the time is 00:00:00Z
@@ -33,7 +33,7 @@ Future<void> updateWatchlist({required Config config, required Set<String> items
           "id": item,
           "name": response.data["name"],
           "status": response.data["status"],
-          "nextAirDate": "${date}T00:00:00Z",
+          "nextAirDate": date != null ? "${date}T00:00:00Z" : null,
         };
       }
     } on DioException catch (e) {

@@ -13,10 +13,14 @@ class CalendarEvent extends StatelessWidget {
 
   DateTime get _start => event.start;
   DateTime get _end => event.end;
-  Duration get _duration => _end.difference(_start);
 
+  /// Check if the event is an all-day event
+  ///
+  /// If [oneDay] is true (default), it will only return true if the event is exactly one day long
+  ///
+  /// If [oneDay] is false, it will return true if the event starts and ends at midnight
   bool isAllDay({bool oneDay = true}) {
-    final bool isOneDay = _duration.inDays > 0 && _duration.inDays < 2;
+    final bool isOneDay = _end.difference(_start).inDays == 1;
     final bool startsMidnight = _start.hour == 0 && _start.minute == 0;
     final bool endsMidnight = _end.hour == 0 && _end.minute == 0;
 
@@ -44,15 +48,15 @@ class CalendarEvent extends StatelessWidget {
       dateString = startDay;
     } else if (isAllDay(oneDay: false)) {
       if (_start.month != _end.month) {
-        dateString = "$startDay — ${DateFormat("EEEE d'${getOrdinal(_end.day - 1)}' MMM").format(_end.subtract(const Duration(days: 1)))}";
+        dateString = "$startDay — ${formatDate(_end.subtract(const Duration(days: 1)), "EEEE d'${getOrdinal(_end.day)}' MMM")}";
       } else {
         dateString = "$startDay - ${formatDate(_end.subtract(const Duration(days: 1)), "EEEE d'${getOrdinal(_end.day - 1)}'")}";
       }
-    } else if (_duration.inDays > 1) {
+    } else if (!DateUtils.isSameDay(_start, _end)) {
       if (_start.month != _end.month) {
-        dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${DateFormat("EEEE d'${getOrdinal(_end.day)}' MMM").format(_end)}";
+        dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${formatDate(_end, "EEEE d'${getOrdinal(_end.day)}' MMM")} (${DateFormat("HH:mm").format(_end)})";
       } else {
-        dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${formatDate(_end, "EEEE d'${getOrdinal(_end.day)}'")}";
+        dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${formatDate(_end, "EEEE d'${getOrdinal(_end.day)}'")} (${DateFormat("HH:mm").format(_end)})";
       }
     } else if (_start.isAtSameMomentAs(_end)) {
       dateString = "$startDay (${DateFormat("HH:mm").format(_start)})";

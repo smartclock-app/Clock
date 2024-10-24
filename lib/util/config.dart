@@ -475,6 +475,7 @@ class Trakt {
   String refreshToken;
   final String redirectUri;
   final String listId;
+  final bool? includeEpisodesAsShow;
 
   Trakt({
     required this.clientId,
@@ -483,6 +484,7 @@ class Trakt {
     required this.refreshToken,
     required this.redirectUri,
     required this.listId,
+    this.includeEpisodesAsShow,
   });
 
   factory Trakt.asDefault() => Trakt(
@@ -501,6 +503,7 @@ class Trakt {
         refreshToken: json["refreshToken"],
         redirectUri: json["redirectUri"],
         listId: json["listId"],
+        includeEpisodesAsShow: json["includeEpisodesAsShow"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -510,6 +513,7 @@ class Trakt {
         "refreshToken": refreshToken,
         "redirectUri": redirectUri,
         "listId": listId,
+        "includeEpisodesAsShow": includeEpisodesAsShow,
       };
 }
 

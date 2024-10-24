@@ -114,6 +114,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
     for (final event in events.items!) {
       late final DateTime startDate;
       late final DateTime endDate;
+      event.summary ??= "No title";
 
       // If the event is an all-day event, use the date field, otherwise use the dateTime field
       if (event.start!.date != null) {
@@ -183,7 +184,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
       if ((item["nextAirDate"] as String?) == null) continue;
 
       final DateTime start = DateTime.parse(item["nextAirDate"] as String);
-      if (start.isBefore(DateTime.now())) continue;
+      if (start.isBefore(DateUtils.dateOnly(DateTime.now()))) continue;
 
       if (!watchlistEvents.containsKey(start)) {
         if (++count > config.watchlist.maxItems) break;

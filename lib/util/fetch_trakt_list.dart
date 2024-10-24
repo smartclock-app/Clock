@@ -20,11 +20,17 @@ Future<(bool, Set<String>, TokenPair?)> fetchTraktList({required Config config, 
 
   final watchlistIds = watchlist.map((e) => e["id"]).toSet();
 
-  final itemIds = items.where((e) => e.type == "show" || e.type == "movie").map((e) {
-    final type = e.type == "show" ? "tv" : "movie";
-    final tmdbId = e.movie?.ids.tmdb ?? e.show?.ids.tmdb;
+  final itemTypes = <String>{"show", "episode", "movie"};
+  if (config.watchlist.trakt.includeEpisodesAsShow != null && config.watchlist.trakt.includeEpisodesAsShow == false) {
+    itemTypes.remove("episode");
+  }
 
-    return "$type-$tmdbId";
+  final itemIds = items.where((e) => itemTypes.contains(e.type)).map((e) {
+    if (e.type == "show" || e.type == "episode") {
+      return "tv-${e.show!.ids.tmdb}";
+    } else {
+      return "movie-${e.movie!.ids.tmdb}";
+    }
   }).toSet();
 
   final setsHaveChanged = itemIds.difference(watchlistIds).isNotEmpty || watchlistIds.difference(itemIds).isNotEmpty;
