@@ -11,7 +11,6 @@ import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 import 'package:json_schema/json_schema.dart';
 import 'package:bonsoir/bonsoir.dart';
-
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
 import 'package:smartclock/smart_clock.dart';
@@ -21,10 +20,6 @@ import 'package:smartclock/util/config.dart' show ConfigModel, Config;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeRight,
-    DeviceOrientation.landscapeLeft,
-  ]);
 
   final supportDir = await getApplicationSupportDirectory();
   final docsDir = await getApplicationDocumentsDirectory();
@@ -111,6 +106,36 @@ void main() async {
     await broadcast.start();
   }
 
+  if (config.orientation == Orientation.landscape) {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+  } else {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  // Get display resolution and pixel ratio
+  late final double xSize, ySize;
+  final display = WidgetsBinding.instance.platformDispatcher.views.first;
+  final width = display.physicalSize.width / display.devicePixelRatio;
+  final height = display.physicalSize.height / display.devicePixelRatio;
+  final widerThanTall = width >= height;
+  logger.i("Display Resolution: ${width.toInt()}x${height.toInt()}");
+
+  // Set the resolution based on the orientation
+  // If device starts with orientation opposite of config, swap the values
+  if ((widerThanTall && config.orientation == Orientation.landscape) || (!widerThanTall && config.orientation == Orientation.portrait)) {
+    xSize = width;
+    ySize = height;
+  } else {
+    xSize = height;
+    ySize = width;
+  }
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => ConfigModel(config, client: client)),
@@ -120,7 +145,10 @@ void main() async {
       Provider<StreamController<DateTime>>.value(value: StreamController<DateTime>.broadcast()),
     ],
     child: Consumer<ConfigModel>(
-      builder: (context, value, child) => SmartClock(key: UniqueKey()),
+      builder: (context, value, child) => SmartClock(
+        key: UniqueKey(),
+        resolution: (x: xSize, y: ySize),
+      ),
     ),
   ));
 }

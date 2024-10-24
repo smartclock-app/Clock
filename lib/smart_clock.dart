@@ -13,7 +13,9 @@ import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
 
 class SmartClock extends StatefulWidget {
-  const SmartClock({super.key});
+  const SmartClock({super.key, required this.resolution});
+
+  final ({double x, double y}) resolution;
 
   @override
   State<SmartClock> createState() => _SmartClockState();
@@ -73,8 +75,8 @@ class _SmartClockState extends State<SmartClock> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
-          width: config.resolution.x,
-          height: config.resolution.y,
+          width: widget.resolution.x,
+          height: widget.resolution.y,
           color: Colors.white,
           child: Center(
             child: SafeArea(
@@ -89,7 +91,7 @@ class _SmartClockState extends State<SmartClock> {
                   return Stack(
                     children: [
                       const Clock(),
-                      if (config.sidebar.enabled && config.networkEnabled) Sidebar(networkAvailable: networkAvailable),
+                      if (config.sidebar.enabled) Sidebar(networkAvailable: networkAvailable),
                       if (config.weather.enabled && config.networkEnabled && networkAvailable) const Weather(),
                     ],
                   );

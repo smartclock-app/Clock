@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+import 'package:flutter/material.dart';
 
 import 'package:smartclock/util/color_from_hex.dart';
 import 'package:smartclock/util/logger.dart';
@@ -61,7 +60,7 @@ class ConfigModel extends ChangeNotifier {
 
 class Config {
   File file;
-  final ({double x, double y}) resolution;
+  final Orientation orientation;
   final bool networkEnabled;
   final RemoteConfig remoteConfig;
   final Alexa alexa;
@@ -74,7 +73,7 @@ class Config {
 
   Config({
     required this.file,
-    required this.resolution,
+    required this.orientation,
     required this.networkEnabled,
     required this.remoteConfig,
     required this.alexa,
@@ -111,7 +110,7 @@ class Config {
 
   factory Config.asDefault(File file) => Config(
         file: file,
-        resolution: (x: 1280, y: 800),
+        orientation: Orientation.landscape,
         networkEnabled: true,
         remoteConfig: RemoteConfig.asDefault(),
         alexa: Alexa.asDefault(),
@@ -125,10 +124,7 @@ class Config {
 
   factory Config.fromJson(File file, Map<String, dynamic> json) => Config(
         file: file,
-        resolution: (
-          x: double.parse(json["resolution"].split("x")[0]),
-          y: double.parse(json["resolution"].split("x")[1]),
-        ),
+        orientation: json["orientation"] == "landscape" ? Orientation.landscape : Orientation.portrait,
         networkEnabled: json["networkEnabled"],
         remoteConfig: RemoteConfig.fromJson(json["remoteConfig"]),
         alexa: Alexa.fromJson(json["alexa"]),
@@ -142,7 +138,7 @@ class Config {
 
   Map<String, dynamic> toJson() => {
         "\$schema": "./schema.json",
-        "resolution": "${resolution.x.toInt()}x${resolution.y.toInt()}",
+        "orientation": orientation == Orientation.landscape ? "landscape" : "portrait",
         "networkEnabled": networkEnabled,
         "remoteConfig": remoteConfig.toJson(),
         "alexa": alexa.toJson(),
