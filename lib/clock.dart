@@ -59,7 +59,7 @@ class _ClockState extends State<Clock> {
         margin: EdgeInsets.all(config.clock.padding),
         decoration: BoxDecoration(
           color: config.sidebar.cardColor,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(config.sidebar.cardRadius),
         ),
         child: Center(
           child: Column(

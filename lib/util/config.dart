@@ -39,6 +39,7 @@ class ConfigModel extends ChangeNotifier {
   void setConfig(Config config) {
     config.file = this.config.file;
     this.config = config;
+    this.config.save();
     notifyListeners();
   }
 

@@ -24,7 +24,7 @@ class Sidebar extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.all(config.clock.padding),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(config.sidebar.cardRadius),
         ),
         clipBehavior: Clip.hardEdge,
         child: SingleChildScrollView(
