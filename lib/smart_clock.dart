@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
 
@@ -13,6 +11,7 @@ import 'package:smartclock/Weather.dart';
 import 'package:smartclock/sidebar.dart';
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
+import 'package:smartclock/util/websocket_manager.dart';
 
 class SmartClock extends StatefulWidget {
   const SmartClock({super.key, required this.resolution});
@@ -27,7 +26,7 @@ class _SmartClockState extends State<SmartClock> {
   bool networkAvailable = false;
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
-  BonsoirBroadcast? _broadcast;
+  WebSocketManager? _webSocketManager;
 
   @override
   void initState() {
@@ -35,32 +34,17 @@ class _SmartClockState extends State<SmartClock> {
     initConnectivity();
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
 
-    final config = context.read<ConfigModel>().config;
-    if (config.remoteConfig.enabled && config.remoteConfig.useBonjour) {
-      _initBonjour(config).then((broadcast) => _broadcast = broadcast);
+    final configModel = context.read<ConfigModel>();
+    if (configModel.config.remoteConfig.enabled) {
+      _webSocketManager = WebSocketManager(configModel);
     }
   }
 
   @override
   void dispose() {
     _connectivitySubscription.cancel();
-    _broadcast?.stop();
+    _webSocketManager?.dispose();
     super.dispose();
-  }
-
-  Future<BonsoirBroadcast> _initBonjour(config) async {
-    // LINUX BONJOUR DEPENDENCIES:
-    // avahi-daemon avahi-discover avahi-utils libnss-mdns mdns-scan
-    BonsoirService service = BonsoirService(
-      name: config.remoteConfig.bonjourName ?? Platform.localHostname,
-      type: '_smartclock._tcp',
-      port: config.remoteConfig.port,
-      attributes: {'protected': config.remoteConfig.password.isNotEmpty.toString()},
-    );
-    final broadcast = BonsoirBroadcast(service: service);
-    await broadcast.ready;
-    await broadcast.start();
-    return broadcast;
   }
 
   Future<void> initConnectivity() async {
