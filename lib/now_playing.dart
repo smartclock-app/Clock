@@ -3,7 +3,7 @@ import 'dart:math' show min;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/now_playing_lyrics.dart';
@@ -35,7 +35,7 @@ class _NowPlayingState extends State<NowPlaying> {
 
     logger.t("Refetching queue");
     final config = context.read<ConfigModel>().config;
-    final database = context.read<Database>();
+    final database = context.read<sqlite3.Database>();
     final client = context.read<alexa.QueryClient>();
     alexa.Queue q = alexa.Queue(state: "STOPPED");
     try {

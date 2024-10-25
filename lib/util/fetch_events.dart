@@ -6,8 +6,7 @@ import 'package:googleapis_auth/googleapis_auth.dart' as auth;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:smartclock/util/color_from_hex.dart';
-import 'package:sqflite/sqflite.dart';
-// import 'package:trakt_dart/trakt_dart.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/update_watchlist.dart';
@@ -178,7 +177,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
     if (tokens != null) newTraktTokens = (tokens.accessToken, tokens.refreshToken);
 
     int count = 0;
-    final watchlist = await database.query("watchlist", orderBy: "nextAirDate");
+    final watchlist = database.select("SELECT * FROM watchlist WHERE nextAirDate IS NOT NULL ORDER BY nextAirDate");
     Map<DateTime, List<String>> watchlistEvents = {};
     for (final item in watchlist) {
       if ((item["nextAirDate"] as String?) == null) continue;

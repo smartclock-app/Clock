@@ -1,13 +1,13 @@
 import 'package:smartclock/util/logger.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite3/sqlite3.dart';
 import 'package:dio/dio.dart';
 import 'package:smartclock/util/config.dart' show Config;
 
 Future<void> updateWatchlist({required Config config, required Set<String> items, required Database database}) async {
   logger.t("Refetching watchlist items");
 
-  final batch = database.batch();
-  batch.delete("watchlist");
+  database.execute("DELETE FROM watchlist");
+  final insert = database.prepare("INSERT INTO watchlist (id, name, status, nextAirDate) VALUES (?, ?, ?, ?)");
 
   final dio = Dio(BaseOptions(baseUrl: "https://api.themoviedb.org/3", headers: {"Authorization": "Bearer ${config.watchlist.tmdbApiKey}"}));
   for (final item in items) {
@@ -46,8 +46,8 @@ Future<void> updateWatchlist({required Config config, required Set<String> items
       };
     }
 
-    batch.insert("watchlist", data);
+    insert.execute([data["id"], data["name"], data["status"], data["nextAirDate"]]);
   }
 
-  await batch.commit();
+  insert.dispose();
 }

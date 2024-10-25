@@ -8,8 +8,8 @@ import 'package:smartclock/util/logger.dart';
 part 'websocket_handler.dart';
 
 class WebSocketManager {
-  late HttpServer server;
-  late ConfigModel configModel;
+  HttpServer? server;
+  ConfigModel configModel;
   BonsoirBroadcast? _broadcast;
 
   WebSocketManager(this.configModel) {
@@ -38,7 +38,7 @@ class WebSocketManager {
 
   void _initServer() async {
     server = await HttpServer.bind(InternetAddress.anyIPv4, configModel.config.remoteConfig.port);
-    server.transform(WebSocketTransformer()).listen(onWebSocketData);
+    server?.transform(WebSocketTransformer()).listen(onWebSocketData);
     logger.i("WebSocket server started on port ${configModel.config.remoteConfig.port}");
   }
 
@@ -67,7 +67,7 @@ class WebSocketManager {
   }
 
   void dispose() {
-    server.close(force: true);
+    server?.close(force: true);
     _broadcast?.stop();
   }
 }

@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite3/sqlite3.dart';
 import 'package:json_schema/json_schema.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
@@ -55,17 +55,9 @@ void main() async {
     Config.fromJson(confFile, mergedJson).save();
   }
 
-  Database database = await openDatabase(
-    path.join(supportDir.path, 'database.db'),
-    onUpgrade: (db, _, __) async {
-      final batch = db.batch();
-      batch.execute("CREATE TABLE IF NOT EXISTS lyrics (id TEXT PRIMARY KEY, lyrics TEXT)");
-      batch.execute("CREATE TABLE IF NOT EXISTS watchlist (id TEXT PRIMARY KEY UNIQUE, name TEXT, status TEXT, nextAirDate DATE)");
-      await batch.commit();
-      return;
-    },
-    version: 3,
-  );
+  Database database = sqlite3.open(path.join(supportDir.path, 'database.db'));
+  database.execute(
+      "CREATE TABLE IF NOT EXISTS lyrics (id TEXT PRIMARY KEY, lyrics TEXT); CREATE TABLE IF NOT EXISTS watchlist (id TEXT PRIMARY KEY UNIQUE, name TEXT, status TEXT, nextAirDate DATE)");
 
   final config = Config.fromJson(confFile, jsonDecode(confFile.readAsStringSync()));
   final client = alexa.QueryClient(

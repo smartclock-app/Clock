@@ -1,11 +1,11 @@
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite3/sqlite3.dart';
 import 'package:smartclock/util/config.dart';
 import 'package:smartclock/util/trakt_manager.dart';
 
 /// Fetches the Trakt list and compares it to the watchlist database.
 /// Returns a tuple of a boolean indicating if the list has changed and a set of item IDs.
 Future<(bool, Set<String>, TokenPair?)> fetchTraktList({required Config config, required TraktManager trakt, required Database database}) async {
-  final watchlist = await database.query("watchlist");
+  final watchlist = database.select("SELECT * FROM watchlist");
   late List<ListItem> items;
   TokenPair? tokens;
 

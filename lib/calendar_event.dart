@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -68,7 +70,7 @@ class CalendarEvent extends StatelessWidget {
       margin: EdgeInsets.only(top: config.sidebar.cardSpacing),
       padding: const EdgeInsets.only(left: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(config.calendar.eventColorWidth * (4 / 5)),
+        borderRadius: Platform.isLinux ? BorderRadius.zero : BorderRadius.circular(config.calendar.eventColorWidth),
         border: Border(
           left: BorderSide(color: event.color, width: config.calendar.eventColorWidth),
         ),

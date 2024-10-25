@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:smartclock/sidebar_card.dart';
 import 'package:smartclock/calendar_event.dart';
@@ -21,7 +21,7 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   StreamSubscription<void>? _subscription;
   late Config config;
-  late Database database;
+  late sqlite3.Database database;
   late Future<Map<String, List<CalendarItem>>> _futureEvents;
   final _client = http.Client();
 
@@ -29,7 +29,7 @@ class _CalendarState extends State<Calendar> {
   void initState() {
     super.initState();
     config = context.read<ConfigModel>().config;
-    database = context.read<Database>();
+    database = context.read<sqlite3.Database>();
     _futureEvents = fetchEvents(
       config: config,
       httpClient: _client,
