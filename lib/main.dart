@@ -20,26 +20,34 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  final supportDir = await getApplicationSupportDirectory();
-  final docsDir = await getApplicationDocumentsDirectory();
-  final confDir = Directory(path.join(docsDir.path, 'SmartClock'));
-  if (!confDir.existsSync()) confDir.createSync(recursive: true);
-  logger.i("Support Directory: ${supportDir.path}");
-  logger.i("Config Directory: ${confDir.path}");
+  late final Directory appDir;
+  if ((Platform.isMacOS || Platform.isLinux) && Platform.environment['HOME'] != null) {
+    appDir = Directory(path.join(Platform.environment['HOME']!, '.smartclock'));
+  } else if (Platform.isWindows && Platform.environment['APPDATA'] != null) {
+    appDir = Directory(path.join(Platform.environment['APPDATA']!, 'SmartClock'));
+  } else {
+    final documentsDir = await getApplicationDocumentsDirectory();
+    appDir = Directory(path.join(documentsDir.path, 'SmartClock'));
+  }
 
-  final schemaFile = File(path.join(confDir.path, "schema.json"));
+  if (!appDir.existsSync()) appDir.createSync(recursive: true);
+  logger.i("Application Directory: ${appDir.path}");
+
+  final schemaFile = File(path.join(appDir.path, "schema.json"));
   final schema = await rootBundle.loadString("assets/schema.json");
   schemaFile.writeAsStringSync(schema);
 
-  final confFile = File(path.join(confDir.path, "config.json"));
+  final confFile = File(path.join(appDir.path, "config.json"));
+  // TODO: Remove this when remoteConfig is finished.
   if (Platform.isIOS) {
-    final confJson = await rootBundle.loadString("assets/iphone13_example.json");
+    // Writes pre-filled config file to device.
+    final confJson = await rootBundle.loadString("assets/iphone13.json");
     confFile.writeAsStringSync(confJson);
   } else if (!confFile.existsSync()) {
     Config.asDefault(confFile).save();
   }
 
-  final cookieFile = File(path.join(supportDir.path, "cookies.json"));
+  final cookieFile = File(path.join(appDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
 
   final configJson = jsonDecode(confFile.readAsStringSync());
@@ -55,7 +63,7 @@ void main() async {
     Config.fromJson(confFile, mergedJson).save();
   }
 
-  Database database = sqlite3.open(path.join(supportDir.path, 'database.db'));
+  Database database = sqlite3.open(path.join(appDir.path, 'database.db'));
   database.execute(
       "CREATE TABLE IF NOT EXISTS lyrics (id TEXT PRIMARY KEY, lyrics TEXT); CREATE TABLE IF NOT EXISTS watchlist (id TEXT PRIMARY KEY UNIQUE, name TEXT, status TEXT, nextAirDate DATE)");
 
@@ -101,7 +109,7 @@ void main() async {
   final width = display.physicalSize.width / display.devicePixelRatio;
   final height = display.physicalSize.height / display.devicePixelRatio;
   final widerThanTall = width >= height;
-  logger.i("Display Resolution: ${width.toInt()}x${height.toInt()}");
+  logger.i("Window Resolution: ${width.toInt()}x${height.toInt()}");
 
   // Set the resolution based on the orientation
   // If device starts with orientation opposite of config, swap the values

@@ -328,7 +328,7 @@ class Dimensions {
 
   factory Dimensions.asDefault() => Dimensions(
         clock: Dimension.parse("0,0,800,800"),
-        sidebar: Dimension.parse("792,0,488,800"),
+        sidebar: Dimension.parse("784,0,496,800"),
         weather: Dimension.parse("64,64,672,100"),
       );
 

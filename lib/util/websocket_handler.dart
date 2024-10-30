@@ -4,18 +4,26 @@ class WebSocketCommand {
   final String command;
   final String? data;
 
-  WebSocketCommand(this.command, this.data);
+  WebSocketCommand({required this.command, this.data});
 
   factory WebSocketCommand.fromEvent(String event) {
-    late List<String> csv;
+    final Map<String, String> parsed = {};
+    final lines = event.split('\n');
 
-    try {
-      csv = event.split("~~");
-    } on FormatException catch (_) {
-      return WebSocketCommand("invalid_csv", null);
+    for (final line in lines) {
+      final colonIndex = line.indexOf(':');
+      if (colonIndex == -1) continue;
+
+      final key = line.substring(0, colonIndex).trim();
+      final value = line.substring(colonIndex + 1).trim();
+      parsed[key] = value;
     }
 
-    return WebSocketCommand(csv[0], csv.length > 1 ? csv[1] : null);
+    if (parsed['command'] == null) {
+      return WebSocketCommand(command: "invalid_command");
+    }
+
+    return WebSocketCommand(command: parsed['command']!, data: parsed['data']);
   }
 }
 

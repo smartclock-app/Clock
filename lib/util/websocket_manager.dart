@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bonsoir/bonsoir.dart';
 import 'package:smartclock/util/config.dart';
 import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/util/toggle_display.dart';
 
 part 'websocket_handler.dart';
 
@@ -21,14 +22,17 @@ class WebSocketManager {
     }
   }
 
-  Future<BonsoirBroadcast> _initBonjour(config) async {
+  Future<BonsoirBroadcast> _initBonjour(Config config) async {
     // LINUX BONJOUR DEPENDENCIES:
     // avahi-daemon avahi-discover avahi-utils libnss-mdns mdns-scan
     BonsoirService service = BonsoirService(
       name: config.remoteConfig.bonjourName ?? Platform.localHostname,
       type: '_smartclock._tcp',
       port: config.remoteConfig.port,
-      attributes: {'protected': config.remoteConfig.password.isNotEmpty.toString()},
+      attributes: {
+        'platform': Platform.operatingSystem,
+        'protected': config.remoteConfig.password.isNotEmpty.toString(),
+      },
     );
     final broadcast = BonsoirBroadcast(service: service);
     await broadcast.ready;
@@ -46,9 +50,10 @@ class WebSocketManager {
     final commands = WebSocketHandler();
 
     commands.addCommand('echo', (command) => command.data ?? "No data provided");
+    commands.addCommand('toggle_display', (command) => toggleDisplay());
     commands.addCommand('get_config', (command) => jsonEncode(configModel.config));
     commands.addCommand('set_config', (command) {
-      final newConfig = Config.fromJson(File(''), jsonDecode(command.data!));
+      final newConfig = Config.fromJson(configModel.config.file, jsonDecode(command.data!));
       configModel.setConfig(newConfig);
       return "Config updated";
     });
@@ -56,7 +61,7 @@ class WebSocketManager {
     webSocket.listen(
       (event) {
         final command = WebSocketCommand.fromEvent(event);
-        logger.i("Received command: ${command.command}");
+        logger.t("Received command: ${command.command}");
 
         final response = commands.handle(command);
         webSocket.add(response);

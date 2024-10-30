@@ -93,7 +93,7 @@ class _WeatherState extends State<Weather> {
             children: [
               Row(
                 children: [
-                  WeatherIcons.getIcon(weather["icon"]!, size: config.weather.iconSize),
+                  WeatherIcons.getIcon(weather["icon"] ?? "", size: config.weather.iconSize),
                   const SizedBox(width: 16),
                   Text(weather["temp"]!, style: TextStyle(fontSize: config.weather.fontSize)),
                 ],
