@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' as intl; // Must be named as conflicted TextDirection
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,9 +20,20 @@ class _ClockState extends State<Clock> {
   DateTime now = DateTime.now();
 
   String get _hour => now.hour == 12 ? "12" : "${now.hour % 12}".padLeft(2, "0");
+  // ignore: non_constant_identifier_names
+  String get _24Hour => "${now.hour}".padLeft(2, "0");
   String get _minute => "${now.minute}".padLeft(2, "0");
   String get _second => "${now.second}".padLeft(2, "0");
   String get _period => now.hour < 12 ? "AM" : "PM";
+
+  Size _textSize(String text, TextStyle style) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    )..layout(minWidth: 0, maxWidth: double.infinity);
+    return textPainter.size;
+  }
 
   @override
   void initState() {
@@ -31,6 +42,7 @@ class _ClockState extends State<Clock> {
       final newNow = DateTime.now();
       if (newNow.second % 30 == 0) {
         logger.t("Refetching Content...");
+        // Notifies other widgets to refetch their content
         Provider.of<StreamController<DateTime>>(context, listen: false).add(now);
       }
 
@@ -49,6 +61,8 @@ class _ClockState extends State<Clock> {
   @override
   Widget build(BuildContext context) {
     final config = context.read<ConfigModel>().config;
+
+    final smallStyle = TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.black);
 
     return Positioned(
       left: config.dimensions.clock.x,
@@ -71,32 +85,30 @@ class _ClockState extends State<Clock> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "$_hour:$_minute",
+                    "${config.clock.twentyFourHour ? _24Hour : _hour}:$_minute",
                     style: TextStyle(fontSize: config.clock.mainSize, height: 0.8, color: Colors.black),
                     softWrap: false,
                   ),
-                  const SizedBox(width: 10),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _second,
-                        style: TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.black),
-                        softWrap: false,
+                  if (config.clock.showSeconds) ...[
+                    // Ensure section is always the same width to prevent layout shifts
+                    SizedBox(
+                      width: _textSize(_period, smallStyle).width + config.clock.smallGap,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        verticalDirection: config.clock.twentyFourHour ? VerticalDirection.up : VerticalDirection.down,
+                        children: [
+                          Text(_second, style: smallStyle, softWrap: false),
+                          SizedBox(height: config.clock.smallGap),
+                          Text(!config.clock.twentyFourHour ? _period : "", style: smallStyle, softWrap: false),
+                        ],
                       ),
-                      SizedBox(height: config.clock.smallGap),
-                      Text(
-                        _period,
-                        style: TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.black),
-                        softWrap: false,
-                      ),
-                    ],
-                  )
+                    ),
+                  ],
                 ],
               ),
               SizedBox(height: config.clock.dateGap),
               Text(
-                DateFormat("EEEE d'${getOrdinal(now.day)}' MMMM yyyy").format(now),
+                intl.DateFormat("EEEE d'${getOrdinal(now.day)}' MMMM yyyy").format(now),
                 style: TextStyle(fontSize: config.clock.dateSize, height: 0.8, color: Colors.black),
                 textAlign: TextAlign.center,
                 softWrap: false,

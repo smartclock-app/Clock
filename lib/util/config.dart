@@ -244,6 +244,8 @@ class Alexa {
 }
 
 class Clock {
+  final bool twentyFourHour;
+  final bool showSeconds;
   final double mainSize;
   final double smallSize;
   final double smallGap;
@@ -252,6 +254,8 @@ class Clock {
   final double padding;
 
   Clock({
+    required this.twentyFourHour,
+    required this.showSeconds,
     required this.mainSize,
     required this.smallSize,
     required this.smallGap,
@@ -261,6 +265,8 @@ class Clock {
   });
 
   factory Clock.asDefault() => Clock(
+        twentyFourHour: false,
+        showSeconds: true,
         mainSize: 200,
         smallSize: 85,
         smallGap: 15,
@@ -270,6 +276,8 @@ class Clock {
       );
 
   factory Clock.fromJson(Map<String, dynamic> json) => Clock(
+        twentyFourHour: json["twentyFourHour"],
+        showSeconds: json["showSeconds"],
         mainSize: double.parse(json["mainSize"].toString()),
         smallSize: double.parse(json["smallSize"].toString()),
         smallGap: double.parse(json["smallGap"].toString()),
@@ -279,6 +287,8 @@ class Clock {
       );
 
   Map<String, dynamic> toJson() => {
+        "twentyFourHour": twentyFourHour,
+        "showSeconds": showSeconds,
         "mainSize": mainSize,
         "smallSize": smallSize,
         "smallGap": smallGap,

@@ -107,6 +107,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
       timeMin: DateTime.now().toUtc(),
       singleEvents: true,
       orderBy: "startTime",
+      maxResults: config.calendar.maxEvents,
     );
 
     // For each event, create a CalendarItem
@@ -214,9 +215,10 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
 
   // Sort events by month
   final Map<String, List<CalendarItem>> sortedEvents = {};
-  final currentWeek = weekNumber(DateTime.now());
+  final currentTime = DateTime.now();
+  final currentWeek = weekNumber(currentTime);
   final weekReference = DateTime(2024, 1, 1);
-  for (final event in allEvents.getRange(0, config.calendar.maxEvents)) {
+  for (final event in allEvents.take(config.calendar.maxEvents)) {
     final eventMonth = months[event.start.month - 1];
     final eventYear = event.start.year;
     final eventWeek = weekNumber(event.start);
@@ -224,7 +226,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
     String key;
     bool isEven = weekReference.difference(event.start).inDays.isEven;
     final title = isEven ? config.calendar.titles.even : config.calendar.titles.odd;
-    if (eventWeek <= currentWeek) {
+    if (eventWeek == currentWeek || event.start.isBefore(currentTime)) {
       key = config.calendar.titles.enabled && title.isNotEmpty ? "This Week - $title" : "This Week";
     } else if (eventWeek == currentWeek + 1) {
       key = config.calendar.titles.enabled && title.isNotEmpty ? "Next Week - $title" : "Next Week";
