@@ -13,10 +13,10 @@ packages:
     dependency: "direct main"
     description:
       name: alexaquery_dart
-      sha256: faf6694c078613c79efdb499909e4e84415787ff817bc972d44cdf06f4e54c98
+      sha256: cc455a0ebc81dc04e4e400f4a784836a1bff4ac83763ec12a4c809118de7b6ab
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.1"
+    version: "4.0.1"
   args:
     dependency: transitive
     description:

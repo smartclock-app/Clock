@@ -8,7 +8,7 @@ Future<Lrc?> fetchLyrics(Database db, String title, String artist) async {
 
   final response = await Dio().get("https://lrclib.net/api/search?q=$title+$artist");
   final data = response.data as List<dynamic>;
-  final lyrics = data.firstOrNull["syncedLyrics"];
+  final lyrics = data.firstOrNull?["syncedLyrics"];
   if (lyrics != null && Lrc.isValid(lyrics)) {
     db.execute("INSERT INTO lyrics (id, lyrics) VALUES (?, ?)", ["$title - $artist", lyrics]);
     return Lrc.parse(lyrics);

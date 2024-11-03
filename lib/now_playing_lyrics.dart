@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smartclock/util/lrc.dart';
 
 class NowPlayingLyrics extends StatelessWidget {
-  final double progress;
+  final int progress;
   final Lrc lyrics;
 
   const NowPlayingLyrics({super.key, required this.progress, required this.lyrics});
@@ -14,9 +14,9 @@ class NowPlayingLyrics extends StatelessWidget {
     LrcLine? previousLine;
 
     for (final line in lyrics.lyrics) {
-      if (line.timestampInSeconds <= progress) {
+      if (line.timestampInSeconds <= (progress / 1000)) {
         currentLine = line;
-      } else if (line.timestampInSeconds > progress) {
+      } else if (line.timestampInSeconds > (progress / 1000)) {
         break;
       }
     }

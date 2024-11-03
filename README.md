@@ -16,6 +16,7 @@ A configurable smart clock application built with Flutter.
   - Alarms
   - Reminders
   - Now Playing
+  - Sticky Notes (Coming soon)
 - Support for all platforms
 - Companion mobile app
 
@@ -68,6 +69,7 @@ See all config options in the [Configuration Documentation](https://docs.smartcl
 - [Companion App]() - Coming soon
 - [Config Documentation](https://docs.smartclock.app)
 - [Example Auth Server](https://github.com/smartclock-app/Auth) - for Trakt and Google tokens
+- [LRCLIB](https://github.com/tranxuanthang/lrclib) - Library of synced song lyrics
 
 ## License
 

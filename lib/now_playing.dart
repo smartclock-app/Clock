@@ -13,7 +13,7 @@ import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/lrc.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
 
-const radioProviders = ["Unknown Provider", "TuneIn Live Radio", "Global Player"];
+const radioProviders = ["Unknown Provider", "TuneIn", "Global Player"];
 
 class NowPlaying extends StatefulWidget {
   const NowPlaying({super.key});
@@ -24,24 +24,24 @@ class NowPlaying extends StatefulWidget {
 
 class _NowPlayingState extends State<NowPlaying> {
   StreamSubscription<void>? _subscription;
-  double progress = 0;
-  bool get isRadio => radioProviders.contains(queue?.provider?.providerDisplayName ?? "Unknown Provider");
+  int progress = 0;
+  bool get isRadio => radioProviders.contains(queue?.provider?.providerName ?? "Unknown Provider");
   Lrc? lyrics;
 
   alexa.Queue? queue;
 
   void getQueue() async {
-    if (queue?.state == "REFRESHING") return;
+    if (queue?.playerState == "REFRESHING") return;
 
     logger.t("Refetching queue");
     final config = context.read<ConfigModel>().config;
     final database = context.read<sqlite3.Database>();
     final client = context.read<alexa.QueryClient>();
-    alexa.Queue q = alexa.Queue(state: "STOPPED");
+    alexa.Queue q = alexa.Queue(playerState: "STOPPED");
     try {
       for (final device in config.alexa.devices) {
         final queue = await client.getQueue(config.alexa.userId, device);
-        if (queue.state == "PLAYING") {
+        if (queue.playerState == "PLAYING") {
           q = queue;
           break;
         }
@@ -50,7 +50,7 @@ class _NowPlayingState extends State<NowPlaying> {
       return logger.e("Failed to fetch queue: $e");
     }
 
-    if (radioProviders.contains(q.provider?.providerDisplayName ?? "Unknown Provider")) {
+    if (radioProviders.contains(q.provider?.providerName ?? "Unknown Provider")) {
       if (!mounted) return;
       return setState(() {
         lyrics = null;
@@ -63,12 +63,12 @@ class _NowPlayingState extends State<NowPlaying> {
     if (q.infoText?.title != null && q.infoText?.subText1 != null) {
       lyricResult = await fetchLyrics(database, q.infoText!.title!, q.infoText!.subText1!);
     }
-    final difference = DateTime.now().toUtc().difference(q.timestamp!).inMilliseconds;
+
     if (!mounted) return;
     setState(() {
       lyrics = lyricResult;
       queue = q;
-      progress = (q.progress?.mediaProgress ?? 0).toDouble() + difference / 900;
+      progress = q.progress?.mediaProgress ?? 0;
     });
   }
 
@@ -84,18 +84,18 @@ class _NowPlayingState extends State<NowPlaying> {
         return;
       }
 
-      if (queue!.state != "PLAYING") {
+      if (queue!.playerState != "PLAYING") {
         return;
       }
 
       if (!isRadio) {
         if (progress >= queue!.progress!.mediaLength!) {
           getQueue();
-          queue!.state = "REFRESHING";
+          queue!.playerState = "REFRESHING";
         }
 
         setState(() {
-          progress = min(progress + 0.1, queue!.progress!.mediaLength!.toDouble());
+          progress = min(progress + 100, queue!.progress!.mediaLength!);
         });
       }
     });
@@ -117,16 +117,17 @@ class _NowPlayingState extends State<NowPlaying> {
   }
 
   String formatMediaTime(int time, {bool remaining = false}) {
-    final minutes = time ~/ 60;
-    final seconds = time % 60;
+    final minutes = time ~/ 60000;
+    final seconds = (time ~/ 1000) % 60;
     return "${remaining ? "-" : ""}$minutes:${seconds.toString().padLeft(2, '0')}";
   }
 
   @override
   Widget build(BuildContext context) {
-    if (queue == null || queue?.state == null || !(queue!.state == "PLAYING" || queue!.state == "REFRESHING")) return const SizedBox.shrink();
+    if (queue == null || queue?.playerState == null || !(queue!.playerState == "PLAYING" || queue!.playerState == "REFRESHING")) return const SizedBox.shrink();
 
     return SidebarCard(
+      padding: false,
       child: Column(
         children: [
           Column(
@@ -135,7 +136,7 @@ class _NowPlayingState extends State<NowPlaying> {
                 children: [
                   ColorFiltered(
                     colorFilter: const ColorFilter.mode(Color(0xfff8f8f8), BlendMode.darken),
-                    child: Image.network(queue?.mainArt?.url ?? "", height: 146),
+                    child: Image.network(queue?.mainArt?.fullUrl ?? "", height: 146),
                   ),
                   Expanded(
                     child: Padding(
@@ -166,7 +167,7 @@ class _NowPlayingState extends State<NowPlaying> {
                             const SizedBox(height: 16),
                             Row(
                               children: [
-                                Text(formatMediaTime(progress.toInt())),
+                                Text(formatMediaTime(progress)),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: LinearProgressIndicator(
@@ -175,7 +176,7 @@ class _NowPlayingState extends State<NowPlaying> {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Text(formatMediaTime(queue!.progress!.mediaLength! - progress.toInt(), remaining: true)),
+                                Text(formatMediaTime(queue!.progress!.mediaLength! - progress, remaining: true)),
                               ],
                             ),
                           ],

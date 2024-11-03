@@ -62,6 +62,7 @@ class ConfigModel extends ChangeNotifier {
 class Config {
   File file;
   final Orientation orientation;
+  final bool interactive;
   final bool networkEnabled;
   final RemoteConfig remoteConfig;
   final Alexa alexa;
@@ -75,6 +76,7 @@ class Config {
   Config({
     required this.file,
     required this.orientation,
+    required this.interactive,
     required this.networkEnabled,
     required this.remoteConfig,
     required this.alexa,
@@ -112,6 +114,7 @@ class Config {
   factory Config.asDefault(File file) => Config(
         file: file,
         orientation: Orientation.landscape,
+        interactive: false,
         networkEnabled: true,
         remoteConfig: RemoteConfig.asDefault(),
         alexa: Alexa.asDefault(),
@@ -126,6 +129,7 @@ class Config {
   factory Config.fromJson(File file, Map<String, dynamic> json) => Config(
         file: file,
         orientation: json["orientation"] == "landscape" ? Orientation.landscape : Orientation.portrait,
+        interactive: json["interactive"],
         networkEnabled: json["networkEnabled"],
         remoteConfig: RemoteConfig.fromJson(json["remoteConfig"]),
         alexa: Alexa.fromJson(json["alexa"]),
@@ -140,6 +144,7 @@ class Config {
   Map<String, dynamic> toJson() => {
         "\$schema": "./schema.json",
         "orientation": orientation == Orientation.landscape ? "landscape" : "portrait",
+        "interactive": interactive,
         "networkEnabled": networkEnabled,
         "remoteConfig": remoteConfig.toJson(),
         "alexa": alexa.toJson(),
