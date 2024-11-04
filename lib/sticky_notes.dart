@@ -86,7 +86,9 @@ class _StickyNotesState extends State<StickyNotes> {
 
   Future<List<alexa.Memory>> _fetchMemories() async {
     if (_config == null) return List.empty();
-    return _client?.getMemories(_config!.alexa.userId) ?? List.empty();
+    final memories = await _client?.getMemories(_config!.alexa.userId);
+    memories?.sort((b, a) => a.updatedDateTime!.compareTo(b.updatedDateTime!));
+    return memories ?? List.empty();
   }
 
   @override

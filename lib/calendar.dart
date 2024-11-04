@@ -125,6 +125,7 @@ class _CalendarState extends State<Calendar> {
           children: [
             for (var month in snapshot.data!.entries) ...[
               SidebarCard(
+                margin: month.key != snapshot.data!.keys.last,
                 child: Column(
                   children: [
                     Align(

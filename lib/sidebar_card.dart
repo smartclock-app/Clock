@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
 
 class SidebarCard extends StatelessWidget {
-  const SidebarCard({super.key, required this.child, this.padding = true});
+  const SidebarCard({super.key, required this.child, this.padding = true, this.margin = true});
 
+  final bool margin;
   final bool padding;
   final Widget child;
 
@@ -13,7 +14,7 @@ class SidebarCard extends StatelessWidget {
     final config = context.read<ConfigModel>().config;
 
     return Container(
-      margin: EdgeInsets.only(bottom: config.sidebar.cardSpacing),
+      margin: margin ? EdgeInsets.only(bottom: config.sidebar.cardSpacing) : null,
       padding: padding ? EdgeInsets.all(config.sidebar.cardSpacing) : null,
       decoration: BoxDecoration(
         color: config.sidebar.cardColor,
