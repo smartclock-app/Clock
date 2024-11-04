@@ -5,6 +5,7 @@ import 'package:smartclock/calendar.dart';
 import 'package:smartclock/info_widget.dart';
 import 'package:smartclock/now_playing.dart';
 import 'package:smartclock/notifications.dart';
+import 'package:smartclock/sticky_notes.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
 
 class Sidebar extends StatelessWidget {
@@ -44,6 +45,7 @@ class Sidebar extends StatelessWidget {
                             message: "You have enabled Now Playing, but not entered any devices.\n\nTo hide this message, enter at least one device, or disable Now Playing.",
                           ),
                       const Notifications(),
+                      if (config.alexa.features.notes) const StickyNotes(),
                     ],
                     if (config.calendar.enabled) const Calendar(),
                     if (!config.alexa.enabled && !config.calendar.enabled)

@@ -198,10 +198,12 @@ class RemoteConfig {
 
 class Alexa {
   final bool enabled;
-  final ({bool nowplaying, bool alarms, bool timers}) features;
+  final ({bool nowplaying, bool alarms, bool timers, bool notes}) features;
   final String userId;
   final String token;
   final List<String> devices;
+  final int noteColumns;
+  final double noteFontSize;
 
   Alexa({
     required this.enabled,
@@ -209,6 +211,8 @@ class Alexa {
     required this.userId,
     required this.token,
     required this.devices,
+    required this.noteColumns,
+    required this.noteFontSize,
   });
 
   factory Alexa.asDefault() => Alexa(
@@ -217,10 +221,13 @@ class Alexa {
           nowplaying: false,
           alarms: false,
           timers: false,
+          notes: false,
         ),
         userId: "",
         token: "",
         devices: [],
+        noteColumns: 3,
+        noteFontSize: 24,
       );
 
   factory Alexa.fromJson(Map<String, dynamic> json) => Alexa(
@@ -229,10 +236,13 @@ class Alexa {
           nowplaying: json["features"]["nowplaying"],
           alarms: json["features"]["alarms"],
           timers: json["features"]["timers"],
+          notes: json["features"]["notes"],
         ),
         userId: json["userId"],
         token: json["token"],
         devices: List<String>.from(json["devices"].map((x) => x)),
+        noteColumns: json["noteColumns"],
+        noteFontSize: double.parse(json["noteFontSize"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
@@ -241,10 +251,13 @@ class Alexa {
           "nowplaying": features.nowplaying,
           "alarms": features.alarms,
           "timers": features.timers,
+          "notes": features.notes,
         },
         "userId": userId,
         "token": token,
         "devices": List<dynamic>.from(devices.map((x) => x)),
+        "noteColumns": noteColumns,
+        "noteFontSize": noteFontSize,
       };
 }
 
