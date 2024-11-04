@@ -14,9 +14,7 @@ import 'package:smartclock/util/config.dart' show ConfigModel;
 import 'package:smartclock/util/websocket_manager.dart';
 
 class SmartClock extends StatefulWidget {
-  const SmartClock({super.key, required this.resolution});
-
-  final ({double x, double y}) resolution;
+  const SmartClock({super.key});
 
   @override
   State<SmartClock> createState() => _SmartClockState();
@@ -82,8 +80,6 @@ class _SmartClockState extends State<SmartClock> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
-          width: widget.resolution.x,
-          height: widget.resolution.y,
           color: Colors.white,
           child: Center(
             child: SafeArea(

@@ -61,6 +61,7 @@ class ConfigModel extends ChangeNotifier {
 
 class Config {
   File file;
+  static const String version = "1.0.0";
   final Orientation orientation;
   final bool interactive;
   final bool networkEnabled;
@@ -143,6 +144,7 @@ class Config {
 
   Map<String, dynamic> toJson() => {
         "\$schema": "./schema.json",
+        "version": version,
         "orientation": orientation == Orientation.landscape ? "landscape" : "portrait",
         "interactive": interactive,
         "networkEnabled": networkEnabled,

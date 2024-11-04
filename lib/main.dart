@@ -54,7 +54,7 @@ void main() async {
   final configSchema = JsonSchema.create(schema);
   final results = configSchema.validate(configJson);
 
-  if (!results.isValid) {
+  if (!results.isValid || configJson["version"] != Config.version) {
     logger.w("Config file is invalid. Created missing keys.");
     logger.t(results.errors);
 
@@ -104,22 +104,10 @@ void main() async {
   }
 
   // Get display resolution and pixel ratio
-  late final double xSize, ySize;
   final display = WidgetsBinding.instance.platformDispatcher.views.first;
   final width = display.physicalSize.width / display.devicePixelRatio;
   final height = display.physicalSize.height / display.devicePixelRatio;
-  final widerThanTall = width >= height;
   logger.i("Window Resolution: ${width.toInt()}x${height.toInt()}");
-
-  // Set the resolution based on the orientation
-  // If device starts with orientation opposite of config, swap the values
-  if ((widerThanTall && config.orientation == Orientation.landscape) || (!widerThanTall && config.orientation == Orientation.portrait)) {
-    xSize = width;
-    ySize = height;
-  } else {
-    xSize = height;
-    ySize = width;
-  }
 
   runApp(MultiProvider(
     providers: [
@@ -130,10 +118,7 @@ void main() async {
       Provider<StreamController<DateTime>>.value(value: StreamController<DateTime>.broadcast()),
     ],
     child: Consumer<ConfigModel>(
-      builder: (context, value, child) => SmartClock(
-        key: UniqueKey(),
-        resolution: (x: xSize, y: ySize),
-      ),
+      builder: (context, value, child) => SmartClock(key: UniqueKey()),
     ),
   ));
 }
