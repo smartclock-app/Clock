@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:smartclock/util/config.dart';
 import 'package:smartclock/util/lrc.dart';
 
 class NowPlayingLyrics extends StatelessWidget {
   final int progress;
   final Lrc lyrics;
+  final Config config;
 
-  const NowPlayingLyrics({super.key, required this.progress, required this.lyrics});
+  const NowPlayingLyrics({super.key, required this.progress, required this.lyrics, required this.config});
 
   @override
   Widget build(BuildContext context) {
@@ -36,16 +38,16 @@ class NowPlayingLyrics extends StatelessWidget {
         children: [
           Text(
             previousLine?.lyrics ?? "",
-            style: const TextStyle(color: Colors.grey, fontSize: 20, overflow: TextOverflow.ellipsis),
+            style: TextStyle(color: Colors.grey, fontSize: config.alexa.lyricsNextFontSize, overflow: TextOverflow.ellipsis),
           ),
           Text(
             currentLine?.lyrics ?? lyrics.lyrics.first.lyrics,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: config.alexa.lyricsCurrentFontSize, fontWeight: FontWeight.bold),
             maxLines: 2,
           ),
           Text(
             nextLine?.lyrics ?? "",
-            style: const TextStyle(color: Colors.grey, fontSize: 20, overflow: TextOverflow.ellipsis),
+            style: TextStyle(color: Colors.grey, fontSize: config.alexa.lyricsNextFontSize, overflow: TextOverflow.ellipsis),
           ),
         ],
       ),

@@ -72,7 +72,7 @@ class _CalendarState extends State<Calendar> {
 
         return Column(
           children: [
-            if (snapshot.hasError) InfoWidget(title: "Calendar", message: snapshot.error.toString()),
+            if (snapshot.hasError) InfoWidget(title: "Calendar", message: "${snapshot.error.toString()}\n${snapshot.stackTrace.toString()}"),
             if (snapshot.hasData)
               for (var month in snapshot.data!.entries) ...[
                 SidebarCard(

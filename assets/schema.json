@@ -90,6 +90,14 @@
             "type": "string"
           }
         },
+        "nowplayingImageSize": {
+          "type": "number",
+          "description": "The size of the now playing image"
+        },
+        "nowplayingFontSize": {
+          "type": "number",
+          "description": "The font size for the now playing text"
+        },
         "noteColumns": {
           "type": "number",
           "description": "The number of columns to display notes in"

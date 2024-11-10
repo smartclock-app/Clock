@@ -126,6 +126,8 @@ class _NowPlayingState extends State<NowPlaying> {
   Widget build(BuildContext context) {
     if (queue == null || queue?.playerState == null || !(queue!.playerState == "PLAYING" || queue!.playerState == "REFRESHING")) return const SizedBox.shrink();
 
+    final config = context.read<ConfigModel>().config;
+
     return SidebarCard(
       padding: false,
       child: Column(
@@ -136,7 +138,7 @@ class _NowPlayingState extends State<NowPlaying> {
                 children: [
                   ColorFiltered(
                     colorFilter: const ColorFilter.mode(Color(0xfff8f8f8), BlendMode.darken),
-                    child: Image.network(queue?.mainArt?.fullUrl ?? "", height: 146),
+                    child: Image.network(queue?.mainArt?.fullUrl ?? "", height: config.alexa.nowplayingImageSize),
                   ),
                   Expanded(
                     child: Padding(
@@ -149,7 +151,7 @@ class _NowPlayingState extends State<NowPlaying> {
                             alignment: Alignment.topLeft,
                             child: Text(
                               queue?.infoText?.title ?? "",
-                              style: const TextStyle(fontSize: 32, height: 1, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontSize: config.alexa.nowplayingFontSize, height: 1, fontWeight: FontWeight.bold),
                               textAlign: TextAlign.left,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -157,8 +159,8 @@ class _NowPlayingState extends State<NowPlaying> {
                           Align(
                             alignment: Alignment.bottomLeft,
                             child: Text(
-                              queue!.infoText!.subText1!,
-                              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                              queue?.infoText?.subText1 ?? "",
+                              style: TextStyle(fontSize: config.alexa.nowplayingFontSize, fontWeight: FontWeight.bold),
                               textAlign: TextAlign.left,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -186,7 +188,7 @@ class _NowPlayingState extends State<NowPlaying> {
                   ),
                 ],
               ),
-              if (!isRadio && (lyrics?.lyrics.isNotEmpty ?? false)) NowPlayingLyrics(progress: progress, lyrics: lyrics!),
+              if (!isRadio && (lyrics?.lyrics.isNotEmpty ?? false)) NowPlayingLyrics(progress: progress, lyrics: lyrics!, config: config),
             ],
           ),
         ],

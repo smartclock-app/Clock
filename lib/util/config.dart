@@ -208,6 +208,10 @@ class Alexa {
   final String userId;
   final String token;
   final List<String> devices;
+  final double nowplayingImageSize;
+  final double nowplayingFontSize;
+  final double lyricsCurrentFontSize;
+  final double lyricsNextFontSize;
   final int noteColumns;
   final double noteFontSize;
 
@@ -217,6 +221,10 @@ class Alexa {
     required this.userId,
     required this.token,
     required this.devices,
+    required this.nowplayingImageSize,
+    required this.nowplayingFontSize,
+    required this.lyricsCurrentFontSize,
+    required this.lyricsNextFontSize,
     required this.noteColumns,
     required this.noteFontSize,
   });
@@ -232,6 +240,10 @@ class Alexa {
         userId: "",
         token: "",
         devices: [],
+        nowplayingImageSize: 146,
+        nowplayingFontSize: 32,
+        lyricsCurrentFontSize: 24,
+        lyricsNextFontSize: 20,
         noteColumns: 3,
         noteFontSize: 24,
       );
@@ -247,6 +259,10 @@ class Alexa {
         userId: json["userId"],
         token: json["token"],
         devices: List<String>.from(json["devices"].map((x) => x)),
+        nowplayingImageSize: double.parse(json["nowplayingImageSize"].toString()),
+        nowplayingFontSize: double.parse(json["nowplayingFontSize"].toString()),
+        lyricsCurrentFontSize: double.parse(json["lyricsCurrentFontSize"].toString()),
+        lyricsNextFontSize: double.parse(json["lyricsNextFontSize"].toString()),
         noteColumns: json["noteColumns"],
         noteFontSize: double.parse(json["noteFontSize"].toString()),
       );
@@ -262,6 +278,10 @@ class Alexa {
         "userId": userId,
         "token": token,
         "devices": List<dynamic>.from(devices.map((x) => x)),
+        "nowplayingImageSize": nowplayingImageSize,
+        "nowplayingFontSize": nowplayingFontSize,
+        "lyricsCurrentFontSize": lyricsCurrentFontSize,
+        "lyricsNextFontSize": lyricsNextFontSize,
         "noteColumns": noteColumns,
         "noteFontSize": noteFontSize,
       };
