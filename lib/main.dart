@@ -41,7 +41,7 @@ void main() async {
   // TODO: Remove this when remoteConfig is finished.
   if (Platform.isIOS || Platform.isAndroid) {
     // Writes pre-filled config file to device.
-    final confJson = await rootBundle.loadString("assets/iphone13.json");
+    final confJson = await rootBundle.loadString("assets/iphone13_portrait.json");
     confFile.writeAsStringSync(confJson);
   } else if (!confFile.existsSync()) {
     Config.asDefault(confFile).save();
