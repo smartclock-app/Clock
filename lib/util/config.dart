@@ -72,7 +72,7 @@ class Config {
   final Sidebar sidebar;
   final Watchlist watchlist;
   final Weather weather;
-  final Dimensions dimensions;
+  final Map<String, Dimension> dimensions;
 
   Config({
     required this.file,
@@ -124,7 +124,11 @@ class Config {
         sidebar: Sidebar.asDefault(),
         watchlist: Watchlist.asDefault(),
         weather: Weather.asDefault(),
-        dimensions: Dimensions.asDefault(),
+        dimensions: {
+          "clock": Dimension.parse("0,0,800,800"),
+          "sidebar": Dimension.parse("784,0,496,800"),
+          "weather": Dimension.parse("64,64,672,100"),
+        },
       );
 
   factory Config.fromJson(File file, Map<String, dynamic> json) => Config(
@@ -139,7 +143,7 @@ class Config {
         sidebar: Sidebar.fromJson(json["sidebar"]),
         watchlist: Watchlist.fromJson(json["watchlist"]),
         weather: Weather.fromJson(json["weather"]),
-        dimensions: Dimensions.fromJson(json["dimensions"]),
+        dimensions: (json["dimensions"] as Map<String, dynamic>).map((key, value) => MapEntry(key, Dimension.parse(value))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -155,7 +159,7 @@ class Config {
         "sidebar": sidebar.toJson(),
         "watchlist": watchlist.toJson(),
         "weather": weather.toJson(),
-        "dimensions": dimensions.toJson(),
+        "dimensions": dimensions,
       };
 }
 
@@ -331,48 +335,18 @@ class Dimension {
     required this.height,
   });
 
-  factory Dimension.parse(String json) {
-    final csv = json.split(',');
+  factory Dimension.parse(String csv) {
+    final parsed = csv.split(',');
     return Dimension(
-      x: double.parse(csv[0]),
-      y: double.parse(csv[1]),
-      width: double.parse(csv[2]),
-      height: double.parse(csv[3]),
+      x: double.parse(parsed[0]),
+      y: double.parse(parsed[1]),
+      width: double.parse(parsed[2]),
+      height: double.parse(parsed[3]),
     );
   }
 
   @override
   String toString() => "${x.toInt()},${y.toInt()},${width.toInt()},${height.toInt()}";
-}
-
-class Dimensions {
-  final Dimension clock;
-  final Dimension sidebar;
-  final Dimension weather;
-
-  Dimensions({
-    required this.clock,
-    required this.sidebar,
-    required this.weather,
-  });
-
-  factory Dimensions.asDefault() => Dimensions(
-        clock: Dimension.parse("0,0,800,800"),
-        sidebar: Dimension.parse("784,0,496,800"),
-        weather: Dimension.parse("64,64,672,100"),
-      );
-
-  factory Dimensions.fromJson(Map<String, dynamic> json) => Dimensions(
-        clock: Dimension.parse(json["clock"]),
-        sidebar: Dimension.parse(json["sidebar"]),
-        weather: Dimension.parse(json["weather"]),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "clock": clock.toString(),
-        "sidebar": sidebar.toString(),
-        "weather": weather.toString(),
-      };
 }
 
 class Calendar {

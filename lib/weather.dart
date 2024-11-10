@@ -83,10 +83,10 @@ class _WeatherState extends State<Weather> {
         final weather = snapshot.data as Map<String, String>;
 
         return Positioned(
-          left: config.dimensions.weather.x,
-          top: config.dimensions.weather.y,
-          width: config.dimensions.weather.width,
-          height: config.dimensions.weather.height,
+          left: config.dimensions["weather"]!.x,
+          top: config.dimensions["weather"]!.y,
+          width: config.dimensions["weather"]!.width,
+          height: config.dimensions["weather"]!.height,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,

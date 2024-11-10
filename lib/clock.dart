@@ -65,10 +65,10 @@ class _ClockState extends State<Clock> {
     final smallStyle = TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.black);
 
     return Positioned(
-      left: config.dimensions.clock.x,
-      top: config.dimensions.clock.y,
-      width: config.dimensions.clock.width,
-      height: config.dimensions.clock.height,
+      left: config.dimensions["clock"]!.x,
+      top: config.dimensions["clock"]!.y,
+      width: config.dimensions["clock"]!.width,
+      height: config.dimensions["clock"]!.height,
       child: Container(
         margin: EdgeInsets.all(config.clock.padding),
         decoration: BoxDecoration(

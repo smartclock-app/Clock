@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
 
@@ -12,6 +13,20 @@ import 'package:smartclock/sidebar.dart';
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
 import 'package:smartclock/util/websocket_manager.dart';
+
+class ScrollWithMouseBehavior extends MaterialScrollBehavior {
+  const ScrollWithMouseBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.invertedStylus,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.touch,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.unknown,
+      };
+}
 
 class SmartClock extends StatefulWidget {
   const SmartClock({super.key});
@@ -78,6 +93,7 @@ class _SmartClockState extends State<SmartClock> {
       title: 'SmartClock',
       theme: ThemeData(scaffoldBackgroundColor: Colors.black, fontFamily: "Poppins"),
       debugShowCheckedModeBanner: false,
+      scrollBehavior: const ScrollWithMouseBehavior(),
       home: Scaffold(
         body: Container(
           color: Colors.white,

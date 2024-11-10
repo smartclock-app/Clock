@@ -18,10 +18,10 @@ class Sidebar extends StatelessWidget {
     final config = context.read<ConfigModel>().config;
 
     return Positioned(
-      left: config.dimensions.sidebar.x,
-      top: config.dimensions.sidebar.y,
-      width: config.dimensions.sidebar.width,
-      height: config.dimensions.sidebar.height,
+      left: config.dimensions["sidebar"]!.x,
+      top: config.dimensions["sidebar"]!.y,
+      width: config.dimensions["sidebar"]!.width,
+      height: config.dimensions["sidebar"]!.height,
       child: Container(
         margin: EdgeInsets.all(config.clock.padding),
         decoration: BoxDecoration(

@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
+import 'package:smartclock/info_widget.dart';
 import 'package:smartclock/sidebar_card.dart';
 import 'package:smartclock/calendar_event.dart';
 import 'package:smartclock/util/fetch_events.dart';
@@ -66,83 +66,34 @@ class _CalendarState extends State<Calendar> {
     return FutureBuilder(
       future: _futureEvents,
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xfff8f8f8),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Calendar",
-                    style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                Text(snapshot.error.toString()),
-                if (kDebugMode) Text(snapshot.stackTrace.toString()),
-              ],
-            ),
-          );
-        }
-
         if (!snapshot.hasData && snapshot.connectionState != ConnectionState.done) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xfff8f8f8),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Calendar",
-                    style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Loading Events...",
-                    style: TextStyle(fontSize: config.calendar.eventTitleSize),
-                  ),
-                ),
-              ],
-            ),
-          );
+          return const InfoWidget(title: "Calendar", message: "Loading Events...");
         }
 
         return Column(
           children: [
-            for (var month in snapshot.data!.entries) ...[
-              SidebarCard(
-                margin: month.key != snapshot.data!.keys.last,
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        month.key,
-                        style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
+            if (snapshot.hasError) InfoWidget(title: "Calendar", message: snapshot.error.toString()),
+            if (snapshot.hasData)
+              for (var month in snapshot.data!.entries) ...[
+                SidebarCard(
+                  margin: month.key != snapshot.data!.keys.last,
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          month.key,
+                          style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
-                    const Divider(),
-                    for (var event in month.value) ...[
-                      CalendarEvent(event: event),
+                      const Divider(),
+                      for (var event in month.value) ...[
+                        CalendarEvent(event: event),
+                      ],
                     ],
-                  ],
-                ),
-              )
-            ]
+                  ),
+                )
+              ]
           ],
         );
       },
