@@ -13,7 +13,7 @@ import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/lrc.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
 
-const radioProviders = ["Unknown Provider", "TuneIn", "Global Player"];
+const radioProviders = ["Unknown Provider", "PLANET_RADIO", "TuneIn", "Global Player"];
 
 class NowPlaying extends StatefulWidget {
   const NowPlaying({super.key});
