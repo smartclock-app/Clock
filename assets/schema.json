@@ -90,6 +90,13 @@
             "type": "string"
           }
         },
+        "radioProviders": {
+          "type": "array",
+          "description": "The IDs of Alexa radio providers. The clock should not show lyrics or progress for these providers",
+          "items": {
+            "type": "string"
+          }
+        },
         "nowplayingImageSize": {
           "type": "number",
           "description": "The size of the now playing image"
@@ -107,7 +114,17 @@
           "description": "The font size for notes"
         }
       },
-      "required": ["enabled", "features", "userId", "token", "devices", "noteColumns", "noteFontSize"]
+      "required": [
+        "enabled",
+        "features",
+        "userId",
+        "token",
+        "devices",
+        "nowplayingImageSize",
+        "nowplayingFontSize",
+        "noteColumns",
+        "noteFontSize"
+      ]
     },
     "clock": {
       "type": "object",

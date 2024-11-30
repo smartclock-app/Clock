@@ -25,16 +25,24 @@ class NowPlaying extends StatefulWidget {
 class _NowPlayingState extends State<NowPlaying> {
   StreamSubscription<void>? _subscription;
   int progress = 0;
-  bool get isRadio => radioProviders.contains(queue?.provider?.providerName ?? "Unknown Provider");
   Lrc? lyrics;
+  ConfigModel? configModel;
 
   alexa.Queue? queue;
+
+  bool isRadio() {
+    bool isRadio = false;
+    if (configModel!.config.alexa.radioProviders != null && queue?.provider?.providerName != null) {
+      isRadio = configModel!.config.alexa.radioProviders!.contains(queue?.provider?.providerName);
+    }
+    return isRadio || radioProviders.contains(queue?.provider?.providerName ?? "Unknown Provider");
+  }
 
   void getQueue() async {
     if (queue?.playerState == "REFRESHING") return;
 
     logger.t("Refetching queue");
-    final config = context.read<ConfigModel>().config;
+    final config = configModel!.config;
     final database = context.read<sqlite3.Database>();
     final client = context.read<alexa.QueryClient>();
     alexa.Queue q = alexa.Queue(playerState: "STOPPED");
@@ -77,6 +85,7 @@ class _NowPlayingState extends State<NowPlaying> {
   @override
   void initState() {
     super.initState();
+    configModel = context.read<ConfigModel>();
     getQueue();
     timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (queue == null || queue!.progress == null) {
@@ -88,7 +97,7 @@ class _NowPlayingState extends State<NowPlaying> {
         return;
       }
 
-      if (!isRadio) {
+      if (!isRadio()) {
         if (progress >= queue!.progress!.mediaLength!) {
           getQueue();
           queue!.playerState = "REFRESHING";
@@ -127,6 +136,7 @@ class _NowPlayingState extends State<NowPlaying> {
     if (queue == null || queue?.playerState == null || !(queue!.playerState == "PLAYING" || queue!.playerState == "REFRESHING")) return const SizedBox.shrink();
 
     final config = context.read<ConfigModel>().config;
+    final isRadioBool = isRadio();
 
     return SidebarCard(
       padding: false,
@@ -165,7 +175,7 @@ class _NowPlayingState extends State<NowPlaying> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (!isRadio) ...[
+                          if (!isRadioBool) ...[
                             const SizedBox(height: 16),
                             Row(
                               children: [
@@ -188,7 +198,7 @@ class _NowPlayingState extends State<NowPlaying> {
                   ),
                 ],
               ),
-              if (!isRadio && (lyrics?.lyrics.isNotEmpty ?? false)) NowPlayingLyrics(progress: progress, lyrics: lyrics!, config: config),
+              if (!isRadioBool && (lyrics?.lyrics.isNotEmpty ?? false)) NowPlayingLyrics(progress: progress, lyrics: lyrics!, config: config),
             ],
           ),
         ],

@@ -89,6 +89,27 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
     httpClient,
   );
 
+  bool credentialsUpdated = false;
+  client.credentialUpdates.listen((credentials) {
+    if (credentials.accessToken.data != config.calendar.accessToken) {
+      logger.t("Updating calendar access token");
+      config.calendar.accessToken = credentials.accessToken.data;
+      credentialsUpdated = true;
+    }
+
+    if (credentials.refreshToken != config.calendar.refreshToken) {
+      logger.t("Updating calendar refresh token");
+      config.calendar.refreshToken = credentials.refreshToken!;
+      credentialsUpdated = true;
+    }
+
+    if (credentials.accessToken.expiry != config.calendar.tokenExpiry) {
+      logger.t("Updating calendar token expiry");
+      config.calendar.tokenExpiry = credentials.accessToken.expiry;
+      credentialsUpdated = true;
+    }
+  });
+
   final calendarApi = calendar.CalendarApi(client);
 
   final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -239,41 +260,21 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   }
 
   // Update credentials in config if they have changed
-  bool updated = false;
-
-  if (client.credentials.accessToken.data != config.calendar.accessToken) {
-    logger.t("Updating calendar access token");
-    config.calendar.accessToken = client.credentials.accessToken.data;
-    updated = true;
-  }
-
-  if (client.credentials.refreshToken != config.calendar.refreshToken) {
-    logger.t("Updating calendar refresh token");
-    config.calendar.refreshToken = client.credentials.refreshToken!;
-    updated = true;
-  }
-
-  if (client.credentials.accessToken.expiry != config.calendar.tokenExpiry) {
-    logger.t("Updating calendar token expiry");
-    config.calendar.tokenExpiry = client.credentials.accessToken.expiry;
-    updated = true;
-  }
-
   if (newTraktTokens != null) {
     if (newTraktTokens.$1 != config.watchlist.trakt.accessToken) {
       logger.t("Updating Trakt access token");
       config.watchlist.trakt.accessToken = newTraktTokens.$1;
-      updated = true;
+      credentialsUpdated = true;
     }
 
     if (newTraktTokens.$2 != config.watchlist.trakt.refreshToken) {
       logger.t("Updating Trakt refresh token");
       config.watchlist.trakt.refreshToken = newTraktTokens.$2;
-      updated = true;
+      credentialsUpdated = true;
     }
   }
 
-  if (updated) {
+  if (credentialsUpdated) {
     config.save();
   }
 

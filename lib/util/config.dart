@@ -102,6 +102,7 @@ class Config {
   }
 
   void save() {
+    print(jsonEncode(toJson()));
     const encoder = JsonEncoder.withIndent("  ");
     file.writeAsStringSync(encoder.convert(this));
   }
@@ -208,6 +209,7 @@ class Alexa {
   final String userId;
   final String token;
   final List<String> devices;
+  List<String>? radioProviders;
   final double nowplayingImageSize;
   final double nowplayingFontSize;
   final double lyricsCurrentFontSize;
@@ -221,6 +223,7 @@ class Alexa {
     required this.userId,
     required this.token,
     required this.devices,
+    this.radioProviders,
     required this.nowplayingImageSize,
     required this.nowplayingFontSize,
     required this.lyricsCurrentFontSize,
@@ -259,6 +262,7 @@ class Alexa {
         userId: json["userId"],
         token: json["token"],
         devices: List<String>.from(json["devices"].map((x) => x)),
+        radioProviders: json["radioProviders"] != null ? List<String>.from(json["radioProviders"].map((x) => x)) : null,
         nowplayingImageSize: double.parse(json["nowplayingImageSize"].toString()),
         nowplayingFontSize: double.parse(json["nowplayingFontSize"].toString()),
         lyricsCurrentFontSize: double.parse(json["lyricsCurrentFontSize"].toString()),
@@ -278,6 +282,7 @@ class Alexa {
         "userId": userId,
         "token": token,
         "devices": List<dynamic>.from(devices.map((x) => x)),
+        if (radioProviders != null) 'radioProviders': List<dynamic>.from(radioProviders!.map((x) => x)),
         "nowplayingImageSize": nowplayingImageSize,
         "nowplayingFontSize": nowplayingFontSize,
         "lyricsCurrentFontSize": lyricsCurrentFontSize,
@@ -367,6 +372,7 @@ class Dimension {
 
   @override
   String toString() => "${x.toInt()},${y.toInt()},${width.toInt()},${height.toInt()}";
+  String toJson() => toString();
 }
 
 class Calendar {
