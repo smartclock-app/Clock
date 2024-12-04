@@ -102,7 +102,6 @@ class Config {
   }
 
   void save() {
-    print(jsonEncode(toJson()));
     const encoder = JsonEncoder.withIndent("  ");
     file.writeAsStringSync(encoder.convert(this));
   }

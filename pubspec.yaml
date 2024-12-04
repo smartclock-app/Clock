@@ -25,6 +25,7 @@ dependencies:
   logger: ^2.4.0
   connectivity_plus: ^6.1.0
   bonsoir: ^5.1.10
+  sqlite3_flutter_libs: ^0.5.26
 
 dev_dependencies:
   flutter_test:
@@ -43,6 +44,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/display/
 
   fonts:
     - family: Poppins

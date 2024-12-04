@@ -27,7 +27,7 @@ class WebSocketCommand {
   }
 }
 
-typedef WebSocketCommandHandler = String? Function(WebSocketCommand command);
+typedef WebSocketCommandHandler = FutureOr<String?> Function(WebSocketCommand command);
 
 class WebSocketHandler {
   final Map<String, WebSocketCommandHandler> routes = {};
@@ -36,7 +36,9 @@ class WebSocketHandler {
     routes[command] = handler;
   }
 
-  String handle(WebSocketCommand command) {
+  List<String> get commands => routes.keys.toList();
+
+  FutureOr<String?> handle(WebSocketCommand command) {
     return routes[command.command]?.call(command) ?? "Invalid command";
   }
 }

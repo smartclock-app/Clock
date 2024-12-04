@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -12,8 +13,20 @@ class WebSocketManager {
   HttpServer? server;
   ConfigModel configModel;
   BonsoirBroadcast? _broadcast;
+  late final WebSocketHandler commands;
 
   WebSocketManager(this.configModel) {
+    commands = WebSocketHandler();
+
+    commands.addCommand('echo', (command) => command.data ?? "No data provided");
+    commands.addCommand('toggle_display', (command) => toggleDisplay("linux"));
+    commands.addCommand('get_config', (command) => jsonEncode(configModel.config));
+    commands.addCommand('set_config', (command) {
+      final newConfig = Config.fromJson(configModel.config.file, jsonDecode(command.data!));
+      configModel.setConfig(newConfig);
+      return "Config updated";
+    });
+
     _initServer();
 
     final config = configModel.config;
@@ -47,23 +60,12 @@ class WebSocketManager {
   }
 
   void onWebSocketData(WebSocket webSocket) {
-    final commands = WebSocketHandler();
-
-    commands.addCommand('echo', (command) => command.data ?? "No data provided");
-    commands.addCommand('toggle_display', (command) => toggleDisplay());
-    commands.addCommand('get_config', (command) => jsonEncode(configModel.config));
-    commands.addCommand('set_config', (command) {
-      final newConfig = Config.fromJson(configModel.config.file, jsonDecode(command.data!));
-      configModel.setConfig(newConfig);
-      return "Config updated";
-    });
-
     webSocket.listen(
-      (event) {
+      (event) async {
         final command = WebSocketCommand.fromEvent(event);
         logger.t("Received command: ${command.command}");
 
-        final response = commands.handle(command);
+        final response = await commands.handle(command);
         webSocket.add(response);
       },
       onError: (error) => logger.e("WebSocket error: $error"),

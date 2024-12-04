@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,6 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqlite3/sqlite3.dart';
+// ignore: unused_import
+import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart'; // Needed for sqlite3 on android
 import 'package:json_schema/json_schema.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
@@ -39,7 +42,7 @@ void main() async {
 
   final confFile = File(path.join(appDir.path, "config.json"));
   // TODO: Remove this when remoteConfig is finished.
-  if (Platform.isIOS || Platform.isAndroid) {
+  if (kDebugMode && (Platform.isIOS || Platform.isAndroid)) {
     // Writes pre-filled config file to device.
     final confJson = await rootBundle.loadString("assets/iphone13_portrait.json");
     confFile.writeAsStringSync(confJson);
