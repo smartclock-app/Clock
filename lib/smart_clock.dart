@@ -9,6 +9,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:smartclock/clock.dart';
 import 'package:smartclock/Weather.dart';
+import 'package:smartclock/editor.dart';
 import 'package:smartclock/sidebar.dart';
 import 'package:smartclock/util/logger.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
@@ -94,6 +95,7 @@ class _SmartClockState extends State<SmartClock> {
       theme: ThemeData(scaffoldBackgroundColor: Colors.black, fontFamily: "Poppins"),
       debugShowCheckedModeBanner: false,
       scrollBehavior: const ScrollWithMouseBehavior(),
+      routes: {'/editor': (context) => const Editor()},
       home: Scaffold(
         body: Container(
           color: Colors.white,

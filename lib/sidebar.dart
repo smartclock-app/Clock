@@ -29,6 +29,7 @@ class Sidebar extends StatelessWidget {
         ),
         clipBehavior: Clip.hardEdge,
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
           child: Column(
             children: !networkAvailable
                 ? [

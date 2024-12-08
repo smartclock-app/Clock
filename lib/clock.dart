@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' as intl; // Must be named as conflicted TextDirection
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -69,51 +70,57 @@ class _ClockState extends State<Clock> {
       top: config.dimensions["clock"]!.y,
       width: config.dimensions["clock"]!.width,
       height: config.dimensions["clock"]!.height,
-      child: Container(
-        margin: EdgeInsets.all(config.clock.padding),
-        decoration: BoxDecoration(
-          color: config.sidebar.cardColor,
-          borderRadius: BorderRadius.circular(config.sidebar.cardRadius),
-        ),
-        child: Center(
-          child: Column(
-            textBaseline: TextBaseline.alphabetic,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${config.clock.twentyFourHour ? _24Hour : _hour}:$_minute",
-                    style: TextStyle(fontSize: config.clock.mainSize, height: 0.8, color: Colors.black),
-                    softWrap: false,
-                  ),
-                  if (config.clock.showSeconds) ...[
-                    // Ensure section is always the same width to prevent layout shifts
-                    SizedBox(
-                      width: _textSize(_period, smallStyle).width + config.clock.smallGap,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        verticalDirection: config.clock.twentyFourHour ? VerticalDirection.up : VerticalDirection.down,
-                        children: [
-                          Text(_second, style: smallStyle, softWrap: false),
-                          SizedBox(height: config.clock.smallGap),
-                          Text(!config.clock.twentyFourHour ? _period : "", style: smallStyle, softWrap: false),
-                        ],
-                      ),
+      child: GestureDetector(
+        onLongPress: () {
+          HapticFeedback.mediumImpact();
+          Navigator.of(context).pushNamed("/editor");
+        },
+        child: Container(
+          margin: EdgeInsets.all(config.clock.padding),
+          decoration: BoxDecoration(
+            color: config.sidebar.cardColor,
+            borderRadius: BorderRadius.circular(config.sidebar.cardRadius),
+          ),
+          child: Center(
+            child: Column(
+              textBaseline: TextBaseline.alphabetic,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "${config.clock.twentyFourHour ? _24Hour : _hour}:$_minute",
+                      style: TextStyle(fontSize: config.clock.mainSize, height: 0.8, color: Colors.black),
+                      softWrap: false,
                     ),
+                    if (config.clock.showSeconds) ...[
+                      // Ensure section is always the same width to prevent layout shifts
+                      SizedBox(
+                        width: _textSize(_period, smallStyle).width + config.clock.smallGap,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          verticalDirection: config.clock.twentyFourHour ? VerticalDirection.up : VerticalDirection.down,
+                          children: [
+                            Text(_second, style: smallStyle, softWrap: false),
+                            SizedBox(height: config.clock.smallGap),
+                            Text(!config.clock.twentyFourHour ? _period : "", style: smallStyle, softWrap: false),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
-                ],
-              ),
-              SizedBox(height: config.clock.dateGap),
-              Text(
-                intl.DateFormat("EEEE d'${getOrdinal(now.day)}' MMMM yyyy").format(now),
-                style: TextStyle(fontSize: config.clock.dateSize, height: 0.8, color: Colors.black),
-                textAlign: TextAlign.center,
-                softWrap: false,
-              )
-            ],
+                ),
+                SizedBox(height: config.clock.dateGap),
+                Text(
+                  intl.DateFormat("EEEE d'${getOrdinal(now.day)}' MMMM yyyy").format(now),
+                  style: TextStyle(fontSize: config.clock.dateSize, height: 0.8, color: Colors.black),
+                  textAlign: TextAlign.center,
+                  softWrap: false,
+                )
+              ],
+            ),
           ),
         ),
       ),

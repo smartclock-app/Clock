@@ -238,14 +238,14 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   final Map<String, List<CalendarItem>> sortedEvents = {};
   final currentTime = DateTime.now();
   final currentWeek = weekNumber(currentTime);
-  final weekReference = DateTime(2024, 1, 1);
+  final weekReference = DateTime(2024, 1, 1); // Must be a Monday for isEven calculation below
   for (final event in allEvents.take(config.calendar.maxEvents)) {
     final eventMonth = months[event.start.month - 1];
     final eventYear = event.start.year;
     final eventWeek = weekNumber(event.start);
 
     String key;
-    bool isEven = weekReference.difference(event.start).inDays.isEven;
+    bool isEven = (weekReference.difference(event.start).inDays ~/ 7).isEven;
     final title = isEven ? config.calendar.titles.even : config.calendar.titles.odd;
     if (eventWeek == currentWeek || event.start.isBefore(currentTime)) {
       key = config.calendar.titles.enabled && title.isNotEmpty ? "This Week - $title" : "This Week";
