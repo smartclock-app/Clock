@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [[ "$1" = "-q" ]]
+then
+  vcgencmd display_power
+  exit 0
+fi
+
 if [[ "$1" = "-p" ]]
 then
 

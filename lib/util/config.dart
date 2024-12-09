@@ -169,14 +169,9 @@ class RemoteConfig {
   final String password;
   final bool useBonjour;
   String? bonjourName;
+  String? toggleDisplayPath;
 
-  RemoteConfig({
-    required this.enabled,
-    required this.port,
-    required this.password,
-    required this.useBonjour,
-    this.bonjourName,
-  });
+  RemoteConfig({required this.enabled, required this.port, required this.password, required this.useBonjour, this.bonjourName, this.toggleDisplayPath});
 
   factory RemoteConfig.asDefault() => RemoteConfig(
         enabled: true,
@@ -191,6 +186,7 @@ class RemoteConfig {
         password: json["password"],
         useBonjour: json["useBonjour"],
         bonjourName: json["bonjourName"],
+        toggleDisplayPath: json["toggleDisplayPath"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -199,6 +195,7 @@ class RemoteConfig {
         "password": password,
         "useBonjour": useBonjour,
         if (bonjourName != null && bonjourName!.isNotEmpty) 'bonjourName': bonjourName,
+        if (toggleDisplayPath != null && toggleDisplayPath!.isNotEmpty) 'toggleDisplayPath': toggleDisplayPath,
       };
 }
 

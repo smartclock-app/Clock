@@ -3,8 +3,9 @@ part of 'websocket_manager.dart';
 class WebSocketCommand {
   final String command;
   final String? data;
+  final Map<String, String>? headers;
 
-  WebSocketCommand({required this.command, this.data});
+  WebSocketCommand({required this.command, this.data, this.headers});
 
   factory WebSocketCommand.fromEvent(String event) {
     final Map<String, String> parsed = {};
@@ -23,7 +24,13 @@ class WebSocketCommand {
       return WebSocketCommand(command: "invalid_command");
     }
 
-    return WebSocketCommand(command: parsed['command']!, data: parsed['data']);
+    final headers = Map<String, String>.from(parsed)..removeWhere((key, _) => key == 'command' || key == 'data');
+
+    return WebSocketCommand(
+      command: parsed['command']!,
+      data: parsed['data'],
+      headers: headers.isNotEmpty ? headers : null,
+    );
   }
 }
 

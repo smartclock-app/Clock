@@ -35,7 +35,7 @@
         },
         "password": {
           "type": "string",
-          "description": "The password to access remote configuration\nNote: Stored in plain text as since it only protects remote config if they can see the password then they must already have access to this file."
+          "description": "The password to access remote configuration\n\nNote: Stored in plain text as, since it only protects this config, if they can see the password then they must already have access to this file."
         },
         "useBonjour": {
           "type": "boolean",
@@ -44,6 +44,10 @@
         "bonjourName": {
           "type": "string",
           "description": "The name to advertise the remote configuration service as"
+        },
+        "toggleDisplayPath": {
+          "type": "string",
+          "description": "The path to a script used to toggle the display on and off\n\nExamples can be found in /assets/display"
         }
       },
       "required": ["enabled", "port", "password", "useBonjour"]
