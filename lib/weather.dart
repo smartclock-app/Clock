@@ -5,11 +5,14 @@ import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smartclock/util/logger.dart';
-import 'package:smartclock/util/weather_icons.dart';
-import 'package:smartclock/util/config.dart' show ConfigModel, Config;
+import 'package:smartclock/util/config.dart' show ConfigModel, Config, WeatherType;
+import 'package:smartclock/weather_card.dart';
+import 'package:smartclock/weather_floating.dart';
 
 class Weather extends StatefulWidget {
-  const Weather({super.key});
+  const Weather({super.key, required this.type});
+
+  final WeatherType type;
 
   @override
   State<Weather> createState() => _WeatherState();
@@ -71,8 +74,6 @@ class _WeatherState extends State<Weather> {
 
   @override
   Widget build(BuildContext context) {
-    Config config = context.read<ConfigModel>().config;
-
     return FutureBuilder(
       future: _weather,
       builder: (context, snapshot) {
@@ -80,34 +81,18 @@ class _WeatherState extends State<Weather> {
           return const SizedBox.shrink();
         }
 
-        final weather = snapshot.data as Map<String, String>;
+        final weather = snapshot.data;
+        if (weather == null) {
+          return const SizedBox.shrink();
+        }
 
-        return Positioned(
-          left: config.dimensions["weather"]!.x,
-          top: config.dimensions["weather"]!.y,
-          width: config.dimensions["weather"]!.width,
-          height: config.dimensions["weather"]!.height,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  WeatherIcons.getIcon(weather["icon"] ?? "", size: config.weather.iconSize),
-                  const SizedBox(width: 16),
-                  Text(weather["temp"]!, style: TextStyle(fontSize: config.weather.fontSize, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              Row(
-                children: [
-                  Text(weather["windSpeed"]!, style: TextStyle(fontSize: config.weather.fontSize, fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 16),
-                  Icon(Icons.cloud_outlined, size: config.weather.iconSize),
-                ],
-              )
-            ],
-          ),
-        );
+        if (widget.type == WeatherType.floating) {
+          return WeatherFloating(weather: weather);
+        } else if (widget.type == WeatherType.card) {
+          return WeatherCard(weather: weather);
+        } else {
+          return const SizedBox.shrink();
+        }
       },
     );
   }

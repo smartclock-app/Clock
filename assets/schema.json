@@ -186,26 +186,32 @@
           "type": "boolean",
           "description": "Whether to enable the calendar integration"
         },
-        "clientId": {
-          "type": "string",
-          "description": "The Google API client ID"
-        },
-        "clientSecret": {
-          "type": "string",
-          "description": "The Google API client secret"
-        },
-        "accessToken": {
-          "type": "string",
-          "description": "The Google API access token"
-        },
-        "refreshToken": {
-          "type": "string",
-          "description": "The Google API refresh token"
-        },
-        "tokenExpiry": {
-          "type": "string",
-          "description": "The UTC expiry date of the access token",
-          "format": "date-time"
+        "google": {
+          "type": "object",
+          "properties": {
+            "clientId": {
+              "type": "string",
+              "description": "The Google API client ID"
+            },
+            "clientSecret": {
+              "type": "string",
+              "description": "The Google API client secret"
+            },
+            "accessToken": {
+              "type": "string",
+              "description": "The Google API access token"
+            },
+            "refreshToken": {
+              "type": "string",
+              "description": "The Google API refresh token"
+            },
+            "tokenExpiry": {
+              "type": "string",
+              "description": "The UTC expiry date of the access token",
+              "format": "date-time"
+            }
+          },
+          "required": ["clientId", "clientSecret", "accessToken", "refreshToken", "tokenExpiry"]
         },
         "maxEvents": {
           "type": "number",
@@ -256,11 +262,7 @@
       },
       "required": [
         "enabled",
-        "clientId",
-        "clientSecret",
-        "accessToken",
-        "refreshToken",
-        "tokenExpiry",
+        "google",
         "maxEvents",
         "titles",
         "eventFilter",
@@ -380,6 +382,11 @@
         "enabled": {
           "type": "boolean",
           "description": "Whether to enable the weather integration"
+        },
+        "type": {
+          "type": "string",
+          "description": "Whether to display weather floating or in the sidebar",
+          "enum": ["floating", "card"]
         },
         "apiKey": {
           "type": "string",

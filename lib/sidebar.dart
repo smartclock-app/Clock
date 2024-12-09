@@ -6,7 +6,8 @@ import 'package:smartclock/info_widget.dart';
 import 'package:smartclock/now_playing.dart';
 import 'package:smartclock/notifications.dart';
 import 'package:smartclock/sticky_notes.dart';
-import 'package:smartclock/util/config.dart' show ConfigModel;
+import 'package:smartclock/util/config.dart' show ConfigModel, WeatherType;
+import 'package:smartclock/weather.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key, required this.networkAvailable});
@@ -47,6 +48,7 @@ class Sidebar extends StatelessWidget {
                       const Notifications(),
                       if (config.alexa.features.notes) const StickyNotes(),
                     ],
+                    if (config.weather.enabled && config.weather.type == WeatherType.card) const Weather(type: WeatherType.card),
                     if (config.calendar.enabled) const Calendar(),
                     if (!config.alexa.enabled && !config.calendar.enabled)
                       const InfoWidget(

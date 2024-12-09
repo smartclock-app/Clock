@@ -8,11 +8,11 @@ import 'package:provider/provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:smartclock/clock.dart';
-import 'package:smartclock/Weather.dart';
+import 'package:smartclock/weather.dart';
 import 'package:smartclock/editor.dart';
 import 'package:smartclock/sidebar.dart';
 import 'package:smartclock/util/logger.dart';
-import 'package:smartclock/util/config.dart' show ConfigModel;
+import 'package:smartclock/util/config.dart' show ConfigModel, WeatherType;
 import 'package:smartclock/util/websocket_manager.dart';
 
 class ScrollWithMouseBehavior extends MaterialScrollBehavior {
@@ -113,7 +113,7 @@ class _SmartClockState extends State<SmartClock> {
                     children: [
                       const Clock(),
                       if (config.sidebar.enabled) Sidebar(networkAvailable: networkAvailable),
-                      if (config.weather.enabled && config.networkEnabled && networkAvailable) const Weather(),
+                      if (config.weather.enabled && config.weather.type == WeatherType.floating && config.networkEnabled && networkAvailable) const Weather(type: WeatherType.floating),
                     ],
                   );
                 },

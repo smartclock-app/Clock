@@ -67,7 +67,7 @@ class CalendarEvent extends StatelessWidget {
     }
 
     return Container(
-      margin: EdgeInsets.only(top: config.sidebar.cardSpacing),
+      margin: EdgeInsets.only(top: config.clock.padding),
       padding: const EdgeInsets.only(left: 8),
       decoration: BoxDecoration(
         borderRadius: Platform.isLinux ? BorderRadius.zero : BorderRadius.circular(config.calendar.eventColorWidth),

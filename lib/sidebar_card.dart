@@ -14,8 +14,8 @@ class SidebarCard extends StatelessWidget {
     final config = context.read<ConfigModel>().config;
 
     return Container(
-      margin: margin ? EdgeInsets.only(bottom: config.sidebar.cardSpacing) : null,
-      padding: padding ? EdgeInsets.all(config.sidebar.cardSpacing) : null,
+      margin: margin ? EdgeInsets.only(bottom: config.clock.padding) : null,
+      padding: padding ? EdgeInsets.all(config.clock.padding) : null,
       decoration: BoxDecoration(
         color: config.sidebar.cardColor,
         borderRadius: BorderRadius.circular(config.sidebar.cardRadius),

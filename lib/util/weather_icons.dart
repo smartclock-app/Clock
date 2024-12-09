@@ -21,6 +21,7 @@ class WeatherIcons {
     "13n": "\uea11",
     "50d": "\uea12",
     "50n": "\uea13",
+    "wind": "\uea14",
   };
 
   static Widget getIcon(String icon, {required double size}) {

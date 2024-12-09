@@ -371,13 +371,49 @@ class Dimension {
   String toJson() => toString();
 }
 
-class Calendar {
-  final bool enabled;
+class Google {
   final String clientId;
   final String clientSecret;
   String accessToken;
   String refreshToken;
   DateTime tokenExpiry;
+
+  Google({
+    required this.clientId,
+    required this.clientSecret,
+    required this.accessToken,
+    required this.refreshToken,
+    required this.tokenExpiry,
+  });
+
+  factory Google.asDefault() => Google(
+        clientId: "",
+        clientSecret: "",
+        accessToken: "",
+        refreshToken: "",
+        tokenExpiry: DateTime.now(),
+      );
+
+  factory Google.fromJson(Map<String, dynamic> json) => Google(
+        clientId: json["clientId"],
+        clientSecret: json["clientSecret"],
+        accessToken: json["accessToken"],
+        refreshToken: json["refreshToken"],
+        tokenExpiry: DateTime.parse(json["tokenExpiry"]).toUtc(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "clientId": clientId,
+        "clientSecret": clientSecret,
+        "accessToken": accessToken,
+        "refreshToken": refreshToken,
+        "tokenExpiry": tokenExpiry.toIso8601String(),
+      };
+}
+
+class Calendar {
+  final bool enabled;
+  final Google google;
   final int maxEvents;
   final ({bool enabled, String odd, String even}) titles;
   final List<String> eventFilter;
@@ -389,11 +425,7 @@ class Calendar {
 
   Calendar({
     required this.enabled,
-    required this.clientId,
-    required this.clientSecret,
-    required this.accessToken,
-    required this.refreshToken,
-    required this.tokenExpiry,
+    required this.google,
     required this.maxEvents,
     required this.titles,
     required this.eventFilter,
@@ -405,12 +437,8 @@ class Calendar {
 
   factory Calendar.asDefault() => Calendar(
         enabled: false,
-        clientId: "",
-        clientSecret: "",
-        accessToken: "",
-        refreshToken: "",
-        tokenExpiry: DateTime.now(),
-        maxEvents: 0,
+        google: Google.asDefault(),
+        maxEvents: 10,
         titles: (
           enabled: false,
           odd: "",
@@ -425,11 +453,7 @@ class Calendar {
 
   factory Calendar.fromJson(Map<String, dynamic> json) => Calendar(
         enabled: json["enabled"],
-        clientId: json["clientId"],
-        clientSecret: json["clientSecret"],
-        accessToken: json["accessToken"],
-        refreshToken: json["refreshToken"],
-        tokenExpiry: DateTime.parse(json["tokenExpiry"]).toUtc(),
+        google: Google.fromJson(json["google"]),
         maxEvents: json["maxEvents"],
         titles: (
           enabled: json["titles"]["enabled"],
@@ -445,11 +469,7 @@ class Calendar {
 
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
-        "clientId": clientId,
-        "clientSecret": clientSecret,
-        "accessToken": accessToken,
-        "refreshToken": refreshToken,
-        "tokenExpiry": tokenExpiry.toIso8601String(),
+        "google": google.toJson(),
         "maxEvents": maxEvents,
         "titles": {
           "enabled": titles.enabled,
@@ -467,34 +487,29 @@ class Calendar {
 class Sidebar {
   final bool enabled;
   final double cardRadius;
-  final double cardSpacing;
   final Color cardColor;
 
   Sidebar({
     required this.enabled,
     required this.cardRadius,
-    required this.cardSpacing,
     required this.cardColor,
   });
 
   factory Sidebar.asDefault() => Sidebar(
         enabled: true,
         cardRadius: 10,
-        cardSpacing: 16,
         cardColor: "#f8f8f8".toColor(),
       );
 
   factory Sidebar.fromJson(Map<String, dynamic> json) => Sidebar(
         enabled: json["enabled"],
         cardRadius: double.parse(json["cardRadius"].toString()),
-        cardSpacing: double.parse(json["cardSpacing"].toString()),
         cardColor: (json["cardColor"] as String).toColor(),
       );
 
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
         "cardRadius": cardRadius,
-        "cardSpacing": cardSpacing,
         "cardColor": cardColor.toHex(),
       };
 }
@@ -593,8 +608,11 @@ class Watchlist {
       };
 }
 
+enum WeatherType { floating, card }
+
 class Weather {
   final bool enabled;
+  final WeatherType type;
   final String apiKey;
   final String postcode;
   final String country;
@@ -604,6 +622,7 @@ class Weather {
 
   Weather({
     required this.enabled,
+    required this.type,
     required this.apiKey,
     required this.postcode,
     required this.country,
@@ -614,6 +633,7 @@ class Weather {
 
   factory Weather.asDefault() => Weather(
         enabled: false,
+        type: WeatherType.floating,
         apiKey: "",
         postcode: "",
         country: "",
@@ -624,6 +644,7 @@ class Weather {
 
   factory Weather.fromJson(Map<String, dynamic> json) => Weather(
         enabled: json["enabled"],
+        type: json["type"] == "card" ? WeatherType.card : WeatherType.floating,
         apiKey: json["apiKey"],
         postcode: json["postcode"],
         country: json["country"],
@@ -634,6 +655,7 @@ class Weather {
 
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
+        "type": type == WeatherType.card ? "card" : "floating",
         "apiKey": apiKey,
         "postcode": postcode,
         "country": country,
