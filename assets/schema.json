@@ -294,7 +294,7 @@
           "description": "The background color of the cards"
         }
       },
-      "required": ["enabled", "cardSpacing", "cardRadius", "cardColor"]
+      "required": ["enabled", "cardRadius", "cardColor"]
     },
     "watchlist": {
       "type": "object",
