@@ -41,12 +41,7 @@ void main() async {
   schemaFile.writeAsStringSync(schema);
 
   final confFile = File(path.join(appDir.path, "config.json"));
-  // TODO: Remove this when remoteConfig is finished.
-  if (kDebugMode && (Platform.isIOS || Platform.isAndroid)) {
-    // Writes pre-filled config file to device.
-    final confJson = await rootBundle.loadString("assets/iphone13_portrait.json");
-    confFile.writeAsStringSync(confJson);
-  } else if (!confFile.existsSync()) {
+  if (!confFile.existsSync()) {
     Config.asDefault(confFile).save();
   }
 
