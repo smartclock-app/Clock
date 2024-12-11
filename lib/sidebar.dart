@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smartclock/calendar.dart';
+import 'package:smartclock/energy.dart';
 import 'package:smartclock/info_widget.dart';
 import 'package:smartclock/now_playing.dart';
 import 'package:smartclock/notifications.dart';
@@ -49,6 +50,7 @@ class Sidebar extends StatelessWidget {
                       if (config.alexa.features.notes) const StickyNotes(),
                     ],
                     if (config.weather.enabled && config.weather.type == WeatherType.card) const Weather(type: WeatherType.card),
+                    if (config.energy.enabled) const Energy(),
                     if (config.calendar.enabled) const Calendar(),
                     if (!config.alexa.enabled && !config.calendar.enabled)
                       const InfoWidget(

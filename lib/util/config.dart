@@ -69,6 +69,7 @@ class Config {
   final Alexa alexa;
   final Clock clock;
   final Calendar calendar;
+  final Energy energy;
   final Sidebar sidebar;
   final Watchlist watchlist;
   final Weather weather;
@@ -83,6 +84,7 @@ class Config {
     required this.alexa,
     required this.clock,
     required this.calendar,
+    required this.energy,
     required this.sidebar,
     required this.watchlist,
     required this.weather,
@@ -121,6 +123,7 @@ class Config {
         alexa: Alexa.asDefault(),
         clock: Clock.asDefault(),
         calendar: Calendar.asDefault(),
+        energy: Energy.asDefault(),
         sidebar: Sidebar.asDefault(),
         watchlist: Watchlist.asDefault(),
         weather: Weather.asDefault(),
@@ -140,6 +143,7 @@ class Config {
         alexa: Alexa.fromJson(json["alexa"]),
         clock: Clock.fromJson(json["clock"]),
         calendar: Calendar.fromJson(json["calendar"]),
+        energy: Energy.fromJson(json["energy"]),
         sidebar: Sidebar.fromJson(json["sidebar"]),
         watchlist: Watchlist.fromJson(json["watchlist"]),
         weather: Weather.fromJson(json["weather"]),
@@ -156,6 +160,7 @@ class Config {
         "alexa": alexa.toJson(),
         "clock": clock.toJson(),
         "calendar": calendar.toJson(),
+        "energy": energy.toJson(),
         "sidebar": sidebar.toJson(),
         "watchlist": watchlist.toJson(),
         "weather": weather.toJson(),
@@ -369,6 +374,51 @@ class Dimension {
   @override
   String toString() => "${x.toInt()},${y.toInt()},${width.toInt()},${height.toInt()}";
   String toJson() => toString();
+}
+
+class Energy {
+  final bool enabled;
+  final String token;
+  final String gasId;
+  final String electricityId;
+  final double fontSize;
+  final double iconSize;
+
+  Energy({
+    required this.enabled,
+    required this.token,
+    required this.gasId,
+    required this.electricityId,
+    required this.fontSize,
+    required this.iconSize,
+  });
+
+  factory Energy.asDefault() => Energy(
+        enabled: false,
+        token: "",
+        gasId: "",
+        electricityId: "",
+        fontSize: 32,
+        iconSize: 50,
+      );
+
+  factory Energy.fromJson(Map<String, dynamic> json) => Energy(
+        enabled: json["enabled"],
+        token: json["token"],
+        gasId: json["gasId"],
+        electricityId: json["electricityId"],
+        fontSize: double.parse(json["fontSize"].toString()),
+        iconSize: double.parse(json["iconSize"].toString()),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "enabled": enabled,
+        "token": token,
+        "gasId": gasId,
+        "electricityId": electricityId,
+        "fontSize": fontSize,
+        "iconSize": iconSize,
+      };
 }
 
 class Google {

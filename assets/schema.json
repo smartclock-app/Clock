@@ -272,6 +272,37 @@
         "eventColorWidth"
       ]
     },
+    "energy": {
+      "type": "object",
+      "description": "Configuration for the Glowmarkt energy integration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the Glowmarkt energy integration"
+        },
+        "token": {
+          "type": "string",
+          "description": "The Glowmarkt API token"
+        },
+        "gasId": {
+          "type": "string",
+          "description": "The Glowmarkt gas cost resourceId"
+        },
+        "electricityId": {
+          "type": "string",
+          "description": "The Glowmarkt electricity cost resourceId"
+        },
+        "fontSize": {
+          "type": "number",
+          "description": "The font size for the energy usage"
+        },
+        "iconSize": {
+          "type": "number",
+          "description": "The size of the energy icons"
+        }
+      },
+      "required": ["enabled", "token", "gasId", "electricityId", "fontSize", "iconSize"]
+    },
     "sidebar": {
       "type": "object",
       "description": "Configuration for the sidebar",
@@ -448,6 +479,7 @@
     "alexa",
     "clock",
     "calendar",
+    "energy",
     "sidebar",
     "weather",
     "watchlist",
