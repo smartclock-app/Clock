@@ -221,10 +221,6 @@
           "type": "object",
           "description": "Custom titles for 'This Week' and 'Next Week'",
           "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether to display custom titles for 'This Week' and 'Next Week'"
-            },
             "odd": {
               "type": "string",
               "description": "The title for odd weeks"
@@ -234,7 +230,7 @@
               "description": "The title for even weeks"
             }
           },
-          "required": ["enabled", "odd", "even"]
+          "required": ["odd", "even"]
         },
         "eventFilter": {
           "type": "array",
@@ -310,10 +306,6 @@
         "enabled": {
           "type": "boolean",
           "description": "Whether to enable the sidebar"
-        },
-        "cardSpacing": {
-          "type": "number",
-          "description": "The spacing between cards"
         },
         "cardRadius": {
           "type": "number",

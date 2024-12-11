@@ -66,10 +66,13 @@ class _EnergyState extends State<Energy> {
     super.didChangeDependencies();
     final stream = Provider.of<StreamController<DateTime>>(context).stream;
     _subscription?.cancel();
-    _subscription = stream.listen((_) {
-      setState(() {
-        _data = _fetchData();
-      });
+    _subscription = stream.listen((time) {
+      // Refetch every half hour
+      if ((time.minute == 0 || time.minute == 30) && time.second == 0) {
+        setState(() {
+          _data = _fetchData();
+        });
+      }
     });
   }
 

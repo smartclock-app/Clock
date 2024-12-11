@@ -248,9 +248,9 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
     bool isEven = (weekReference.difference(event.start).inDays ~/ 7).isEven;
     final title = isEven ? config.calendar.titles.even : config.calendar.titles.odd;
     if (eventWeek == currentWeek || event.start.isBefore(currentTime)) {
-      key = config.calendar.titles.enabled && title.isNotEmpty ? "This Week - $title" : "This Week";
+      key = title.isNotEmpty ? "This Week - $title" : "This Week";
     } else if (eventWeek == currentWeek + 1) {
-      key = config.calendar.titles.enabled && title.isNotEmpty ? "Next Week - $title" : "Next Week";
+      key = title.isNotEmpty ? "Next Week - $title" : "Next Week";
     } else {
       key = "$eventMonth $eventYear";
     }

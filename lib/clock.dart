@@ -44,7 +44,7 @@ class _ClockState extends State<Clock> {
       if (newNow.second % 30 == 0) {
         logger.t("Refetching Content...");
         // Notifies other widgets to refetch their content
-        Provider.of<StreamController<DateTime>>(context, listen: false).add(now);
+        Provider.of<StreamController<DateTime>>(context, listen: false).add(newNow);
       }
 
       setState(() {

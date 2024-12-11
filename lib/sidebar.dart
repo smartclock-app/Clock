@@ -46,7 +46,7 @@ class Sidebar extends StatelessWidget {
                             title: "Now Playing",
                             message: "You have enabled Now Playing, but not entered any devices.\n\nTo hide this message, enter at least one device, or disable Now Playing.",
                           ),
-                      const Notifications(),
+                      if (config.alexa.features.timers || config.alexa.features.alarms) const Notifications(),
                       if (config.alexa.features.notes) const StickyNotes(),
                     ],
                     if (config.weather.enabled && config.weather.type == WeatherType.card) const Weather(type: WeatherType.card),

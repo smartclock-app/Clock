@@ -465,7 +465,7 @@ class Calendar {
   final bool enabled;
   final Google google;
   final int maxEvents;
-  final ({bool enabled, String odd, String even}) titles;
+  final ({String odd, String even}) titles;
   final List<String> eventFilter;
 
   final double monthTitleSize;
@@ -490,7 +490,6 @@ class Calendar {
         google: Google.asDefault(),
         maxEvents: 10,
         titles: (
-          enabled: false,
           odd: "",
           even: "",
         ),
@@ -506,7 +505,6 @@ class Calendar {
         google: Google.fromJson(json["google"]),
         maxEvents: json["maxEvents"],
         titles: (
-          enabled: json["titles"]["enabled"],
           odd: json["titles"]["odd"],
           even: json["titles"]["even"],
         ),
@@ -522,7 +520,6 @@ class Calendar {
         "google": google.toJson(),
         "maxEvents": maxEvents,
         "titles": {
-          "enabled": titles.enabled,
           "odd": titles.odd,
           "even": titles.even,
         },
