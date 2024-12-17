@@ -36,17 +36,13 @@ Future<void> updateWatchlist({required Config config, required Set<String> items
           "nextAirDate": date != null ? "${date}T00:00:00Z" : null,
         };
       }
+
+      insert.execute([data["id"], data["name"], data["status"], data["nextAirDate"]]);
     } on DioException catch (e) {
       logger.t("Failed to fetch '${e.response?.realUri}': ${e.response?.statusCode} ${e.type}");
-      data = {
-        "id": item,
-        "name": "Failed to fetch",
-        "status": "Failed to fetch",
-        "nextAirDate": null,
-      };
+    } on SqliteException catch (e) {
+      logger.e("Failed to insert watchlist item: $e");
     }
-
-    insert.execute([data["id"], data["name"], data["status"], data["nextAirDate"]]);
   }
 
   insert.dispose();

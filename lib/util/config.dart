@@ -403,7 +403,7 @@ class Energy {
       );
 
   factory Energy.fromJson(Map<String, dynamic> json) => Energy(
-        enabled: json["enabled"],
+        enabled: false, // TODO: Disable until better implementation, current api not useful.
         token: json["token"],
         gasId: json["gasId"],
         electricityId: json["electricityId"],

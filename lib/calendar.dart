@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:smartclock/info_widget.dart';
+import 'package:smartclock/error_info_widget.dart';
 import 'package:smartclock/sidebar_card.dart';
 import 'package:smartclock/calendar_event.dart';
 import 'package:smartclock/util/fetch_events.dart';
@@ -72,7 +73,7 @@ class _CalendarState extends State<Calendar> {
 
         return Column(
           children: [
-            if (snapshot.hasError) InfoWidget(title: "Calendar", message: "${snapshot.error.toString()}\n${snapshot.stackTrace.toString()}"),
+            if (snapshot.hasError) ErrorInfoWidget(title: "Calendar", message: snapshot.error.toString(), stack: snapshot.stackTrace.toString()),
             if (snapshot.hasData)
               for (var month in snapshot.data!.entries) ...[
                 SidebarCard(

@@ -270,11 +270,12 @@
     },
     "energy": {
       "type": "object",
-      "description": "Configuration for the Glowmarkt energy integration",
+      "description": "Configuration for the Glowmarkt energy integration\n\nCannot be enabled, current api not useful.",
       "properties": {
         "enabled": {
           "type": "boolean",
-          "description": "Whether to enable the Glowmarkt energy integration"
+          "description": "Whether to enable the Glowmarkt energy integration",
+          "enum": [false]
         },
         "token": {
           "type": "string",

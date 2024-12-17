@@ -25,12 +25,15 @@ class WeatherIcons {
   };
 
   static Widget getIcon(String icon, {required double size}) {
-    return Text(
-      icons[icon] ?? "",
-      style: TextStyle(
-        fontFamily: "WeatherIcons",
-        fontSize: size,
-        height: 1,
+    return SizedBox(
+      width: size,
+      child: Text(
+        icons[icon] ?? "",
+        style: TextStyle(
+          fontFamily: "WeatherIcons",
+          fontSize: size,
+          height: 1,
+        ),
       ),
     );
   }

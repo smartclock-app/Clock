@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
-import 'package:smartclock/info_widget.dart';
+import 'package:smartclock/error_info_widget.dart';
 import 'package:smartclock/util/config.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -98,10 +98,7 @@ class _StickyNotesState extends State<StickyNotes> {
     return FutureBuilder(
       future: _futureMemories,
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return InfoWidget(title: "Sticky Notes", message: "Error loading sticky notes: ${snapshot.error}");
-        }
-
+        if (snapshot.hasError) return ErrorInfoWidget(title: "Sticky Notes", message: "Error loading sticky notes: ${snapshot.error}");
         if (!snapshot.hasData || snapshot.data!.isEmpty) return const SizedBox.shrink();
 
         return LayoutBuilder(
