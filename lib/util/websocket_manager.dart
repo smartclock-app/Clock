@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:bonsoir/bonsoir.dart';
 import 'package:smartclock/util/config.dart';
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/util/toggle_display.dart';
 
 part 'websocket_handler.dart';

@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:smartclock/util/color_from_hex.dart';
 import 'package:sqlite3/sqlite3.dart';
 
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/util/update_watchlist.dart';
 import 'package:smartclock/util/trakt_manager.dart';
 import 'package:smartclock/util/fetch_trakt_list.dart';

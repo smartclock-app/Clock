@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/util/config.dart' show ConfigModel, Config, WeatherType;
 import 'package:smartclock/weather_card.dart';
 import 'package:smartclock/weather_floating.dart';

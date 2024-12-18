@@ -9,7 +9,7 @@ import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/now_playing_lyrics.dart';
 import 'package:smartclock/sidebar_card.dart';
 import 'package:smartclock/util/fetch_lyrics.dart';
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/util/lrc.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel;
 

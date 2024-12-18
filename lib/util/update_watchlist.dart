@@ -1,4 +1,4 @@
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/main.dart' show logger;
 import 'package:sqlite3/sqlite3.dart';
 import 'package:dio/dio.dart';
 import 'package:smartclock/util/config.dart' show Config;

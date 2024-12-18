@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'package:smartclock/sidebar_card.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel, Config;
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/main.dart' show logger;
 
 typedef EnergyData = ({String? gas, String? electricity});
 

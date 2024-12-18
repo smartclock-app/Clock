@@ -4,33 +4,33 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqlite3/sqlite3.dart';
-// ignore: unused_import
-import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart'; // Needed for sqlite3 on android
+// ignore: unused_import --- Needed for sqlite3 on android
+import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:json_schema/json_schema.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
 import 'package:smartclock/smart_clock.dart';
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/util/logger_output.dart';
+import 'package:smartclock/util/get_application_directory.dart';
 import 'package:smartclock/util/config.dart' show ConfigModel, Config;
+
+late Logger logger;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  final Directory appDir = await getApplicationDirectory();
 
-  late final Directory appDir;
-  if ((Platform.isMacOS || Platform.isLinux) && Platform.environment['HOME'] != null) {
-    appDir = Directory(path.join(Platform.environment['HOME']!, '.smartclock'));
-  } else if (Platform.isWindows && Platform.environment['APPDATA'] != null) {
-    appDir = Directory(path.join(Platform.environment['APPDATA']!, 'SmartClock'));
-  } else {
-    final documentsDir = await getApplicationDocumentsDirectory();
-    appDir = Directory(path.join(documentsDir.path, 'SmartClock'));
-  }
+  final loggerOutput = LoggerOutput(file: File(path.join(appDir.path, "logs.txt")));
+  logger = Logger(
+    printer: SimplePrinter(printTime: true, colors: false),
+    output: loggerOutput,
+  );
 
   if (!appDir.existsSync()) appDir.createSync(recursive: true);
   logger.i("Application Directory: ${appDir.path}");
@@ -71,19 +71,19 @@ void main() async {
     logger: (log, level) {
       switch (level) {
         case "trace":
-          logger.t(log);
+          logger.t("[AlexaQuery] $log");
           break;
         case "info":
-          logger.i(log);
+          logger.i("[AlexaQuery] $log");
           break;
         case "warn":
-          logger.w(log);
+          logger.w("[AlexaQuery] $log");
           break;
         case "error":
-          logger.e(log);
+          logger.e("[AlexaQuery] $log");
           break;
         default:
-          logger.i(log);
+          logger.i("[AlexaQuery] $log");
       }
     },
   );
@@ -108,7 +108,7 @@ void main() async {
 
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => ConfigModel(config, client: client)),
+      ChangeNotifierProvider(create: (context) => ConfigModel(config, client: client, appDir: appDir)),
       Provider<Database>.value(value: database),
       Provider<alexa.QueryClient>.value(value: client),
       // Push events to this stream to tell widgets to update

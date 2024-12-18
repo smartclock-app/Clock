@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/alarm.dart';
 import 'package:smartclock/timer.dart';
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/util/config.dart' show ConfigModel;
 
 class Notifications extends StatefulWidget {

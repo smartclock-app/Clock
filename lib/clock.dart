@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smartclock/util/get_ordinal.dart';
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/util/config.dart' show ConfigModel;
 
 class Clock extends StatefulWidget {
@@ -73,7 +73,33 @@ class _ClockState extends State<Clock> {
       child: GestureDetector(
         onLongPress: () {
           HapticFeedback.mediumImpact();
-          Navigator.of(context).pushNamed("/editor");
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Navigate to"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: const Text("Logs"),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).pushNamed("/logs");
+                      },
+                    ),
+                    ListTile(
+                      title: const Text("Editor"),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).pushNamed("/editor");
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
         },
         child: Container(
           margin: EdgeInsets.all(config.clock.padding),

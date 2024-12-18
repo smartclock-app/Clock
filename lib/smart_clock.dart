@@ -8,10 +8,11 @@ import 'package:provider/provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:smartclock/clock.dart';
+import 'package:smartclock/log_viewer.dart';
 import 'package:smartclock/weather.dart';
 import 'package:smartclock/editor.dart';
 import 'package:smartclock/sidebar.dart';
-import 'package:smartclock/util/logger.dart';
+import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/util/config.dart' show ConfigModel, WeatherType;
 import 'package:smartclock/util/websocket_manager.dart';
 
@@ -95,7 +96,10 @@ class _SmartClockState extends State<SmartClock> {
       theme: ThemeData(scaffoldBackgroundColor: Colors.black, fontFamily: "Poppins"),
       debugShowCheckedModeBanner: false,
       scrollBehavior: const ScrollWithMouseBehavior(),
-      routes: {'/editor': (context) => const Editor()},
+      routes: {
+        '/editor': (context) => const Editor(),
+        '/logs': (context) => const LogViewer(),
+      },
       home: Scaffold(
         body: Container(
           color: Colors.white,

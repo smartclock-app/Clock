@@ -2,18 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:flutter/material.dart';
-
+import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/util/color_from_hex.dart';
-import 'package:smartclock/util/logger.dart';
 
 class ConfigModel extends ChangeNotifier {
   StreamSubscription<FileSystemEvent>? _fileWatcher;
   late alexa.QueryClient _client;
   Config config;
+  Directory appDir;
 
-  ConfigModel(this.config, {required alexa.QueryClient client}) {
+  ConfigModel(this.config, {required alexa.QueryClient client, required this.appDir}) {
     _client = client;
 
     if (!Platform.isIOS) {

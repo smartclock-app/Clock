@@ -46,7 +46,7 @@ class _EditorState extends State<Editor> {
             controller: _controller,
             maxLines: null,
             expands: true,
-            style: const TextStyle(color: Colors.black, fontFamily: 'monospace'),
+            style: const TextStyle(color: Colors.black, fontFamily: 'RobotoMono'),
             decoration: const InputDecoration(
               border: InputBorder.none,
               hintText: "Enter JSON here",
