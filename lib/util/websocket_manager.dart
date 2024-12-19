@@ -19,6 +19,10 @@ class WebSocketManager {
     commands = WebSocketHandler();
 
     commands.addCommand('echo', (command) => command.data ?? "No data provided");
+    commands.addCommand('refresh', (command) {
+      configModel.notifyListeners();
+      return "Clock refreshed";
+    });
     commands.addCommand('toggle_display', (command) {
       return toggleDisplay(
         script: configModel.config.remoteConfig.toggleDisplayPath,
