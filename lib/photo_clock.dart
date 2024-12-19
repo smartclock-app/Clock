@@ -40,33 +40,32 @@ class _PhotoClockState extends State<PhotoClock> {
     return textPainter.size;
   }
 
+  FutureOr<List<String>> getImages() async {
+    final config = context.read<ConfigModel>().config;
+
+    List<String> images;
+    if (config.photos.useStaticLinks) {
+      images = config.photos.images;
+    } else {
+      if (config.photos.scraperApiKey.isEmpty || config.photos.googlePhotoAlbumUrl.isEmpty) {
+        logger.w("Cannot scrape Google Photos: API key or album URL is empty");
+        return [];
+      }
+
+      images = await scrapeGooglePhotos(config.photos.scraperApiKey, config.photos.googlePhotoAlbumUrl);
+    }
+
+    for (final image in images) {
+      logger.t("Precaching image: $image");
+      if (mounted) precacheImage(NetworkImage(image), context);
+    }
+
+    return images;
+  }
+
   @override
   void initState() {
     super.initState();
-
-    FutureOr<List<String>> getImages() async {
-      final config = context.read<ConfigModel>().config;
-
-      List<String> images;
-      if (config.photos.useStaticLinks) {
-        images = config.photos.images;
-      } else {
-        if (config.photos.scraperApiKey.isEmpty || config.photos.googlePhotoAlbumUrl.isEmpty) {
-          logger.w("Cannot scrape Google Photos: API key or album URL is empty");
-          return [];
-        }
-
-        images = await scrapeGooglePhotos(config.photos.scraperApiKey, config.photos.googlePhotoAlbumUrl);
-      }
-
-      for (final image in images) {
-        logger.t("Precaching image: $image");
-        if (mounted) precacheImage(NetworkImage(image), context);
-      }
-
-      return images;
-    }
-
     _futureImages = getImages();
   }
 
@@ -87,6 +86,13 @@ class _PhotoClockState extends State<PhotoClock> {
           photoIndex++;
         });
       }
+    }
+
+    // Refetch images every 12 hours
+    if (widget.now.hour % 12 == 0 && widget.now.minute == 0 && widget.now.second == 0) {
+      setState(() {
+        _futureImages = getImages();
+      });
     }
 
     return FutureBuilder(
