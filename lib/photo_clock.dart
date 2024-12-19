@@ -37,6 +37,17 @@ class _PhotoClockState extends State<PhotoClock> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final config = context.read<ConfigModel>().config;
+    for (final image in config.photos.images) {
+      logger.t("Precaching image: $image");
+      precacheImage(NetworkImage(image), context);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final config = context.read<ConfigModel>().config;
     final smallStyle = TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.white);
