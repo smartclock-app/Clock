@@ -26,6 +26,7 @@ dependencies:
   connectivity_plus: ^6.1.0
   bonsoir: ^5.1.10
   sqlite3_flutter_libs: ^0.5.26
+  html: ^0.15.5
 
 dev_dependencies:
   flutter_test:
