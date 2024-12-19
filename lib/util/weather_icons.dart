@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class WeatherIcons {
   static const Map<String, String> icons = {
@@ -24,15 +24,17 @@ class WeatherIcons {
     "wind": "\uea14",
   };
 
-  static Widget getIcon(String icon, {required double size}) {
+  static Widget getIcon(String icon, {required double size, Color color = Colors.black, Shadow? shadow}) {
     return SizedBox(
       width: size,
       child: Text(
         icons[icon] ?? "",
         style: TextStyle(
+          color: color,
           fontFamily: "WeatherIcons",
           fontSize: size,
           height: 1,
+          shadows: shadow != null ? [shadow] : null,
         ),
       ),
     );

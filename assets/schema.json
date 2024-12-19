@@ -130,6 +130,68 @@
         "noteFontSize"
       ]
     },
+    "calendar": {
+      "type": "object",
+      "description": "Configuration for the calendar integration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the calendar integration"
+        },
+        "maxEvents": {
+          "type": "number",
+          "description": "The maximum number of events to display"
+        },
+        "titles": {
+          "type": "object",
+          "description": "Custom titles for 'This Week' and 'Next Week'",
+          "properties": {
+            "odd": {
+              "type": "string",
+              "description": "The title for odd weeks"
+            },
+            "even": {
+              "type": "string",
+              "description": "The title for even weeks"
+            }
+          },
+          "required": ["odd", "even"]
+        },
+        "eventFilter": {
+          "type": "array",
+          "description": "A list of regular expressions to filter events by",
+          "items": {
+            "type": "string"
+          }
+        },
+        "monthTitleSize": {
+          "type": "number",
+          "description": "The font size for the month title"
+        },
+        "eventTitleSize": {
+          "type": "number",
+          "description": "The font size for event titles"
+        },
+        "eventTimeSize": {
+          "type": "number",
+          "description": "The font size for event times"
+        },
+        "eventColorWidth": {
+          "type": "number",
+          "description": "The width of the colored event indicator"
+        }
+      },
+      "required": [
+        "enabled",
+        "maxEvents",
+        "titles",
+        "eventFilter",
+        "monthTitleSize",
+        "eventTitleSize",
+        "eventTimeSize",
+        "eventColorWidth"
+      ]
+    },
     "clock": {
       "type": "object",
       "description": "Configuration for the clock display",
@@ -178,96 +240,6 @@
         "padding"
       ]
     },
-    "calendar": {
-      "type": "object",
-      "description": "Configuration for the calendar integration",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Whether to enable the calendar integration"
-        },
-        "google": {
-          "type": "object",
-          "properties": {
-            "clientId": {
-              "type": "string",
-              "description": "The Google API client ID"
-            },
-            "clientSecret": {
-              "type": "string",
-              "description": "The Google API client secret"
-            },
-            "accessToken": {
-              "type": "string",
-              "description": "The Google API access token"
-            },
-            "refreshToken": {
-              "type": "string",
-              "description": "The Google API refresh token"
-            },
-            "tokenExpiry": {
-              "type": "string",
-              "description": "The UTC expiry date of the access token",
-              "format": "date-time"
-            }
-          },
-          "required": ["clientId", "clientSecret", "accessToken", "refreshToken", "tokenExpiry"]
-        },
-        "maxEvents": {
-          "type": "number",
-          "description": "The maximum number of events to display"
-        },
-        "titles": {
-          "type": "object",
-          "description": "Custom titles for 'This Week' and 'Next Week'",
-          "properties": {
-            "odd": {
-              "type": "string",
-              "description": "The title for odd weeks"
-            },
-            "even": {
-              "type": "string",
-              "description": "The title for even weeks"
-            }
-          },
-          "required": ["odd", "even"]
-        },
-        "eventFilter": {
-          "type": "array",
-          "description": "A list of regular expressions to filter events by",
-          "items": {
-            "type": "string"
-          }
-        },
-        "monthTitleSize": {
-          "type": "number",
-          "description": "The font size for the month title"
-        },
-        "eventTitleSize": {
-          "type": "number",
-          "description": "The font size for event titles"
-        },
-        "eventTimeSize": {
-          "type": "number",
-          "description": "The font size for event times"
-        },
-        "eventColorWidth": {
-          "type": "number",
-          "description": "The width of the colored event indicator"
-        }
-      },
-      "required": [
-        "enabled",
-        "google",
-        "maxEvents",
-        "titles",
-        "eventFilter",
-        "monthTitleSize",
-        "eventTitleSize",
-        "eventTimeSize",
-        "eventColorWidth"
-      ]
-    },
     "energy": {
       "type": "object",
       "description": "Configuration for the Glowmarkt energy integration\n\nCannot be enabled, current api not useful.",
@@ -299,6 +271,58 @@
         }
       },
       "required": ["enabled", "token", "gasId", "electricityId", "fontSize", "iconSize"]
+    },
+    "google": {
+      "type": "object",
+      "description": "Google API configuration for Calendar",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "The Google API client ID"
+        },
+        "clientSecret": {
+          "type": "string",
+          "description": "The Google API client secret"
+        },
+        "accessToken": {
+          "type": "string",
+          "description": "The Google API access token"
+        },
+        "refreshToken": {
+          "type": "string",
+          "description": "The Google API refresh token"
+        },
+        "tokenExpiry": {
+          "type": "string",
+          "description": "The UTC expiry date of the access token",
+          "format": "date-time"
+        }
+      },
+      "required": ["clientId", "clientSecret", "accessToken", "refreshToken", "tokenExpiry"]
+    },
+    "photos": {
+      "type": "object",
+      "description": "Configuration for the Photos integration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the Photos integration"
+        },
+        "interval": {
+          "type": "number",
+          "description": "The interval in groups of 30 seconds to check for new photos\n\nI.e. 1 = 30 seconds, 2 = 1 minute, 3 = 1 minute 30 seconds, etc.",
+          "minimum": 1
+        },
+        "images": {
+          "type": "array",
+          "description": "The urls of the photos to display",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "required": ["enabled", "interval", "images"]
     },
     "sidebar": {
       "type": "object",
@@ -470,9 +494,11 @@
     "networkEnabled",
     "remoteConfig",
     "alexa",
-    "clock",
     "calendar",
+    "clock",
     "energy",
+    "google",
+    "photos",
     "sidebar",
     "weather",
     "watchlist",

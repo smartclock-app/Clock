@@ -14,6 +14,13 @@ class WeatherFloating extends StatelessWidget {
   Widget build(BuildContext context) {
     Config config = context.read<ConfigModel>().config;
 
+    final fontColor = config.photos.enabled ? Colors.white : Colors.black;
+    final shadow = Shadow(
+      offset: const Offset(2.0, 2.0),
+      blurRadius: 3.0,
+      color: Colors.black.withOpacity(0.5),
+    );
+
     return Positioned(
       left: config.dimensions["weather"]!.x,
       top: config.dimensions["weather"]!.y,
@@ -25,16 +32,32 @@ class WeatherFloating extends StatelessWidget {
         children: [
           Row(
             children: [
-              WeatherIcons.getIcon(weather["icon"] ?? "", size: config.weather.iconSize),
+              WeatherIcons.getIcon(weather["icon"] ?? "", size: config.weather.iconSize, color: fontColor, shadow: shadow),
               const SizedBox(width: 16),
-              Text(weather["temp"]!, style: TextStyle(fontSize: config.weather.fontSize, fontWeight: FontWeight.bold)),
+              Text(
+                weather["temp"]!,
+                style: TextStyle(
+                  fontSize: config.weather.fontSize,
+                  fontWeight: FontWeight.bold,
+                  color: fontColor,
+                  shadows: [shadow],
+                ),
+              ),
             ],
           ),
           Row(
             children: [
-              Text(weather["windSpeed"]!, style: TextStyle(fontSize: config.weather.fontSize, fontWeight: FontWeight.bold)),
+              Text(
+                weather["windSpeed"]!,
+                style: TextStyle(
+                  fontSize: config.weather.fontSize,
+                  fontWeight: FontWeight.bold,
+                  color: fontColor,
+                  shadows: [shadow],
+                ),
+              ),
               const SizedBox(width: 16),
-              WeatherIcons.getIcon("wind", size: config.weather.iconSize),
+              WeatherIcons.getIcon("wind", size: config.weather.iconSize, color: fontColor, shadow: shadow),
             ],
           )
         ],

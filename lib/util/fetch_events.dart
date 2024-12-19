@@ -74,16 +74,16 @@ String? eventColor(String? colorId) {
 Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, required http.Client httpClient, required Database database, bool updateWl = false}) async {
   logger.t("Refetching calendar");
 
-  if (config.calendar.google.accessToken.isEmpty || config.calendar.google.refreshToken.isEmpty || config.calendar.google.clientId.isEmpty || config.calendar.google.clientSecret.isEmpty) {
+  if (config.google.accessToken.isEmpty || config.google.refreshToken.isEmpty || config.google.clientId.isEmpty || config.google.clientSecret.isEmpty) {
     throw Exception("Calendar API credentials must be set in the config file.");
   }
 
   // Create Google auth client with credentials from config
   final client = auth.autoRefreshingClient(
-    auth.ClientId(config.calendar.google.clientId, config.calendar.google.clientSecret),
+    auth.ClientId(config.google.clientId, config.google.clientSecret),
     auth.AccessCredentials(
-      auth.AccessToken("Bearer", config.calendar.google.accessToken, config.calendar.google.tokenExpiry),
-      config.calendar.google.refreshToken,
+      auth.AccessToken("Bearer", config.google.accessToken, config.google.tokenExpiry),
+      config.google.refreshToken,
       [calendar.CalendarApi.calendarReadonlyScope],
     ),
     httpClient,
@@ -91,21 +91,21 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
 
   bool credentialsUpdated = false;
   client.credentialUpdates.listen((credentials) {
-    if (credentials.accessToken.data != config.calendar.google.accessToken) {
+    if (credentials.accessToken.data != config.google.accessToken) {
       logger.t("Updating calendar access token");
-      config.calendar.google.accessToken = credentials.accessToken.data;
+      config.google.accessToken = credentials.accessToken.data;
       credentialsUpdated = true;
     }
 
-    if (credentials.refreshToken != config.calendar.google.refreshToken) {
+    if (credentials.refreshToken != config.google.refreshToken) {
       logger.t("Updating calendar refresh token");
-      config.calendar.google.refreshToken = credentials.refreshToken!;
+      config.google.refreshToken = credentials.refreshToken!;
       credentialsUpdated = true;
     }
 
-    if (credentials.accessToken.expiry != config.calendar.google.tokenExpiry) {
+    if (credentials.accessToken.expiry != config.google.tokenExpiry) {
       logger.t("Updating calendar token expiry");
-      config.calendar.google.tokenExpiry = credentials.accessToken.expiry;
+      config.google.tokenExpiry = credentials.accessToken.expiry;
       credentialsUpdated = true;
     }
   });

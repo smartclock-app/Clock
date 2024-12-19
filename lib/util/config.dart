@@ -67,9 +67,11 @@ class Config {
   final bool networkEnabled;
   final RemoteConfig remoteConfig;
   final Alexa alexa;
-  final Clock clock;
   final Calendar calendar;
+  final Clock clock;
   final Energy energy;
+  final Google google;
+  final Photos photos;
   final Sidebar sidebar;
   final Watchlist watchlist;
   final Weather weather;
@@ -82,9 +84,11 @@ class Config {
     required this.networkEnabled,
     required this.remoteConfig,
     required this.alexa,
-    required this.clock,
     required this.calendar,
+    required this.clock,
     required this.energy,
+    required this.google,
+    required this.photos,
     required this.sidebar,
     required this.watchlist,
     required this.weather,
@@ -121,9 +125,11 @@ class Config {
         networkEnabled: true,
         remoteConfig: RemoteConfig.asDefault(),
         alexa: Alexa.asDefault(),
-        clock: Clock.asDefault(),
         calendar: Calendar.asDefault(),
+        clock: Clock.asDefault(),
         energy: Energy.asDefault(),
+        google: Google.asDefault(),
+        photos: Photos.asDefault(),
         sidebar: Sidebar.asDefault(),
         watchlist: Watchlist.asDefault(),
         weather: Weather.asDefault(),
@@ -141,9 +147,11 @@ class Config {
         networkEnabled: json["networkEnabled"],
         remoteConfig: RemoteConfig.fromJson(json["remoteConfig"]),
         alexa: Alexa.fromJson(json["alexa"]),
-        clock: Clock.fromJson(json["clock"]),
         calendar: Calendar.fromJson(json["calendar"]),
+        clock: Clock.fromJson(json["clock"]),
         energy: Energy.fromJson(json["energy"]),
+        google: Google.fromJson(json["google"]),
+        photos: Photos.fromJson(json["photos"]),
         sidebar: Sidebar.fromJson(json["sidebar"]),
         watchlist: Watchlist.fromJson(json["watchlist"]),
         weather: Weather.fromJson(json["weather"]),
@@ -158,9 +166,11 @@ class Config {
         "networkEnabled": networkEnabled,
         "remoteConfig": remoteConfig.toJson(),
         "alexa": alexa.toJson(),
-        "clock": clock.toJson(),
         "calendar": calendar.toJson(),
+        "clock": clock.toJson(),
         "energy": energy.toJson(),
+        "google": google.toJson(),
+        "photos": photos.toJson(),
         "sidebar": sidebar.toJson(),
         "watchlist": watchlist.toJson(),
         "weather": weather.toJson(),
@@ -262,8 +272,8 @@ class Alexa {
         ),
         userId: json["userId"],
         token: json["token"],
-        devices: List<String>.from(json["devices"].map((x) => x)),
-        radioProviders: json["radioProviders"] != null ? List<String>.from(json["radioProviders"].map((x) => x)) : null,
+        devices: List<String>.from(json["devices"]),
+        radioProviders: json["radioProviders"] != null ? List<String>.from(json["radioProviders"]) : null,
         nowplayingImageSize: double.parse(json["nowplayingImageSize"].toString()),
         nowplayingFontSize: double.parse(json["nowplayingFontSize"].toString()),
         lyricsCurrentFontSize: double.parse(json["lyricsCurrentFontSize"].toString()),
@@ -282,14 +292,79 @@ class Alexa {
         },
         "userId": userId,
         "token": token,
-        "devices": List<dynamic>.from(devices.map((x) => x)),
-        if (radioProviders != null) 'radioProviders': List<dynamic>.from(radioProviders!.map((x) => x)),
+        "devices": List<dynamic>.from(devices),
+        if (radioProviders != null) 'radioProviders': List<dynamic>.from(radioProviders!),
         "nowplayingImageSize": nowplayingImageSize,
         "nowplayingFontSize": nowplayingFontSize,
         "lyricsCurrentFontSize": lyricsCurrentFontSize,
         "lyricsNextFontSize": lyricsNextFontSize,
         "noteColumns": noteColumns,
         "noteFontSize": noteFontSize,
+      };
+}
+
+class Calendar {
+  final bool enabled;
+  final int maxEvents;
+  final ({String odd, String even}) titles;
+  final List<String> eventFilter;
+
+  final double monthTitleSize;
+  final double eventTitleSize;
+  final double eventTimeSize;
+  final double eventColorWidth;
+
+  Calendar({
+    required this.enabled,
+    required this.maxEvents,
+    required this.titles,
+    required this.eventFilter,
+    required this.monthTitleSize,
+    required this.eventTitleSize,
+    required this.eventTimeSize,
+    required this.eventColorWidth,
+  });
+
+  factory Calendar.asDefault() => Calendar(
+        enabled: false,
+        maxEvents: 10,
+        titles: (
+          odd: "",
+          even: "",
+        ),
+        eventFilter: [],
+        monthTitleSize: 36,
+        eventTitleSize: 34,
+        eventTimeSize: 28,
+        eventColorWidth: 8,
+      );
+
+  factory Calendar.fromJson(Map<String, dynamic> json) => Calendar(
+        enabled: json["enabled"],
+        maxEvents: json["maxEvents"],
+        titles: (
+          odd: json["titles"]["odd"],
+          even: json["titles"]["even"],
+        ),
+        eventFilter: List<String>.from(json["eventFilter"]),
+        monthTitleSize: double.parse(json["monthTitleSize"].toString()),
+        eventTitleSize: double.parse(json["eventTitleSize"].toString()),
+        eventTimeSize: double.parse(json["eventTimeSize"].toString()),
+        eventColorWidth: double.parse(json["eventColorWidth"].toString()),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "enabled": enabled,
+        "maxEvents": maxEvents,
+        "titles": {
+          "odd": titles.odd,
+          "even": titles.even,
+        },
+        "eventFilter": List<dynamic>.from(eventFilter),
+        "monthTitleSize": monthTitleSize,
+        "eventTitleSize": eventTitleSize,
+        "eventTimeSize": eventTimeSize,
+        "eventColorWidth": eventColorWidth,
       };
 }
 
@@ -461,73 +536,33 @@ class Google {
       };
 }
 
-class Calendar {
+class Photos {
   final bool enabled;
-  final Google google;
-  final int maxEvents;
-  final ({String odd, String even}) titles;
-  final List<String> eventFilter;
+  final int interval;
+  final List<String> images;
 
-  final double monthTitleSize;
-  final double eventTitleSize;
-  final double eventTimeSize;
-  final double eventColorWidth;
-
-  Calendar({
+  Photos({
     required this.enabled,
-    required this.google,
-    required this.maxEvents,
-    required this.titles,
-    required this.eventFilter,
-    required this.monthTitleSize,
-    required this.eventTitleSize,
-    required this.eventTimeSize,
-    required this.eventColorWidth,
+    required this.interval,
+    required this.images,
   });
 
-  factory Calendar.asDefault() => Calendar(
+  factory Photos.asDefault() => Photos(
         enabled: false,
-        google: Google.asDefault(),
-        maxEvents: 10,
-        titles: (
-          odd: "",
-          even: "",
-        ),
-        eventFilter: [],
-        monthTitleSize: 36,
-        eventTitleSize: 34,
-        eventTimeSize: 28,
-        eventColorWidth: 8,
+        interval: 2,
+        images: [],
       );
 
-  factory Calendar.fromJson(Map<String, dynamic> json) => Calendar(
+  factory Photos.fromJson(Map<String, dynamic> json) => Photos(
         enabled: json["enabled"],
-        google: Google.fromJson(json["google"]),
-        maxEvents: json["maxEvents"],
-        titles: (
-          odd: json["titles"]["odd"],
-          even: json["titles"]["even"],
-        ),
-        eventFilter: List<String>.from(json["eventFilter"].map((x) => x)),
-        monthTitleSize: double.parse(json["monthTitleSize"].toString()),
-        eventTitleSize: double.parse(json["eventTitleSize"].toString()),
-        eventTimeSize: double.parse(json["eventTimeSize"].toString()),
-        eventColorWidth: double.parse(json["eventColorWidth"].toString()),
+        interval: json["interval"],
+        images: List<String>.from(json["images"]),
       );
 
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
-        "google": google.toJson(),
-        "maxEvents": maxEvents,
-        "titles": {
-          "odd": titles.odd,
-          "even": titles.even,
-        },
-        "eventFilter": List<dynamic>.from(eventFilter.map((x) => x)),
-        "monthTitleSize": monthTitleSize,
-        "eventTitleSize": eventTitleSize,
-        "eventTimeSize": eventTimeSize,
-        "eventColorWidth": eventColorWidth,
+        "interval": interval,
+        "images": List<dynamic>.from(images),
       };
 }
 
