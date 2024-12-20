@@ -11,7 +11,6 @@ import 'package:path/path.dart' as path;
 import 'package:sqlite3/sqlite3.dart';
 // ignore: unused_import --- Needed for sqlite3 on android
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
-import 'package:json_schema/json_schema.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
@@ -49,24 +48,16 @@ void main() async {
   final cookieFile = File(path.join(appDir.path, "cookies.json"));
   if (!cookieFile.existsSync()) cookieFile.writeAsStringSync("{}");
 
+  // Read config from disk, merge with default config to ensure all fields are present
   final configJson = jsonDecode(confFile.readAsStringSync());
-  final configSchema = JsonSchema.create(schema);
-  final results = configSchema.validate(configJson);
-
-  if (!results.isValid || configJson["version"] != Config.version) {
-    logger.w("Config file is invalid. Created missing keys.");
-    logger.t(results.errors);
-
-    final exampleConfig = Config.asDefault(File("")).toJson();
-    final mergedJson = Config.merge(configJson, exampleConfig);
-    Config.fromJson(confFile, mergedJson).save();
-  }
+  final exampleConfig = Config.asDefault(File("")).toJson();
+  final mergedJson = Config.merge(configJson, exampleConfig);
+  final config = Config.fromJson(confFile, mergedJson)..save();
 
   Database database = sqlite3.open(path.join(appDir.path, 'database.db'));
   database.execute(
       "CREATE TABLE IF NOT EXISTS lyrics (id TEXT PRIMARY KEY, lyrics TEXT); CREATE TABLE IF NOT EXISTS watchlist (id TEXT PRIMARY KEY UNIQUE, name TEXT, status TEXT, nextAirDate DATE)");
 
-  final config = Config.fromJson(confFile, jsonDecode(confFile.readAsStringSync()));
   final client = alexa.QueryClient(
     cookieFile,
     loginToken: config.alexa.token,
