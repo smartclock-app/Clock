@@ -1,0 +1,526 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SmartClock Config Schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "The version of the config schema",
+      "const": "1.0.0"
+    },
+    "orientation": {
+      "type": "string",
+      "description": "The orientation of the display",
+      "enum": ["landscape", "portrait"]
+    },
+    "interactive": {
+      "type": "boolean",
+      "description": "Whether to enable interactive features"
+    },
+    "networkEnabled": {
+      "type": "boolean",
+      "description": "Whether to enable network features"
+    },
+    "remoteConfig": {
+      "type": "object",
+      "description": "Configuration for the remote configuration app",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable remote configuration"
+        },
+        "port": {
+          "type": "number",
+          "description": "The port to access remote configuration"
+        },
+        "password": {
+          "type": "string",
+          "description": "The password to access remote configuration\n\nNote: Stored in plain text as, since it only protects this config, if they can see the password then they must already have access to this file."
+        },
+        "useBonjour": {
+          "type": "boolean",
+          "description": "Whether to use Bonjour to advertise the remote configuration service"
+        },
+        "bonjourName": {
+          "type": "string",
+          "description": "The name to advertise the remote configuration service as"
+        },
+        "toggleDisplayPath": {
+          "type": "string",
+          "description": "The path to a script used to toggle the display on and off\n\nExamples can be found in /assets/display"
+        }
+      },
+      "required": ["enabled", "port", "password", "useBonjour"]
+    },
+    "alexa": {
+      "type": "object",
+      "description": "Configuration for the Alexa integration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the Alexa integration"
+        },
+        "features": {
+          "type": "object",
+          "description": "Which Alexa features to enable",
+          "properties": {
+            "nowplaying": {
+              "type": "boolean"
+            },
+            "alarms": {
+              "type": "boolean"
+            },
+            "timers": {
+              "type": "boolean"
+            },
+            "notes": {
+              "type": "boolean"
+            }
+          },
+          "required": ["nowplaying", "alarms", "timers", "notes"]
+        },
+        "userId": {
+          "type": "string",
+          "description": "Identifies the Alexa cookie stored in cookies.json"
+        },
+        "token": {
+          "type": "string",
+          "description": "The refresh token for the Alexa account, used to generate the Amazon cookie"
+        },
+        "devices": {
+          "type": "array",
+          "description": "The names of the Alexa devices to control",
+          "items": {
+            "type": "string"
+          }
+        },
+        "radioProviders": {
+          "type": "array",
+          "description": "The IDs of Alexa radio providers. The clock should not show lyrics or progress for these providers",
+          "items": {
+            "type": "string"
+          }
+        },
+        "nowplayingImageSize": {
+          "type": "number",
+          "description": "The size of the now playing image"
+        },
+        "nowplayingFontSize": {
+          "type": "number",
+          "description": "The font size for the now playing text"
+        },
+        "noteColumns": {
+          "type": "number",
+          "description": "The number of columns to display notes in"
+        },
+        "noteFontSize": {
+          "type": "number",
+          "description": "The font size for notes"
+        }
+      },
+      "required": [
+        "enabled",
+        "features",
+        "userId",
+        "token",
+        "devices",
+        "nowplayingImageSize",
+        "nowplayingFontSize",
+        "noteColumns",
+        "noteFontSize"
+      ]
+    },
+    "calendar": {
+      "type": "object",
+      "description": "Configuration for the calendar integration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the calendar integration"
+        },
+        "maxEvents": {
+          "type": "number",
+          "description": "The maximum number of events to display"
+        },
+        "titles": {
+          "type": "object",
+          "description": "Custom titles for 'This Week' and 'Next Week'",
+          "properties": {
+            "odd": {
+              "type": "string",
+              "description": "The title for odd weeks"
+            },
+            "even": {
+              "type": "string",
+              "description": "The title for even weeks"
+            }
+          },
+          "required": ["odd", "even"]
+        },
+        "eventFilter": {
+          "type": "array",
+          "description": "A list of regular expressions to filter events by",
+          "items": {
+            "type": "string"
+          }
+        },
+        "monthTitleSize": {
+          "type": "number",
+          "description": "The font size for the month title"
+        },
+        "eventTitleSize": {
+          "type": "number",
+          "description": "The font size for event titles"
+        },
+        "eventTimeSize": {
+          "type": "number",
+          "description": "The font size for event times"
+        },
+        "eventColorWidth": {
+          "type": "number",
+          "description": "The width of the colored event indicator"
+        }
+      },
+      "required": [
+        "enabled",
+        "maxEvents",
+        "titles",
+        "eventFilter",
+        "monthTitleSize",
+        "eventTitleSize",
+        "eventTimeSize",
+        "eventColorWidth"
+      ]
+    },
+    "clock": {
+      "type": "object",
+      "description": "Configuration for the clock display",
+      "properties": {
+        "twentyFourHour": {
+          "type": "boolean",
+          "description": "Whether to use 24 hour time"
+        },
+        "showSeconds": {
+          "type": "boolean",
+          "description": "Whether to show seconds"
+        },
+        "mainSize": {
+          "type": "number",
+          "description": "The font size for the main time"
+        },
+        "smallSize": {
+          "type": "number",
+          "description": "The font size for seconds and AM/PM"
+        },
+        "smallGap": {
+          "type": "number",
+          "description": "The gap between the seconds and AM/PM"
+        },
+        "dateSize": {
+          "type": "number",
+          "description": "The font size for the date"
+        },
+        "dateGap": {
+          "type": "number",
+          "description": "The gap between the time and the date"
+        },
+        "padding": {
+          "type": "number",
+          "description": "The padding around the clock"
+        }
+      },
+      "required": [
+        "twentyFourHour",
+        "showSeconds",
+        "mainSize",
+        "smallSize",
+        "smallGap",
+        "dateSize",
+        "dateGap",
+        "padding"
+      ]
+    },
+    "energy": {
+      "type": "object",
+      "description": "Configuration for the Glowmarkt energy integration\n\nCannot be enabled, current api not useful.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the Glowmarkt energy integration",
+          "enum": [false]
+        },
+        "token": {
+          "type": "string",
+          "description": "The Glowmarkt API token"
+        },
+        "gasId": {
+          "type": "string",
+          "description": "The Glowmarkt gas cost resourceId"
+        },
+        "electricityId": {
+          "type": "string",
+          "description": "The Glowmarkt electricity cost resourceId"
+        },
+        "fontSize": {
+          "type": "number",
+          "description": "The font size for the energy usage"
+        },
+        "iconSize": {
+          "type": "number",
+          "description": "The size of the energy icons"
+        }
+      },
+      "required": ["enabled", "token", "gasId", "electricityId", "fontSize", "iconSize"]
+    },
+    "google": {
+      "type": "object",
+      "description": "Google API configuration for Calendar",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "The Google API client ID"
+        },
+        "clientSecret": {
+          "type": "string",
+          "description": "The Google API client secret"
+        },
+        "accessToken": {
+          "type": "string",
+          "description": "The Google API access token"
+        },
+        "refreshToken": {
+          "type": "string",
+          "description": "The Google API refresh token"
+        },
+        "tokenExpiry": {
+          "type": "string",
+          "description": "The UTC expiry date of the access token",
+          "format": "date-time"
+        }
+      },
+      "required": ["clientId", "clientSecret", "accessToken", "refreshToken", "tokenExpiry"]
+    },
+    "photos": {
+      "type": "object",
+      "description": "Configuration for the Photos integration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the Photos integration"
+        },
+        "scraperApiKey": {
+          "type": "string",
+          "description": "The scraping.narf.ai API key"
+        },
+        "interval": {
+          "type": "number",
+          "description": "The interval in groups of 30 seconds to check for new photos\n\nI.e. 1 = 30 seconds, 2 = 1 minute, 3 = 1 minute 30 seconds, etc.",
+          "minimum": 1
+        },
+        "googlePhotoAlbumUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "The url of the Google Photo album to display"
+        },
+        "useStaticLinks": {
+          "type": "boolean",
+          "description": "Whether to use static links for the photos"
+        },
+        "images": {
+          "type": "array",
+          "description": "The urls of the photos to display",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "required": ["enabled", "scraperApiKey", "interval", "googlePhotoAlbumUrl", "images"]
+    },
+    "sidebar": {
+      "type": "object",
+      "description": "Configuration for the sidebar",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the sidebar"
+        },
+        "cardRadius": {
+          "type": "number",
+          "description": "The border radius of the cards"
+        },
+        "cardColor": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$|^#[0-9a-fA-F]{8}$",
+          "description": "The background color of the cards"
+        }
+      },
+      "required": ["enabled", "cardRadius", "cardColor"]
+    },
+    "watchlist": {
+      "type": "object",
+      "description": "Configuration for the Trakt watchlist integration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the Trakt watchlist integration"
+        },
+        "trakt": {
+          "type": "object",
+          "description": "Configuration for the Trakt API",
+          "properties": {
+            "clientId": {
+              "type": "string",
+              "description": "The Trakt API client ID"
+            },
+            "clientSecret": {
+              "type": "string",
+              "description": "The Trakt API client secret"
+            },
+            "accessToken": {
+              "type": "string",
+              "description": "The Trakt API access token"
+            },
+            "refreshToken": {
+              "type": "string",
+              "description": "The Trakt API refresh token"
+            },
+            "redirectUri": {
+              "type": "string",
+              "description": "The Trakt API redirect URI"
+            },
+            "listId": {
+              "type": "string",
+              "description": "The Trakt watchlist ID"
+            },
+            "includeEpisodesAsShow": {
+              "type": "boolean",
+              "description": "Whether to include listed episodes as their show"
+            }
+          },
+          "required": ["clientId", "clientSecret", "accessToken", "refreshToken", "redirectUri", "listId"]
+        },
+        "tmdbApiKey": {
+          "type": "string",
+          "description": "The TMDb API key"
+        },
+        "region": {
+          "type": "string",
+          "description": "The TMDb release date region",
+          "format": "region",
+          "examples": ["GB", "US"]
+        },
+        "prefix": {
+          "type": "string",
+          "description": "The prefix for watchlist items on the calendar"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$|^#[0-9a-fA-F]{8}$",
+          "description": "The border color of the watchlist items on the calendar"
+        },
+        "maxItems": {
+          "type": "number",
+          "description": "The maximum number of watchlist items to display"
+        }
+      },
+      "required": ["enabled", "trakt", "tmdbApiKey", "prefix", "color", "maxItems"]
+    },
+    "weather": {
+      "type": "object",
+      "description": "Configuration for the weather integration",
+
+      "if": {
+        "properties": {
+          "country": {
+            "const": "GB"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "postcode": {
+            "pattern": "^$|([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\\s?[0-9][A-Za-z]{2})"
+          }
+        }
+      },
+
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the weather integration"
+        },
+        "type": {
+          "type": "string",
+          "description": "Whether to display weather floating or in the sidebar",
+          "enum": ["floating", "card"]
+        },
+        "apiKey": {
+          "type": "string",
+          "description": "The OpenWeatherMap API key"
+        },
+        "postcode": {
+          "type": "string",
+          "description": "The postcode for the weather forecast"
+        },
+        "country": {
+          "type": "string",
+          "description": "The 2 letter country code for the weather forecast",
+          "pattern": "^$|^[A-Z]{2}$"
+        },
+        "units": {
+          "type": "string",
+          "description": "The units to display the weather in",
+          "enum": ["metric", "imperial"]
+        },
+        "fontSize": {
+          "type": "number",
+          "description": "The font size for the weather"
+        },
+        "iconSize": {
+          "type": "number",
+          "description": "The size of the weather icons"
+        }
+      },
+      "required": ["enabled", "apiKey", "postcode", "country", "units", "fontSize", "iconSize"]
+    },
+    "dimensions": {
+      "type": "object",
+      "description": "The position and size of the elements on the display",
+      "properties": {
+        "clock": {
+          "type": "string",
+          "description": "The position and size of the clock in the format 'x,y,width,height'",
+          "pattern": "^[0-9]+,[0-9]+,[0-9]+,[0-9]+$"
+        },
+        "sidebar": {
+          "type": "string",
+          "description": "The position and size of the sidebar in the format 'x,y,width,height'",
+          "pattern": "^[0-9]+,[0-9]+,[0-9]+,[0-9]+$"
+        },
+        "weather": {
+          "type": "string",
+          "description": "The position and size of the weather in the format 'x,y,width,height'",
+          "pattern": "^[0-9]+,[0-9]+,[0-9]+,[0-9]+$"
+        }
+      },
+      "required": ["clock", "sidebar", "weather"]
+    }
+  },
+  "required": [
+    "orientation",
+    "interactive",
+    "networkEnabled",
+    "remoteConfig",
+    "alexa",
+    "calendar",
+    "clock",
+    "energy",
+    "google",
+    "photos",
+    "sidebar",
+    "weather",
+    "watchlist",
+    "dimensions"
+  ]
+}

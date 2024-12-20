@@ -14,10 +14,10 @@ import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:json_schema/json_schema.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
-import 'package:smartclock/smart_clock.dart';
+import 'package:smartclock/config/config.dart' show ConfigModel, Config;
+import 'package:smartclock/routes/smart_clock.dart';
 import 'package:smartclock/util/logger_output.dart';
-import 'package:smartclock/util/get_application_directory.dart';
-import 'package:smartclock/util/config.dart' show ConfigModel, Config;
+import 'package:smartclock/util/file_utils.dart';
 
 late Logger logger;
 
@@ -28,6 +28,8 @@ void main() async {
 
   final loggerOutput = LoggerOutput(file: File(path.join(appDir.path, "logs.txt")));
   logger = Logger(
+    level: Level.all,
+    filter: ProductionFilter(),
     printer: SimplePrinter(printTime: true, colors: false),
     output: loggerOutput,
   );
@@ -36,7 +38,7 @@ void main() async {
   logger.i("Application Directory: ${appDir.path}");
 
   final schemaFile = File(path.join(appDir.path, "schema.json"));
-  final schema = await rootBundle.loadString("assets/schema.json");
+  final schema = await rootBundle.loadString("lib/config/schema.json");
   schemaFile.writeAsStringSync(schema);
 
   final confFile = File(path.join(appDir.path, "config.json"));

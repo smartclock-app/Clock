@@ -45,6 +45,7 @@ flutter:
 
   assets:
     - assets/
+    - lib/config/schema.json
 
   fonts:
     - family: Poppins
