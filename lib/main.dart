@@ -37,7 +37,7 @@ void main() async {
   logger.i("Application Directory: ${appDir.path}");
 
   final schemaFile = File(path.join(appDir.path, "schema.json"));
-  final schema = await rootBundle.loadString("lib/config/schema.json");
+  final schema = await rootBundle.loadString("assets/schema.json");
   schemaFile.writeAsStringSync(schema);
 
   final confFile = File(path.join(appDir.path, "config.json"));
