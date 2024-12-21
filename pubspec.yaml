@@ -26,6 +26,7 @@ dependencies:
   bonsoir: ^5.1.10
   sqlite3_flutter_libs: ^0.5.26
   html: ^0.15.5
+  web_socket_channel: ^3.0.1
 
 dev_dependencies:
   flutter_test:

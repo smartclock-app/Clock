@@ -29,7 +29,7 @@ void main() async {
   logger = Logger(
     level: Level.all,
     filter: ProductionFilter(),
-    printer: SimplePrinter(printTime: true, colors: false),
+    printer: SimplePrinter(printTime: true, colors: true),
     output: loggerOutput,
   );
 

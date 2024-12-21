@@ -58,7 +58,6 @@ class _PhotoClockState extends State<PhotoClock> {
     images.shuffle();
 
     for (final image in images) {
-      logger.t("Precaching image: $image");
       if (mounted) precacheImage(NetworkImage(image), context);
     }
 

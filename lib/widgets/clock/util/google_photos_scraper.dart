@@ -14,7 +14,7 @@ Future<List<String>> scrapeGooglePhotos(String apiKey, String photoUrl) async {
   final dataElements = document.querySelectorAll('[data-latest-bg]');
   final dataUrls = dataElements.map((element) => element.attributes['data-latest-bg'] ?? '').where((url) => url.isNotEmpty);
 
-  logger.i("Scraped Google Photos: ${imgUrls.length} img, ${dataUrls.length} data-latest-bg");
+  logger.t("Scraped Google Photos: ${imgUrls.length} img, ${dataUrls.length} data-latest-bg");
 
   if (imgUrls.isNotEmpty) {
     return imgUrls.map((e) => e.replaceAll(RegExp(r'(=w[0-9]+-h[0-9]+)|(=s[0-9]+)'), "=w1000-h1000")).toList();

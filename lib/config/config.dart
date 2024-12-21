@@ -14,6 +14,7 @@ part 'clock.dart';
 part 'dimension.dart';
 part 'energy.dart';
 part 'google.dart';
+part 'homeassistant.dart';
 part 'photos.dart';
 part 'sidebar.dart';
 part 'trakt.dart';
@@ -84,6 +85,7 @@ class Config {
   final Clock clock;
   final Energy energy;
   final Google google;
+  final HomeAssistant homeAssistant;
   final Photos photos;
   final Sidebar sidebar;
   final Watchlist watchlist;
@@ -101,6 +103,7 @@ class Config {
     required this.clock,
     required this.energy,
     required this.google,
+    required this.homeAssistant,
     required this.photos,
     required this.sidebar,
     required this.watchlist,
@@ -142,6 +145,7 @@ class Config {
         clock: Clock.asDefault(),
         energy: Energy.asDefault(),
         google: Google.asDefault(),
+        homeAssistant: HomeAssistant.asDefault(),
         photos: Photos.asDefault(),
         sidebar: Sidebar.asDefault(),
         watchlist: Watchlist.asDefault(),
@@ -164,6 +168,7 @@ class Config {
         clock: Clock.fromJson(json["clock"]),
         energy: Energy.fromJson(json["energy"]),
         google: Google.fromJson(json["google"]),
+        homeAssistant: HomeAssistant.fromJson(json["homeAssistant"]),
         photos: Photos.fromJson(json["photos"]),
         sidebar: Sidebar.fromJson(json["sidebar"]),
         watchlist: Watchlist.fromJson(json["watchlist"]),
@@ -183,6 +188,7 @@ class Config {
         "clock": clock.toJson(),
         "energy": energy.toJson(),
         "google": google.toJson(),
+        "homeAssistant": homeAssistant.toJson(),
         "photos": photos.toJson(),
         "sidebar": sidebar.toJson(),
         "watchlist": watchlist.toJson(),

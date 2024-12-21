@@ -12,6 +12,7 @@ import 'package:smartclock/config/config.dart' show ConfigModel, WeatherType;
 import 'package:smartclock/routes/editor.dart';
 import 'package:smartclock/routes/logs.dart';
 import 'package:smartclock/widgets/clock/clock.dart';
+import 'package:smartclock/widgets/homeassistant/homeassistant.dart';
 import 'package:smartclock/widgets/sidebar/sidebar.dart';
 import 'package:smartclock/widgets/weather/weather.dart';
 import 'package:smartclock/websocket/websocket_manager.dart';
@@ -118,6 +119,7 @@ class _SmartClockState extends State<SmartClock> {
                       const Clock(),
                       if (config.sidebar.enabled) Sidebar(networkAvailable: networkAvailable),
                       if (config.weather.enabled && config.weather.type == WeatherType.floating && config.networkEnabled && networkAvailable) const Weather(type: WeatherType.floating),
+                      if (config.homeAssistant.enabled && config.networkEnabled && networkAvailable) const HomeAssistant(),
                     ],
                   );
                 },
