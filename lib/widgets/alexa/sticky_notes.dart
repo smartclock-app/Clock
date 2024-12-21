@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
+import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/widgets/sidebar/error_info_widget.dart';
 import 'package:smartclock/config/config.dart';
 import 'package:provider/provider.dart';
@@ -69,12 +70,14 @@ class _StickyNotesState extends State<StickyNotes> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<DateTime>>(context).stream;
+    final stream = context.read<StreamController<ClockEvent>>().stream;
     _subscription?.cancel();
-    _subscription = stream.listen((time) {
-      setState(() {
-        _futureMemories = _fetchMemories();
-      });
+    _subscription = stream.listen((event) {
+      if (event.event == ClockEvents.refetch) {
+        setState(() {
+          _futureMemories = _fetchMemories();
+        });
+      }
     });
   }
 

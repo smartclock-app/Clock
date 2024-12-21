@@ -7,6 +7,7 @@ import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
 import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/config/config.dart' show ConfigModel;
+import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/widgets/alexa/alarm.dart';
 import 'package:smartclock/widgets/alexa/timer.dart';
 
@@ -73,9 +74,9 @@ class _NotificationsState extends State<Notifications> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<DateTime>>(context).stream;
+    final stream = context.read<StreamController<ClockEvent>>().stream;
     _subscription?.cancel();
-    _subscription = stream.listen((_) => getNotifications());
+    _subscription = stream.listen((event) => event.event == ClockEvents.refetch ? getNotifications() : null);
   }
 
   @override

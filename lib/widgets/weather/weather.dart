@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/config/config.dart' show ConfigModel, Config, WeatherType;
+import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/widgets/weather/weather_card.dart';
 import 'package:smartclock/widgets/weather/weather_floating.dart';
 
@@ -57,12 +58,14 @@ class _WeatherState extends State<Weather> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<DateTime>>(context).stream;
+    final stream = context.read<StreamController<ClockEvent>>().stream;
     _subscription?.cancel();
-    _subscription = stream.listen((_) {
-      setState(() {
-        _weather = _fetchWeather();
-      });
+    _subscription = stream.listen((event) {
+      if (event.event == ClockEvents.refetch) {
+        setState(() {
+          _weather = _fetchWeather();
+        });
+      }
     });
   }
 

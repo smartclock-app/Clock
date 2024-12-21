@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'package:smartclock/util/data_utils.dart';
 import 'package:smartclock/main.dart' show logger;
+import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/widgets/clock/photo_clock.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 
@@ -29,7 +30,7 @@ class _ClockState extends State<Clock> {
       if (newNow.second % 30 == 0) {
         logger.t("Refetching Content...");
         // Notifies other widgets to refetch their content
-        Provider.of<StreamController<DateTime>>(context, listen: false).add(newNow);
+        context.read<StreamController<ClockEvent>>().add((time: newNow, event: ClockEvents.refetch));
       }
 
       setState(() {

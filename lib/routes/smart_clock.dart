@@ -52,7 +52,7 @@ class _SmartClockState extends State<SmartClock> {
 
     final configModel = context.read<ConfigModel>();
     if (configModel.config.remoteConfig.enabled) {
-      _webSocketManager = WebSocketManager(configModel);
+      _webSocketManager = WebSocketManager(context);
     }
   }
 

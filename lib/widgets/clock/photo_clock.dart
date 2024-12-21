@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/config/config.dart';
 import 'package:smartclock/util/data_utils.dart';
+import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/widgets/clock/util/google_photos_scraper.dart';
 
 class PhotoClock extends StatefulWidget {
@@ -23,6 +24,7 @@ class _PhotoClockState extends State<PhotoClock> {
   int photoIndex = 0;
   int thirtyCount = 0;
   late FutureOr<List<String>> _futureImages;
+  StreamSubscription<void>? _subscription;
 
   String get _hour => widget.now.hour == 12 ? "12" : "${widget.now.hour % 12}".padLeft(2, "0");
   // ignore: non_constant_identifier_names
@@ -68,6 +70,27 @@ class _PhotoClockState extends State<PhotoClock> {
   void initState() {
     super.initState();
     _futureImages = getImages();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final stream = context.read<StreamController<ClockEvent>>().stream;
+    _subscription?.cancel();
+    _subscription = stream.listen((event) {
+      if (event.event == ClockEvents.skipPhoto) {
+        setState(() {
+          photoIndex++;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   @override

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:smartclock/util/event_utils.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:smartclock/widgets/sidebar/info_widget.dart';
@@ -42,17 +43,19 @@ class _CalendarState extends State<Calendar> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<DateTime>>(context).stream;
+    final stream = context.read<StreamController<ClockEvent>>().stream;
     _subscription?.cancel();
-    _subscription = stream.listen((time) {
-      setState(() {
-        _futureEvents = fetchEvents(
-          config: config,
-          httpClient: _client,
-          database: database,
-          updateWl: time.hour == 0 && time.minute == 0,
-        );
-      });
+    _subscription = stream.listen((event) {
+      if (event.event == ClockEvents.refetch) {
+        setState(() {
+          _futureEvents = fetchEvents(
+            config: config,
+            httpClient: _client,
+            database: database,
+            updateWl: event.time.hour == 0 && event.time.minute == 0,
+          );
+        });
+      }
     });
   }
 

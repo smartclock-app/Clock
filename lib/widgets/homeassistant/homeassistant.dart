@@ -28,7 +28,7 @@ class _HomeAssistantState extends State<HomeAssistant> {
 
     Response alive = await dio.get("/api/");
     if (alive.statusCode != 200 || alive.data["message"] != "API running.") {
-      logger.w("Home Assistant connection failed");
+      logger.w("[Home Assistant] Connection failed");
       return;
     }
 
@@ -36,7 +36,7 @@ class _HomeAssistantState extends State<HomeAssistant> {
     channel = WebSocketChannel.connect(webSocketUri);
     await channel.ready;
 
-    logger.t("Connected to Home Assistant");
+    logger.t("[Home Assistant] Connected successfully");
     channel.stream.listen((message) {
       logger.t("[Home Assistant] $message");
 

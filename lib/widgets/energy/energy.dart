@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
+import 'package:smartclock/util/event_utils.dart';
 
 import 'package:smartclock/widgets/sidebar/sidebar_card.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
@@ -64,11 +65,11 @@ class _EnergyState extends State<Energy> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<DateTime>>(context).stream;
+    final stream = context.read<StreamController<ClockEvent>>().stream;
     _subscription?.cancel();
-    _subscription = stream.listen((time) {
+    _subscription = stream.listen((event) {
       // Refetch every half hour
-      if ((time.minute == 0 || time.minute == 30) && time.second == 0) {
+      if (event.event == ClockEvents.refetch && (event.time.minute == 0 || event.time.minute == 30) && event.time.second == 0) {
         setState(() {
           _data = _fetchData();
         });

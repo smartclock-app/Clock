@@ -2,20 +2,26 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+
 import 'package:bonsoir/bonsoir.dart';
-import 'package:smartclock/config/config.dart';
+import 'package:provider/provider.dart';
+
 import 'package:smartclock/main.dart' show logger;
+import 'package:smartclock/config/config.dart';
+import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/websocket/commands/toggle_display.dart';
 
 part 'websocket_handler.dart';
 
 class WebSocketManager {
   HttpServer? server;
-  ConfigModel configModel;
+  late ConfigModel configModel;
   BonsoirBroadcast? _broadcast;
   late final WebSocketHandler commands;
 
-  WebSocketManager(this.configModel) {
+  WebSocketManager(BuildContext context) {
+    configModel = context.read<ConfigModel>();
     commands = WebSocketHandler();
 
     commands.addCommand('echo', (command) => command.data ?? "No data provided");
@@ -33,6 +39,10 @@ class WebSocketManager {
       return getDisplayStatus(
         script: configModel.config.remoteConfig.toggleDisplayPath,
       );
+    });
+    commands.addCommand('skip_photo', (command) {
+      context.read<StreamController<ClockEvent>>().add((time: DateTime.now(), event: ClockEvents.skipPhoto));
+      return "Photo skipped";
     });
     commands.addCommand('get_config', (command) => jsonEncode(configModel.config));
     commands.addCommand('set_config', (command) {

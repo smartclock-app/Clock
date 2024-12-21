@@ -3,6 +3,7 @@ import 'dart:math' show min;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:smartclock/util/event_utils.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
@@ -113,9 +114,9 @@ class _NowPlayingState extends State<NowPlaying> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final stream = Provider.of<StreamController<DateTime>>(context).stream;
+    final stream = context.read<StreamController<ClockEvent>>().stream;
     _subscription?.cancel();
-    _subscription = stream.listen((_) => getQueue());
+    _subscription = stream.listen((event) => event.event == ClockEvents.refetch ? getQueue() : null);
   }
 
   @override

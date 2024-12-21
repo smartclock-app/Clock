@@ -16,6 +16,7 @@ import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 import 'package:smartclock/routes/smart_clock.dart';
 import 'package:smartclock/util/logger_output.dart';
+import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/util/file_utils.dart';
 
 late Logger logger;
@@ -105,7 +106,7 @@ void main() async {
       Provider<Database>.value(value: database),
       Provider<alexa.QueryClient>.value(value: client),
       // Push events to this stream to tell widgets to update
-      Provider<StreamController<DateTime>>.value(value: StreamController<DateTime>.broadcast()),
+      Provider<StreamController<ClockEvent>>.value(value: StreamController<ClockEvent>.broadcast()),
     ],
     child: Consumer<ConfigModel>(
       builder: (context, value, child) => SmartClock(key: UniqueKey()),
