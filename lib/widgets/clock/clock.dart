@@ -47,7 +47,8 @@ class _ClockState extends State<Clock> {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.read<ConfigModel>().config;
+    final configModel = context.read<ConfigModel>();
+    final config = configModel.config;
 
     return Positioned(
       left: config.dimensions["clock"]!.x,
@@ -61,10 +62,17 @@ class _ClockState extends State<Clock> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: const Text("Navigate to"),
+                title: const Text("Debug"),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    ListTile(
+                      title: const Text("Refresh"),
+                      onTap: () {
+                        Navigator.pop(context);
+                        configModel.notifyListeners();
+                      },
+                    ),
                     ListTile(
                       title: const Text("Logs"),
                       onTap: () {
