@@ -69,6 +69,7 @@ class WebSocketManager {
       attributes: {
         'platform': Platform.operatingSystem,
         'protected': config.remoteConfig.password.isNotEmpty.toString(),
+        'ip': InternetAddress.anyIPv4.address,
       },
     );
     final broadcast = BonsoirBroadcast(service: service);
