@@ -26,11 +26,11 @@ void main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   final Directory appDir = await getApplicationDirectory();
 
-  final loggerOutput = LoggerOutput(file: File(path.join(appDir.path, "logs.txt")));
+  final loggerOutput = LoggerOutput(file: File(path.join(appDir.path, "logs.txt")), overrideExisting: true);
   logger = Logger(
     level: Level.all,
     filter: ProductionFilter(),
-    printer: SimplePrinter(printTime: true, colors: true),
+    printer: SimplePrinter(printTime: true, colors: false),
     output: loggerOutput,
   );
 
@@ -108,8 +108,6 @@ void main() async {
       // Push events to this stream to tell widgets to update
       Provider<StreamController<ClockEvent>>.value(value: StreamController<ClockEvent>.broadcast()),
     ],
-    child: Consumer<ConfigModel>(
-      builder: (context, value, child) => SmartClock(key: UniqueKey()),
-    ),
+    child: const SmartClock(),
   ));
 }

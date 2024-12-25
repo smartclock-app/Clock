@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
 
@@ -15,20 +14,6 @@ import 'package:smartclock/widgets/clock/clock.dart';
 import 'package:smartclock/widgets/sidebar/sidebar.dart';
 import 'package:smartclock/widgets/weather/weather.dart';
 import 'package:smartclock/websocket/websocket_manager.dart';
-
-class ScrollWithMouseBehavior extends MaterialScrollBehavior {
-  const ScrollWithMouseBehavior();
-
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.invertedStylus,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.stylus,
-        PointerDeviceKind.touch,
-        PointerDeviceKind.trackpad,
-        PointerDeviceKind.unknown,
-      };
-}
 
 class SmartClock extends StatefulWidget {
   const SmartClock({super.key});
@@ -84,7 +69,7 @@ class _SmartClockState extends State<SmartClock> {
     setState(() {
       networkAvailable = networkAvailable;
     });
-    logger.t('Connectivity changed: $result');
+    logger.t('Connection\'s Available: $result');
   }
 
   @override
@@ -95,32 +80,34 @@ class _SmartClockState extends State<SmartClock> {
       title: 'SmartClock',
       theme: ThemeData(scaffoldBackgroundColor: Colors.black, fontFamily: "Poppins"),
       debugShowCheckedModeBanner: false,
-      scrollBehavior: const ScrollWithMouseBehavior(),
       routes: {
         '/editor': (context) => const Editor(),
         '/logs': (context) => const LogViewer(),
       },
       home: Scaffold(
-        body: Container(
-          color: Colors.white,
-          child: Center(
-            child: SafeArea(
-              bottom: false,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final resolution = constraints.biggest;
-                  final width = (resolution.width).toInt();
-                  final height = (resolution.height).toInt();
-                  logger.i("Safe Area Resolution: ${width}x$height");
+        body: Consumer<ConfigModel>(
+          builder: (context, value, child) => Container(
+            key: value.clockKey,
+            color: Colors.white,
+            child: Center(
+              child: SafeArea(
+                bottom: false,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final resolution = constraints.biggest;
+                    final width = (resolution.width).toInt();
+                    final height = (resolution.height).toInt();
+                    logger.i("Safe Area Resolution: ${width}x$height");
 
-                  return Stack(
-                    children: [
-                      const Clock(),
-                      if (config.sidebar.enabled) Sidebar(networkAvailable: networkAvailable),
-                      if (config.weather.enabled && config.weather.type == WeatherType.floating && config.networkEnabled && networkAvailable) const Weather(type: WeatherType.floating),
-                    ],
-                  );
-                },
+                    return Stack(
+                      children: [
+                        const Clock(),
+                        if (config.sidebar.enabled) Sidebar(networkAvailable: networkAvailable),
+                        if (config.weather.enabled && config.weather.type == WeatherType.floating && config.networkEnabled && networkAvailable) const Weather(type: WeatherType.floating),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
           ),

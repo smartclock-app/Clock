@@ -5,31 +5,23 @@ import 'dart:io';
 import 'package:logger/logger.dart';
 
 class LoggerOutput extends LogOutput {
-  // Stream output dependencies
-  late StreamController<List<String>> _controller;
-  bool _shouldForward = false;
-
-  // File output dependencies
   final File file;
   final bool overrideExisting;
   final Encoding encoding;
   IOSink? _sink;
 
+  static bool shouldBroadcast = false;
+  static final StreamController<List<String>> _streamController = StreamController<List<String>>.broadcast(
+    onListen: () => shouldBroadcast = true,
+    onCancel: () => shouldBroadcast = false,
+  );
+  static Stream<List<String>> get stream => _streamController.stream;
+
   LoggerOutput({
     required this.file,
     this.overrideExisting = false,
     this.encoding = utf8,
-  }) {
-    // Init stream
-    _controller = StreamController<List<String>>(
-      onListen: () => _shouldForward = true,
-      onPause: () => _shouldForward = false,
-      onResume: () => _shouldForward = true,
-      onCancel: () => _shouldForward = false,
-    );
-  }
-
-  Stream<List<String>> get stream => _controller.stream;
+  });
 
   @override
   Future<void> init() async {
@@ -45,8 +37,8 @@ class LoggerOutput extends LogOutput {
     // Write to console
     event.lines.forEach(print);
 
-    // Add to stream
-    if (_shouldForward) _controller.add(event.lines);
+    // Write to stream
+    if (shouldBroadcast) _streamController.add(event.lines);
 
     // Write to file
     _sink?.writeAll(event.lines, '\n');
@@ -55,9 +47,6 @@ class LoggerOutput extends LogOutput {
 
   @override
   Future<void> destroy() async {
-    // Cleanup stream
-    await _controller.close();
-
     // Cleanup file
     await _sink?.flush();
     await _sink?.close();

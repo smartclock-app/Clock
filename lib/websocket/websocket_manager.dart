@@ -69,7 +69,6 @@ class WebSocketManager {
       attributes: {
         'platform': Platform.operatingSystem,
         'protected': config.remoteConfig.password.isNotEmpty.toString(),
-        'ip': InternetAddress.anyIPv4.address,
       },
     );
     final broadcast = BonsoirBroadcast(service: service);
@@ -81,14 +80,14 @@ class WebSocketManager {
   void _initServer() async {
     server = await HttpServer.bind(InternetAddress.anyIPv4, configModel.config.remoteConfig.port);
     server?.transform(WebSocketTransformer()).listen(onWebSocketData);
-    logger.i("WebSocket server started on port ${configModel.config.remoteConfig.port}");
+    logger.i("[Remote Config] WebSocket server started on port ${configModel.config.remoteConfig.port}");
   }
 
   void onWebSocketData(WebSocket webSocket) {
     webSocket.listen(
       (event) async {
         final command = WebSocketCommand.fromEvent(event);
-        logger.t("Received command: ${command.command}");
+        logger.t("[Remote Config] Received ${command.command}");
 
         final config = configModel.config;
         if (config.remoteConfig.password.isNotEmpty && command.headers?['password'] != config.remoteConfig.password) {
@@ -99,8 +98,8 @@ class WebSocketManager {
         final response = await commands.handle(command);
         webSocket.add(response);
       },
-      onError: (error) => logger.e("WebSocket error: $error"),
-      onDone: () => logger.i("WebSocket connection closed"),
+      onError: (error) => logger.e("[Remote Config] WebSocket error: $error"),
+      onDone: () => logger.i("[Remote Config] WebSocket connection closed"),
     );
   }
 

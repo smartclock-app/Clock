@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:smartclock/config/config.dart' show ConfigModel;
+import 'package:smartclock/util/logger_output.dart';
 
 class LogViewer extends StatefulWidget {
   const LogViewer({super.key});
@@ -16,6 +18,7 @@ class LogViewer extends StatefulWidget {
 class _LogViewerState extends State<LogViewer> {
   late List<String> log;
   ScrollController scrollController = ScrollController();
+  StreamSubscription? _logStream;
 
   @override
   void initState() {
@@ -24,13 +27,21 @@ class _LogViewerState extends State<LogViewer> {
     final file = File(path.join(configModel.appDir.path, "logs.txt"));
     log = file.readAsLinesSync();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    });
+    _logStream ??= LoggerOutput.stream.listen((lines) => setState(() => log.addAll(lines)));
+  }
+
+  @override
+  void dispose() {
+    _logStream?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Clock Logs"),

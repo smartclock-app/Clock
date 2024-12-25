@@ -51,8 +51,6 @@ class _HomeAssistantState extends State<HomeAssistant> {
           _channel.sink.close();
           break;
         case "auth_ok":
-          logger.i("[Home Assistant] Authenticated sucessfully");
-
           _channel.sink.add(jsonEncode({
             "id": 1,
             "type": "subscribe_trigger",

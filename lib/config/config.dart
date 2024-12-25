@@ -26,6 +26,7 @@ class ConfigModel extends ChangeNotifier {
   late alexa.QueryClient _client;
   Config config;
   Directory appDir;
+  Key clockKey = UniqueKey();
 
   ConfigModel(this.config, {required alexa.QueryClient client, required this.appDir}) {
     _client = client;
@@ -65,6 +66,7 @@ class ConfigModel extends ChangeNotifier {
 
   @override
   void notifyListeners() {
+    clockKey = UniqueKey();
     if (_client.loginToken != config.alexa.token) {
       _client.loginToken = config.alexa.token;
       logger.i("Updated Alexa loginToken: ${_client.loginToken}");
