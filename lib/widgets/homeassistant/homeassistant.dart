@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 
@@ -7,8 +8,9 @@ import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 import 'package:smartclock/main.dart';
+import 'package:smartclock/config/config.dart' show ConfigModel, Config, Camera;
+import 'package:smartclock/widgets/homeassistant/camera.dart';
 
 class HomeAssistant extends StatefulWidget {
   const HomeAssistant({super.key});
@@ -21,6 +23,9 @@ class _HomeAssistantState extends State<HomeAssistant> {
   late Config config;
   late WebSocketChannel _channel;
   StreamSubscription? _subscription;
+  final List<(Uri, Camera)> cameras = [];
+  final Map<int, Camera> _messageIds = {};
+  int messageId = 1;
 
   final OverlayPortalController _cameraOverlayController = OverlayPortalController();
 
@@ -44,30 +49,61 @@ class _HomeAssistantState extends State<HomeAssistant> {
       final data = jsonDecode(message);
 
       switch (data['type']) {
+        // Called on first connection
         case "auth_required":
           _channel.sink.add(jsonEncode({"type": "auth", "access_token": config.homeAssistant.token}));
           break;
+
+        // Called if authentication fails
         case "auth_invalid":
           _channel.sink.close();
           break;
+
+        // Called if authentication succeeds
         case "auth_ok":
-          _channel.sink.add(jsonEncode({
-            "id": 1,
-            "type": "subscribe_trigger",
-            "trigger": {
-              "platform": "state",
-              "entity_id": "input_boolean.smart_clock_overlay_test",
-            },
-          }));
+          for (final camera in config.homeAssistant.cameras) {
+            _channel.sink.add(jsonEncode({
+              "id": messageId++,
+              "type": "subscribe_trigger",
+              "trigger": {
+                "platform": "state",
+                "entity_id": camera.trigger,
+              },
+            }));
+          }
 
           break;
+
+        // Called when trigger state changes
         case 'event':
-          final newValue = data['event']['variables']['trigger']['to_state']['state'];
-          if (newValue == "on") {
-            _cameraOverlayController.show();
+          messageId += 1;
+          final trigger = data?['event']?['variables']?['trigger'];
+          final entityId = trigger?['entity_id'];
+          final state = trigger?['to_state']?['state'];
+          if (state == "on") {
+            final camera = config.homeAssistant.cameras.firstWhere((camera) => camera.trigger == entityId);
+            _messageIds[messageId] = camera; // Store camera with message id for use with result
+            _channel.sink.add(jsonEncode({"id": messageId, "type": "camera/stream", "entity_id": camera.id}));
           } else {
-            _cameraOverlayController.hide();
+            setState(() {
+              cameras.removeWhere((camera) => camera.$2.trigger == entityId);
+            });
+            if (cameras.isEmpty) _cameraOverlayController.hide();
           }
+          break;
+
+        // Called after a camera stream is requested
+        case 'result':
+          final id = data?['id'];
+          final url = data?['result']?['url'];
+          if (url != null) {
+            final streamUri = Uri.parse('${config.homeAssistant.url}$url');
+            final camera = _messageIds[id]!;
+            cameras.add((streamUri, camera));
+            _cameraOverlayController.show();
+            _messageIds.remove(id); // Clear message id after use
+          }
+          break;
       }
     });
   }
@@ -87,12 +123,19 @@ class _HomeAssistantState extends State<HomeAssistant> {
 
   @override
   Widget build(BuildContext context) {
+    if (!(Platform.isAndroid || Platform.isIOS || Platform.isMacOS)) {
+      return const SizedBox.shrink();
+    }
+
     return OverlayPortal(
       controller: _cameraOverlayController,
       overlayChildBuilder: (context) {
-        return Container(
-          color: Colors.white,
-          child: const Center(child: Text("Test", style: TextStyle(fontSize: 100))),
+        return Row(
+          children: [
+            for (final camera in cameras) ...[
+              Expanded(child: HomeAssistantCamera(streamUri: camera.$1, aspectRatio: camera.$2.aspectRatio)),
+            ]
+          ],
         );
       },
     );

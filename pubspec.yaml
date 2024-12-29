@@ -27,6 +27,8 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.26
   html: ^0.15.5
   web_socket_channel: ^3.0.1
+  video_player: ^2.9.2
+  chewie: ^1.8.5
 
 dev_dependencies:
   flutter_test:
