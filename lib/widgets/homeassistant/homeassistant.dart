@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+import 'package:smartclock/util/event_utils.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'package:smartclock/main.dart';
@@ -22,9 +23,11 @@ class HomeAssistant extends StatefulWidget {
 class _HomeAssistantState extends State<HomeAssistant> {
   late Config config;
   late WebSocketChannel _channel;
-  StreamSubscription? _subscription;
+  StreamSubscription? _eventSubscription;
+  StreamSubscription? _webSocketSubscription;
   final List<(Uri, Camera)> cameras = [];
   final Map<int, Camera> _messageIds = {};
+  bool isConnected = false;
   int messageId = 1;
 
   final OverlayPortalController _cameraOverlayController = OverlayPortalController();
@@ -43,69 +46,78 @@ class _HomeAssistantState extends State<HomeAssistant> {
     await _channel.ready;
 
     logger.t("[Home Assistant] Connected successfully");
-    _subscription = _channel.stream.listen((message) {
-      logger.t("[Home Assistant] $message");
+    isConnected = true;
+    _webSocketSubscription = _channel.stream.listen(
+      handleMessage,
+      onDone: () {
+        logger.t("[Home Assistant] Connection closed");
+        isConnected = false;
+      },
+    );
+  }
 
-      final data = jsonDecode(message);
+  void handleMessage(dynamic message) {
+    logger.t("[Home Assistant] $message");
 
-      switch (data['type']) {
-        // Called on first connection
-        case "auth_required":
-          _channel.sink.add(jsonEncode({"type": "auth", "access_token": config.homeAssistant.token}));
-          break;
+    final data = jsonDecode(message);
 
-        // Called if authentication fails
-        case "auth_invalid":
-          _channel.sink.close();
-          break;
+    switch (data['type']) {
+      // Called on first connection
+      case "auth_required":
+        _channel.sink.add(jsonEncode({"type": "auth", "access_token": config.homeAssistant.token}));
+        break;
 
-        // Called if authentication succeeds
-        case "auth_ok":
-          for (final camera in config.homeAssistant.cameras) {
-            _channel.sink.add(jsonEncode({
-              "id": messageId++,
-              "type": "subscribe_trigger",
-              "trigger": {
-                "platform": "state",
-                "entity_id": camera.trigger,
-              },
-            }));
-          }
+      // Called if authentication fails
+      case "auth_invalid":
+        _channel.sink.close();
+        break;
 
-          break;
+      // Called if authentication succeeds
+      case "auth_ok":
+        for (final camera in config.homeAssistant.cameras) {
+          _channel.sink.add(jsonEncode({
+            "id": messageId++,
+            "type": "subscribe_trigger",
+            "trigger": {
+              "platform": "state",
+              "entity_id": camera.trigger,
+            },
+          }));
+        }
 
-        // Called when trigger state changes
-        case 'event':
-          messageId += 1;
-          final trigger = data?['event']?['variables']?['trigger'];
-          final entityId = trigger?['entity_id'];
-          final state = trigger?['to_state']?['state'];
-          if (state == "on") {
-            final camera = config.homeAssistant.cameras.firstWhere((camera) => camera.trigger == entityId);
-            _messageIds[messageId] = camera; // Store camera with message id for use with result
-            _channel.sink.add(jsonEncode({"id": messageId, "type": "camera/stream", "entity_id": camera.id}));
-          } else {
-            setState(() {
-              cameras.removeWhere((camera) => camera.$2.trigger == entityId);
-            });
-            if (cameras.isEmpty) _cameraOverlayController.hide();
-          }
-          break;
+        break;
 
-        // Called after a camera stream is requested
-        case 'result':
-          final id = data?['id'];
-          final url = data?['result']?['url'];
-          if (url != null) {
-            final streamUri = Uri.parse('${config.homeAssistant.url}$url');
-            final camera = _messageIds[id]!;
-            cameras.add((streamUri, camera));
-            _cameraOverlayController.show();
-            _messageIds.remove(id); // Clear message id after use
-          }
-          break;
-      }
-    });
+      // Called when trigger state changes
+      case 'event':
+        messageId += 1;
+        final trigger = data?['event']?['variables']?['trigger'];
+        final entityId = trigger?['entity_id'];
+        final state = trigger?['to_state']?['state'];
+        if (state == "on") {
+          final camera = config.homeAssistant.cameras.firstWhere((camera) => camera.trigger == entityId);
+          _messageIds[messageId] = camera; // Store camera with message id for use with result
+          _channel.sink.add(jsonEncode({"id": messageId, "type": "camera/stream", "entity_id": camera.id}));
+        } else {
+          setState(() {
+            cameras.removeWhere((camera) => camera.$2.trigger == entityId);
+          });
+          if (cameras.isEmpty) _cameraOverlayController.hide();
+        }
+        break;
+
+      // Called with camera stream result
+      case 'result':
+        final id = data?['id'];
+        final url = data?['result']?['url'];
+        if (url != null) {
+          final streamUri = Uri.parse('${config.homeAssistant.url}$url');
+          final camera = _messageIds[id]!;
+          cameras.add((streamUri, camera));
+          _cameraOverlayController.show();
+          _messageIds.remove(id); // Clear message id after use
+        }
+        break;
+    }
   }
 
   @override
@@ -116,8 +128,20 @@ class _HomeAssistantState extends State<HomeAssistant> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final stream = context.read<StreamController<ClockEvent>>().stream;
+    _eventSubscription?.cancel();
+    _eventSubscription = stream.listen((event) {
+      if (event.event == ClockEvents.refetch && !isConnected) {
+        connectToHomeAssistant();
+      }
+    });
+  }
+
+  @override
   void dispose() {
-    _subscription?.cancel();
+    _webSocketSubscription?.cancel();
     super.dispose();
   }
 
