@@ -8,6 +8,11 @@ class TraktManagerAPIError {
   final Response response;
 
   TraktManagerAPIError(this.statusCode, this.reasonPhrase, this.response);
+
+  @override
+  String toString() {
+    return 'TraktManagerAPIError(statusCode: $statusCode, reasonPhrase: $reasonPhrase)';
+  }
 }
 
 class AccessTokenResponse {

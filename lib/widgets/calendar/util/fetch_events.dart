@@ -177,12 +177,9 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
         config.watchlist.trakt.refreshToken.isEmpty ||
         config.watchlist.trakt.clientId.isEmpty ||
         config.watchlist.trakt.clientSecret.isEmpty ||
-        config.watchlist.trakt.redirectUri.isEmpty) {
-      throw Exception("Trakt API credentials must be set in the config file.");
-    }
-
-    if (config.watchlist.tmdbApiKey.isEmpty) {
-      throw Exception("TMDB API key must be set in the config file.");
+        config.watchlist.trakt.redirectUri.isEmpty ||
+        config.watchlist.tmdbApiKey.isEmpty) {
+      throw Exception("Trakt & TMDb API credentials must be set in the config file.");
     }
 
     final trakt = TraktManager(

@@ -16,6 +16,8 @@ import 'package:smartclock/widgets/homeassistant/camera.dart';
 class HomeAssistant extends StatefulWidget {
   const HomeAssistant({super.key});
 
+  bool get platformIsSupported => Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+
   @override
   State<HomeAssistant> createState() => _HomeAssistantState();
 }
@@ -123,6 +125,7 @@ class _HomeAssistantState extends State<HomeAssistant> {
   @override
   void initState() {
     super.initState();
+    if (!widget.platformIsSupported) return;
     config = context.read<ConfigModel>().config;
     connectToHomeAssistant();
   }
@@ -147,7 +150,7 @@ class _HomeAssistantState extends State<HomeAssistant> {
 
   @override
   Widget build(BuildContext context) {
-    if (!(Platform.isAndroid || Platform.isIOS || Platform.isMacOS)) {
+    if (!widget.platformIsSupported) {
       return const SizedBox.shrink();
     }
 
