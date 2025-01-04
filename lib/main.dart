@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,8 +26,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   final Directory appDir = await getApplicationDirectory();
+  if (!appDir.existsSync()) appDir.createSync(recursive: true);
 
-  final loggerOutput = LoggerOutput(file: File(path.join(appDir.path, "logs.txt")), overrideExisting: true);
+  final logFile = File(path.join(appDir.path, "logs.txt"));
+  final loggerOutput = LoggerOutput(file: logFile, overrideExisting: true);
   logger = Logger(
     level: Level.all,
     filter: ProductionFilter(),
@@ -34,7 +37,16 @@ void main() async {
     output: loggerOutput,
   );
 
-  if (!appDir.existsSync()) appDir.createSync(recursive: true);
+  FlutterError.onError = (details) {
+    logger.e(details.exceptionAsString());
+    FlutterError.presentError(details);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    logger.e(error.toString());
+    return true;
+  };
+
   logger.i("Application Directory: ${appDir.path}");
 
   final schemaFile = File(path.join(appDir.path, "schema.json"));
