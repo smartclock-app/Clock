@@ -63,9 +63,7 @@ void main() async {
 
   // Read config from disk, merge with default config to ensure all fields are present
   final configJson = jsonDecode(confFile.readAsStringSync());
-  final exampleConfig = Config.asDefault(File("")).toJson();
-  final mergedJson = Config.merge(configJson, exampleConfig);
-  final config = Config.fromJson(confFile, mergedJson)..save();
+  final config = Config.fromJsonValidated(confFile, configJson)..save();
 
   Database database = sqlite3.open(path.join(appDir.path, 'database.db'));
   database.execute(

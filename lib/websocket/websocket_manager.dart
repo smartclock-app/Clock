@@ -46,7 +46,7 @@ class WebSocketManager {
     });
     commands.addCommand('get_config', (command) => jsonEncode(configModel.config));
     commands.addCommand('set_config', (command) {
-      final newConfig = Config.fromJson(configModel.config.file, jsonDecode(command.data!));
+      final newConfig = Config.fromJsonValidated(configModel.config.file, jsonDecode(command.data!));
       configModel.setConfig(newConfig);
       return "Config updated";
     });

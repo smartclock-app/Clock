@@ -38,10 +38,10 @@ class ConfigModel extends ChangeNotifier {
         if (event.type == FileSystemEvent.modify) {
           final json = jsonDecode(config.file.readAsStringSync());
 
-          final updatedConfig = Config.fromJson(config.file, json);
+          final updatedConfig = Config.fromJsonValidated(config.file, json);
 
           if (config != updatedConfig) {
-            config = Config.fromJson(config.file, json);
+            config = updatedConfig;
             notifyListeners();
           } else {
             logger.i("Config hash unchanged");
@@ -113,16 +113,21 @@ class Config {
     required this.dimensions,
   });
 
-  static Map<String, dynamic> merge(Map<String, dynamic> base, Map<String, dynamic> updates) {
-    updates.forEach((key, value) {
-      if (value is Map<String, dynamic> && base[key] is Map<String, dynamic>) {
-        merge(base[key] ?? {}, value);
-      } else if (!base.containsKey(key)) {
-        base[key] = value;
-      }
-    });
+  factory Config.fromJsonValidated(File file, Map<String, dynamic> json) {
+    Map<String, dynamic> merge(Map<String, dynamic> base, Map<String, dynamic> updates) {
+      updates.forEach((key, value) {
+        if (value is Map<String, dynamic> && base[key] is Map<String, dynamic>) {
+          merge(base[key] ?? {}, value);
+        } else if (!base.containsKey(key)) {
+          base[key] = value;
+        }
+      });
 
-    return base;
+      return base;
+    }
+
+    final merged = merge(json, Config.asDefault(null).toJson());
+    return Config.fromJson(file, merged);
   }
 
   void save() {
@@ -136,8 +141,8 @@ class Config {
   @override
   bool operator ==(Object other) => other is Config && other.hashCode == hashCode;
 
-  factory Config.asDefault(File file) => Config(
-        file: file,
+  factory Config.asDefault(File? file) => Config(
+        file: file ?? File(""),
         orientation: Orientation.landscape,
         interactive: false,
         networkEnabled: true,

@@ -300,7 +300,7 @@
       },
       "required": ["clientId", "clientSecret", "accessToken", "refreshToken", "tokenExpiry"]
     },
-    "homeassistant": {
+    "homeAssistant": {
       "type": "object",
       "properties": {
         "enabled": {
@@ -557,7 +557,7 @@
     "clock",
     "energy",
     "google",
-    "homeassistant",
+    "homeAssistant",
     "photos",
     "sidebar",
     "weather",
