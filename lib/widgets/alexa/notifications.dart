@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
-import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/config/config.dart' show ConfigModel;
 import 'package:smartclock/util/event_utils.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/alexa/alarm.dart';
 import 'package:smartclock/widgets/alexa/timer.dart';
 
@@ -21,6 +22,7 @@ class Notifications extends StatefulWidget {
 class _NotificationsState extends State<Notifications> {
   ({List<alexa.Notification> alarms, List<alexa.Notification> timers}) notifications = (alarms: [], timers: []);
   StreamSubscription<void>? _subscription;
+  Logger logger = LoggerUtil.logger;
 
   void getNotifications() async {
     logger.t("Refetching notifications");

@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 
-import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/config/config.dart' show ConfigModel, Config, WeatherType;
 import 'package:smartclock/util/event_utils.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/weather/weather_card.dart';
 import 'package:smartclock/widgets/weather/weather_floating.dart';
 
@@ -25,6 +25,7 @@ class _WeatherState extends State<Weather> {
   late Config config;
 
   Future<Map<String, String>> _fetchWeather() async {
+    final logger = LoggerUtil.logger;
     logger.t("Refetching weather");
     if (config.weather.apiKey.isEmpty || config.weather.postcode.isEmpty || config.weather.country.isEmpty || config.weather.units.isEmpty) {
       throw Exception("Weather API Key, Postcode, Country, and Units must be set in the config file.");

@@ -4,8 +4,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
-import 'package:smartclock/main.dart' show logger;
+import 'package:logger/logger.dart';
 import 'package:smartclock/util/color_from_hex.dart';
+import 'package:smartclock/util/logger_util.dart';
 
 part 'remote_config.dart';
 part 'alexa.dart';
@@ -27,6 +28,7 @@ class ConfigModel extends ChangeNotifier {
   Config config;
   Directory appDir;
   Key clockKey = UniqueKey();
+  Logger logger = LoggerUtil.logger;
 
   ConfigModel(this.config, {required alexa.QueryClient client, required this.appDir}) {
     _client = client;

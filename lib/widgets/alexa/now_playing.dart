@@ -2,15 +2,16 @@ import 'dart:async';
 import 'dart:math' show min;
 
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:smartclock/util/event_utils.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/widgets/alexa/now_playing_lyrics.dart';
 import 'package:smartclock/widgets/sidebar/sidebar_card.dart';
 import 'package:smartclock/widgets/alexa/util/fetch_lyrics.dart';
-import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/widgets/alexa/util/lrc.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel;
 
@@ -28,6 +29,7 @@ class _NowPlayingState extends State<NowPlaying> {
   int progress = 0;
   Lrc? lyrics;
   ConfigModel? configModel;
+  Logger logger = LoggerUtil.logger;
 
   alexa.Queue? queue;
 

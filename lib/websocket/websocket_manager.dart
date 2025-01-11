@@ -5,11 +5,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:bonsoir/bonsoir.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
-import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/config/config.dart';
 import 'package:smartclock/util/event_utils.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/websocket/commands/toggle_display.dart';
 
 part 'websocket_handler.dart';
@@ -19,6 +20,7 @@ class WebSocketManager {
   late ConfigModel configModel;
   BonsoirBroadcast? _broadcast;
   late final WebSocketHandler commands;
+  Logger logger = LoggerUtil.logger;
 
   WebSocketManager(BuildContext context) {
     configModel = context.read<ConfigModel>();

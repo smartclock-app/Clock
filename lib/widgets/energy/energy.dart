@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:smartclock/util/event_utils.dart';
+import 'package:smartclock/util/logger_util.dart';
 
 import 'package:smartclock/widgets/sidebar/sidebar_card.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
-import 'package:smartclock/main.dart' show logger;
 
 typedef EnergyData = ({String? gas, String? electricity});
 
@@ -25,6 +25,7 @@ class _EnergyState extends State<Energy> {
   late Config config;
 
   Future<EnergyData> _fetchData() async {
+    final logger = LoggerUtil.logger;
     logger.t("Refetching weather");
     if (config.energy.token.isEmpty || config.energy.electricityId.isEmpty || config.energy.gasId.isEmpty) {
       throw Exception("Energy token and ids must be set in the config file.");

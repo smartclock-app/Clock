@@ -2,44 +2,54 @@ part of 'config.dart';
 
 class Photos {
   final bool enabled;
-  final String scraperApiKey;
   final int interval;
-  final String googlePhotoAlbumUrl;
+  final Uri immichUrl;
+  final String immichAccessToken;
+  final String immichAlbumId;
+  final String immichShareKey;
   final bool useStaticLinks;
   final List<String> images;
 
   Photos({
     required this.enabled,
-    required this.scraperApiKey,
     required this.interval,
-    required this.googlePhotoAlbumUrl,
+    required this.immichUrl,
+    required this.immichAccessToken,
+    required this.immichAlbumId,
+    required this.immichShareKey,
     required this.useStaticLinks,
     required this.images,
   });
 
   factory Photos.asDefault() => Photos(
         enabled: false,
-        scraperApiKey: "",
         interval: 2,
-        googlePhotoAlbumUrl: "",
+        immichUrl: Uri(),
+        immichAccessToken: "",
+        immichAlbumId: "",
+        immichShareKey: "",
         useStaticLinks: false,
         images: [],
       );
 
   factory Photos.fromJson(Map<String, dynamic> json) => Photos(
         enabled: json["enabled"],
-        scraperApiKey: json["scraperApiKey"],
         interval: json["interval"],
-        googlePhotoAlbumUrl: json["googlePhotoAlbumUrl"],
+        immichUrl: Uri.parse(json["immichUrl"]),
+        immichAccessToken: json["immichAccessToken"],
+        immichAlbumId: json["immichAlbumId"],
+        immichShareKey: json["immichShareKey"],
         useStaticLinks: json["useStaticLinks"],
         images: List<String>.from(json["images"]),
       );
 
   Map<String, dynamic> toJson() => {
         "enabled": enabled,
-        "scraperApiKey": scraperApiKey,
         "interval": interval,
-        "googlePhotoAlbumUrl": googlePhotoAlbumUrl,
+        "immichUrl": immichUrl.toString(),
+        "immichAccessToken": immichAccessToken,
+        "immichAlbumId": immichAlbumId,
+        "immichShareKey": immichShareKey,
         "useStaticLinks": useStaticLinks,
         "images": List<dynamic>.from(images),
       };

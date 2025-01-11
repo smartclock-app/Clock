@@ -2,14 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
+import 'package:logger/logger.dart';
 
 import 'package:provider/provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/config/config.dart' show ConfigModel, WeatherType;
 import 'package:smartclock/routes/editor.dart';
 import 'package:smartclock/routes/logs.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/clock/clock.dart';
 import 'package:smartclock/widgets/sidebar/sidebar.dart';
 import 'package:smartclock/widgets/weather/weather.dart';
@@ -27,6 +28,7 @@ class _SmartClockState extends State<SmartClock> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
   WebSocketManager? _webSocketManager;
+  Logger logger = LoggerUtil.logger;
 
   @override
   void initState() {

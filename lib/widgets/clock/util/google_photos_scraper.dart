@@ -1,8 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
-import 'package:smartclock/main.dart';
+import 'package:smartclock/util/logger_util.dart';
 
 Future<List<String>> scrapeGooglePhotos(String apiKey, String photoUrl) async {
+  final logger = LoggerUtil.logger;
   final url = 'https://scraping.narf.ai/api/v1/?api_key=$apiKey&url=$photoUrl';
 
   final response = await http.get(Uri.parse(url));

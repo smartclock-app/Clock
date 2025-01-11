@@ -3,13 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart' as intl; // Must be named as conflicted TextDirection
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
-import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/config/config.dart';
 import 'package:smartclock/util/data_utils.dart';
 import 'package:smartclock/util/event_utils.dart';
-import 'package:smartclock/widgets/clock/util/google_photos_scraper.dart';
+import 'package:smartclock/util/logger_util.dart';
+import 'package:smartclock/widgets/clock/util/get_images_from_immich.dart';
 
 class PhotoClock extends StatefulWidget {
   const PhotoClock({super.key, required this.now});
@@ -25,6 +26,8 @@ class _PhotoClockState extends State<PhotoClock> {
   int thirtyCount = 0;
   late FutureOr<List<String>> _futureImages;
   StreamSubscription<void>? _subscription;
+  late Config config;
+  Logger logger = LoggerUtil.logger;
 
   String get _hour => widget.now.hour == 12 ? "12" : "${widget.now.hour % 12}".padLeft(2, "0");
   // ignore: non_constant_identifier_names
@@ -43,18 +46,16 @@ class _PhotoClockState extends State<PhotoClock> {
   }
 
   FutureOr<List<String>> getImages() async {
-    final config = context.read<ConfigModel>().config;
-
     List<String> images;
     if (config.photos.useStaticLinks) {
       images = config.photos.images;
     } else {
-      if (config.photos.scraperApiKey.isEmpty || config.photos.googlePhotoAlbumUrl.isEmpty) {
-        logger.w("Cannot scrape Google Photos: API key or album URL is empty");
+      if (!config.photos.immichUrl.isAbsolute || config.photos.immichAccessToken.isEmpty || config.photos.immichAlbumId.isEmpty || config.photos.immichShareKey.isEmpty) {
+        logger.w("Cannot get images from Immich, missing required fields");
         return [];
       }
 
-      images = await scrapeGooglePhotos(config.photos.scraperApiKey, config.photos.googlePhotoAlbumUrl);
+      images = await getImagesFromImmich(config);
     }
 
     images.shuffle();
@@ -69,6 +70,7 @@ class _PhotoClockState extends State<PhotoClock> {
   @override
   void initState() {
     super.initState();
+    config = context.read<ConfigModel>().config;
     _futureImages = getImages();
   }
 
@@ -84,6 +86,29 @@ class _PhotoClockState extends State<PhotoClock> {
           photoIndex++;
         });
       }
+
+      if (event.event == ClockEvents.refetch) {
+        if (event.time.second % 30 == 0) {
+          setState(() {
+            thirtyCount++;
+          });
+
+          if (thirtyCount >= config.photos.interval) {
+            logger.i("Cycling clock image");
+            setState(() {
+              thirtyCount = 0;
+              photoIndex++;
+            });
+          }
+        }
+
+        // Refetch images every 12 hours
+        if (event.time.hour % 12 == 0 && event.time.minute == 0 && event.time.second == 0) {
+          setState(() {
+            _futureImages = getImages();
+          });
+        }
+      }
     });
   }
 
@@ -95,29 +120,7 @@ class _PhotoClockState extends State<PhotoClock> {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.read<ConfigModel>().config;
     final smallStyle = TextStyle(fontSize: config.clock.smallSize, height: 0.8, color: Colors.white);
-
-    if (widget.now.second % 30 == 0) {
-      setState(() {
-        thirtyCount++;
-      });
-
-      if (thirtyCount >= config.photos.interval) {
-        logger.i("Cycling clock image");
-        setState(() {
-          thirtyCount = 0;
-          photoIndex++;
-        });
-      }
-    }
-
-    // Refetch images every 12 hours
-    if (widget.now.hour % 12 == 0 && widget.now.minute == 0 && widget.now.second == 0) {
-      setState(() {
-        _futureImages = getImages();
-      });
-    }
 
     return FutureBuilder(
       future: Future.value(_futureImages),

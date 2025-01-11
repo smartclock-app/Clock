@@ -5,10 +5,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:logger/logger.dart';
 
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:logger/logger.dart';
 import 'package:sqlite3/sqlite3.dart';
 // ignore: unused_import --- Needed for sqlite3 on android
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
@@ -17,10 +17,9 @@ import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 import 'package:smartclock/routes/smart_clock.dart';
 import 'package:smartclock/util/logger_output.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/util/file_utils.dart';
-
-late Logger logger;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,12 +29,13 @@ void main() async {
 
   final logFile = File(path.join(appDir.path, "logs.txt"));
   final loggerOutput = LoggerOutput(file: logFile, overrideExisting: true);
-  logger = Logger(
+  final logger = Logger(
     level: Level.all,
     filter: ProductionFilter(),
     printer: SimplePrinter(printTime: true, colors: false),
     output: loggerOutput,
   );
+  LoggerUtil.init(logger);
 
   FlutterError.onError = (details) {
     logger.e(details.exceptionAsString());

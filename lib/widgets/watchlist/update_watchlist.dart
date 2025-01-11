@@ -1,9 +1,10 @@
-import 'package:smartclock/main.dart' show logger;
+import 'package:smartclock/util/logger_util.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:dio/dio.dart';
 import 'package:smartclock/config/config.dart' show Config;
 
 Future<void> updateWatchlist({required Config config, required Set<String> items, required Database database}) async {
+  final logger = LoggerUtil.logger;
   logger.t("Refetching watchlist items");
 
   database.execute("DELETE FROM watchlist");

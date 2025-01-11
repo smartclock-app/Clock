@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' as intl; // Must be named as conflicted TextDirection
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smartclock/util/data_utils.dart';
-import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/util/event_utils.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/clock/photo_clock.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 
@@ -21,6 +22,7 @@ class Clock extends StatefulWidget {
 class _ClockState extends State<Clock> {
   Timer? timer;
   DateTime now = DateTime.now();
+  Logger logger = LoggerUtil.logger;
 
   @override
   void initState() {

@@ -6,9 +6,9 @@ import 'package:googleapis_auth/googleapis_auth.dart' as auth;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:smartclock/util/color_from_hex.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:sqlite3/sqlite3.dart';
 
-import 'package:smartclock/main.dart' show logger;
 import 'package:smartclock/widgets/watchlist/update_watchlist.dart';
 import 'package:smartclock/widgets/watchlist/trakt_manager.dart';
 import 'package:smartclock/config/config.dart' show Config;
@@ -71,6 +71,7 @@ String? eventColor(String? colorId) {
 }
 
 Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, required http.Client httpClient, required Database database, bool updateWl = false}) async {
+  final logger = LoggerUtil.logger;
   logger.t("Refetching calendar");
 
   if (config.google.accessToken.isEmpty || config.google.refreshToken.isEmpty || config.google.clientId.isEmpty || config.google.clientSecret.isEmpty) {

@@ -4,13 +4,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
-import 'package:smartclock/util/event_utils.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import 'package:smartclock/main.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config, Camera;
+import 'package:smartclock/util/event_utils.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/homeassistant/camera.dart';
 
 class HomeAssistant extends StatefulWidget {
@@ -24,6 +25,7 @@ class HomeAssistant extends StatefulWidget {
 
 class _HomeAssistantState extends State<HomeAssistant> {
   late Config config;
+  Logger logger = LoggerUtil.logger;
   late WebSocketChannel _channel;
   StreamSubscription? _eventSubscription;
   StreamSubscription? _webSocketSubscription;
@@ -35,11 +37,19 @@ class _HomeAssistantState extends State<HomeAssistant> {
   final OverlayPortalController _cameraOverlayController = OverlayPortalController();
 
   void connectToHomeAssistant() async {
-    final dio = Dio(BaseOptions(baseUrl: config.homeAssistant.url, headers: {"Authorization": "Bearer ${config.homeAssistant.token}"}));
+    final dio = Dio(BaseOptions(
+      baseUrl: config.homeAssistant.url,
+      headers: {"Authorization": "Bearer ${config.homeAssistant.token}"},
+    ));
 
-    Response alive = await dio.get("/api/");
-    if (alive.statusCode != 200 || alive.data["message"] != "API running.") {
-      logger.w("[Home Assistant] Connection failed");
+    try {
+      Response alive = await dio.get("/api/");
+      if (alive.statusCode != 200 || alive.data["message"] != "API running.") {
+        logger.w("[Home Assistant] Connection failed");
+        return;
+      }
+    } catch (e) {
+      logger.w("[Home Assistant] Connection failed: $e");
       return;
     }
 
