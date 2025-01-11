@@ -87,7 +87,7 @@ class _CalendarState extends State<Calendar> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           month.key,
-                          style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: config.sidebar.titleSize, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const Divider(),

@@ -164,33 +164,12 @@
             "type": "string"
           }
         },
-        "monthTitleSize": {
-          "type": "number",
-          "description": "The font size for the month title"
-        },
-        "eventTitleSize": {
-          "type": "number",
-          "description": "The font size for event titles"
-        },
-        "eventTimeSize": {
-          "type": "number",
-          "description": "The font size for event times"
-        },
         "eventColorWidth": {
           "type": "number",
           "description": "The width of the colored event indicator"
         }
       },
-      "required": [
-        "enabled",
-        "maxEvents",
-        "titles",
-        "eventFilter",
-        "monthTitleSize",
-        "eventTitleSize",
-        "eventTimeSize",
-        "eventColorWidth"
-      ]
+      "required": ["enabled", "maxEvents", "titles", "eventFilter", "eventColorWidth"]
     },
     "clock": {
       "type": "object",
@@ -383,7 +362,16 @@
           }
         }
       },
-      "required": ["enabled", "scraperApiKey", "interval", "googlePhotoAlbumUrl", "images"]
+      "required": [
+        "enabled",
+        "interval",
+        "immichUrl",
+        "immichAccessToken",
+        "immichAlbumId",
+        "immichShareKey",
+        "useStaticLinks",
+        "images"
+      ]
     },
     "sidebar": {
       "type": "object",
@@ -401,9 +389,21 @@
           "type": "string",
           "pattern": "^#[0-9a-fA-F]{6}$|^#[0-9a-fA-F]{8}$",
           "description": "The background color of the cards"
+        },
+        "titleSize": {
+          "type": "number",
+          "description": "The font size for the card title"
+        },
+        "headingSize": {
+          "type": "number",
+          "description": "The font size for card heading"
+        },
+        "subheadingSize": {
+          "type": "number",
+          "description": "The font size for card subheading"
         }
       },
-      "required": ["enabled", "cardRadius", "cardColor"]
+      "required": ["enabled", "cardRadius", "cardColor", "titleSize", "headingSize", "subheadingSize"]
     },
     "watchlist": {
       "type": "object",

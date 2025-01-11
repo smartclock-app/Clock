@@ -36,14 +36,14 @@ class _ErrorInfoWidgetState extends State<ErrorInfoWidget> {
             children: [
               Text(
                 widget.title,
-                style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: config.sidebar.titleSize, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const Divider(),
               const SizedBox(height: 16),
               Text(
                 widget.message,
-                style: TextStyle(fontSize: config.calendar.eventTimeSize),
+                style: TextStyle(fontSize: config.sidebar.headingSize),
                 textAlign: TextAlign.center,
               ),
               if (showStack && widget.stack != null) ...[

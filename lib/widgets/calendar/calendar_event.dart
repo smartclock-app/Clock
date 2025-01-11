@@ -81,7 +81,7 @@ class CalendarEvent extends StatelessWidget {
           Text(
             event.title,
             style: TextStyle(
-              fontSize: config.calendar.eventTitleSize,
+              fontSize: config.sidebar.headingSize,
               fontWeight: FontWeight.bold,
               overflow: TextOverflow.ellipsis,
             ),
@@ -90,7 +90,7 @@ class CalendarEvent extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text(dateString, style: TextStyle(fontSize: config.calendar.eventTimeSize), textAlign: TextAlign.left),
+              child: Text(dateString, style: TextStyle(fontSize: config.sidebar.subheadingSize), textAlign: TextAlign.left),
             ),
           )
         ],

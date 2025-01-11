@@ -26,14 +26,14 @@ class InfoWidget extends StatelessWidget {
           children: [
             Text(
               title,
-              style: TextStyle(fontSize: config.calendar.monthTitleSize, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: config.sidebar.titleSize, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const Divider(),
             const SizedBox(height: 16),
             Text(
               message,
-              style: TextStyle(fontSize: config.calendar.eventTimeSize),
+              style: TextStyle(fontSize: config.sidebar.headingSize),
               textAlign: TextAlign.center,
             ),
           ],

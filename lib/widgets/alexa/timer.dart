@@ -4,9 +4,10 @@ import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 import 'package:smartclock/widgets/sidebar/sidebar_card.dart';
 
 class TimerCard extends StatefulWidget {
-  const TimerCard({super.key, required this.timer});
+  const TimerCard({super.key, required this.timer, required this.style});
 
   final alexa.Notification timer;
+  final TextStyle style;
 
   @override
   State<TimerCard> createState() => _TimerCardState();
@@ -34,16 +35,19 @@ class _TimerCardState extends State<TimerCard> {
 
   @override
   Widget build(BuildContext context) {
-    Duration remaining = DateTime.fromMillisecondsSinceEpoch(widget.timer.triggerTime!).difference(now);
-    String remainingString = "${remaining.inHours}:${remaining.inMinutes.remainder(60).toString().padLeft(2, '0')}:${remaining.inSeconds.remainder(60).toString().padLeft(2, '0')}";
+    final remaining = DateTime.fromMillisecondsSinceEpoch(widget.timer.triggerTime!).difference(now);
+    final hours = remaining.inHours > 0 ? "${remaining.inHours}:" : "";
+    final minutes = remaining.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = remaining.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final remainingString = "$hours$minutes:$seconds";
 
     return SidebarCard(
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text("Timer", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-          Text(remainingString, style: const TextStyle(fontSize: 28)),
+          Text("Timer", style: widget.style),
+          Text(remainingString, style: widget.style),
         ],
       ),
     );

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
-import 'package:smartclock/config/config.dart' show ConfigModel;
+import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/alexa/alarm.dart';
@@ -23,10 +23,10 @@ class _NotificationsState extends State<Notifications> {
   ({List<alexa.Notification> alarms, List<alexa.Notification> timers}) notifications = (alarms: [], timers: []);
   StreamSubscription<void>? _subscription;
   Logger logger = LoggerUtil.logger;
+  late Config config;
 
   void getNotifications() async {
     logger.t("Refetching notifications");
-    final config = context.read<ConfigModel>().config;
     final client = context.read<alexa.QueryClient>();
     late List<alexa.Notification> ns;
     try {
@@ -70,6 +70,7 @@ class _NotificationsState extends State<Notifications> {
   @override
   void initState() {
     super.initState();
+    config = context.read<ConfigModel>().config;
     getNotifications();
   }
 
@@ -89,13 +90,15 @@ class _NotificationsState extends State<Notifications> {
 
   @override
   Widget build(BuildContext context) {
+    final style = TextStyle(fontSize: config.sidebar.titleSize, fontWeight: FontWeight.bold);
+
     return Column(
       children: [
         for (var timer in notifications.timers) ...[
-          TimerCard(timer: timer),
+          TimerCard(timer: timer, style: style),
         ],
         for (var alarm in notifications.alarms) ...[
-          AlarmCard(alarm: alarm),
+          AlarmCard(alarm: alarm, style: style),
         ],
       ],
     );
