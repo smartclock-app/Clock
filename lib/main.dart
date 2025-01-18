@@ -44,11 +44,13 @@ void main() async {
 
   FlutterError.onError = (details) {
     logger.e(details.exceptionAsString());
+    logger.e(details.stack.toString());
     FlutterError.presentError(details);
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {
     logger.e(error.toString());
+    logger.e(stack.toString());
     return true;
   };
 

@@ -43,7 +43,7 @@ class _UpdaterState extends State<Updater> {
   }
 
   void checkForUpdates() async {
-    logger.i("Checking for updates");
+    logger.i("[Updater] Checking for updates");
     // Doesn't matter if the token is leaked, only has read access to a repo that will soon become public
     const githubToken = "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";
     const url = "https://api.github.com/repos/smartclock-app/Clock/releases/latest";
@@ -62,10 +62,10 @@ class _UpdaterState extends State<Updater> {
     final latestVersion = latest["tag_name"].toString().substring(1);
 
     if (semverCompare(latestVersion, currentVersion)) {
-      logger.i("Update available: v$currentVersion -> $latestVersion");
+      logger.i("[Updater] Update available: v$currentVersion -> $latestVersion");
       setState(() => updateInfo = latest);
     } else {
-      logger.i("No updates available");
+      logger.i("[Updater] No updates available");
       setState(() => updateInfo = null);
     }
   }
