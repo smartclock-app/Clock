@@ -79,7 +79,7 @@ class ConfigModel extends ChangeNotifier {
 
 class Config {
   File file;
-  static const String version = "1.0.0";
+  static String version = ""; // Version set in main.dart from PackageInfo
   final Orientation orientation;
   final bool interactive;
   final bool networkEnabled;

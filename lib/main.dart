@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:logger/logger.dart';
@@ -24,6 +25,10 @@ import 'package:smartclock/util/file_utils.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  Config.version = packageInfo.version;
+
   final Directory appDir = await getApplicationDirectory();
   if (!appDir.existsSync()) appDir.createSync(recursive: true);
 
@@ -47,6 +52,7 @@ void main() async {
     return true;
   };
 
+  logger.i("SmartClock v${Config.version}");
   logger.i("Application Directory: ${appDir.path}");
 
   final schemaFile = File(path.join(appDir.path, "schema.json"));

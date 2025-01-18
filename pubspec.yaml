@@ -2,7 +2,7 @@ name: smartclock
 description: "SmartClock"
 publish_to: "none"
 repository: "https://www.github.com/smartclock-app/Clock"
-version: 1.0.0
+version: 1.0.1
 
 environment:
   sdk: ">=3.4.3 <4.0.0"
@@ -29,6 +29,8 @@ dependencies:
   web_socket_channel: ^3.0.1
   video_player: ^2.9.2
   chewie: ^1.8.5
+  install_plugin: ^2.1.0
+  package_info_plus: ^8.1.3
 
 dev_dependencies:
   flutter_test:
