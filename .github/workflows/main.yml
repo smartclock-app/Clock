@@ -13,6 +13,24 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Extract version from pubspec.yaml
+        id: extract_version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_OUTPUT
+
+      - name: Check if Tag Exists
+        uses: mukunku/tag-exists-action@v1.6.0
+        id: check_tag
+        with:
+          tag: v${{ steps.extract_version.outputs.VERSION }}
+
+      - name: Fail if Tag Exists
+        if: steps.check_tag.outputs.exists == 'true'
+        run: |
+          echo "::error title=SKIPPING-BUILD::Version Tag Exists"
+          exit 1
+
       - name: Set Up Java
         uses: actions/setup-java@v3.12.0
         with:
@@ -48,28 +66,6 @@ jobs:
           path: |
             build/app/outputs/flutter-apk/app-release.apk
             build/ios_build.tar.gz
-
-      - name: Extract version from pubspec.yaml
-        id: extract_version
-        run: |
-          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
-          echo "VERSION=$version" >> $GITHUB_OUTPUT
-
-      - name: Check if Tag Exists
-        id: check_tag
-        run: |
-          if git rev-parse "v${{ steps.extract_version.outputs.VERSION }}" >/dev/null 2>&1; then
-            echo "TAG_EXISTS=true" >> $GITHUB_OUTPUT
-          else
-            echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Modify Tag
-        if: steps.check_tag.outputs.TAG_EXISTS == 'true'
-        id: modify_tag
-        run: |
-          new_version="${{ steps.extract_version.outputs.VERSION }}-build-${{ github.run_number }}"
-          echo "VERSION=$new_version" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: ncipollo/release-action@v1
