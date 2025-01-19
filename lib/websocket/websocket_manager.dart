@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import 'package:path/path.dart' as path;
 import 'package:bonsoir/bonsoir.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -51,6 +52,11 @@ class WebSocketManager {
       final newConfig = Config.fromJsonValidated(configModel.config.file, jsonDecode(command.data!));
       configModel.setConfig(newConfig);
       return "Config updated";
+    });
+    commands.addCommand('get_log', (command) {
+      final file = File(path.join(configModel.appDir.path, "logs.txt"));
+      final log = file.readAsLinesSync();
+      return log.join("\n");
     });
 
     _initServer();
