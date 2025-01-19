@@ -99,7 +99,7 @@ class _SmartClockState extends State<SmartClock> {
                     final resolution = constraints.biggest;
                     final width = (resolution.width).toInt();
                     final height = (resolution.height).toInt();
-                    logger.i("[Safe Area Resolution] ${width}x$height");
+                    logger.i("[Resolution] Safe Area: ${width}x$height");
 
                     return Stack(
                       children: [

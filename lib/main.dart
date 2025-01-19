@@ -116,7 +116,7 @@ void main() async {
   final display = WidgetsBinding.instance.platformDispatcher.views.first;
   final width = display.physicalSize.width / display.devicePixelRatio;
   final height = display.physicalSize.height / display.devicePixelRatio;
-  logger.i("Window Resolution: ${width.toInt()}x${height.toInt()}");
+  logger.i("[Resolution] Window: ${width.toInt()}x${height.toInt()}");
 
   runApp(MultiProvider(
     providers: [

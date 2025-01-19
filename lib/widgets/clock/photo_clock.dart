@@ -103,8 +103,8 @@ class _PhotoClockState extends State<PhotoClock> {
           }
         }
 
-        // Refetch images every 12 hours
-        if (event.time.hour % 12 == 0 && event.time.minute == 0 && event.time.second == 0) {
+        // Refetch images every 6 hours
+        if (event.time.hour % 6 == 0 && event.time.minute == 0 && event.time.second == 0) {
           setState(() {
             _futureImages = getImages();
           });
@@ -133,7 +133,7 @@ class _PhotoClockState extends State<PhotoClock> {
             image = snapshot.data![photoIndex];
             final nextPhotoIndex = (photoIndex + 1) % snapshot.data!.length;
             final nextImage = snapshot.data![nextPhotoIndex];
-            logger.i("[Clock] Preloading next image: $nextImage");
+            logger.t("[Clock] Preloading next image");
             precacheImage(NetworkImage(nextImage), context);
           }
         } else {
