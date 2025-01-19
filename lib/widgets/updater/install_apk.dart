@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:install_plugin/install_plugin.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
 void installApk({required String url, required void Function(int, int) onDownloadProgress, required void Function(String) callback}) async {
@@ -16,6 +16,14 @@ void installApk({required String url, required void Function(int, int) onDownloa
     await Dio().download(url, savePath, onReceiveProgress: onDownloadProgress, options: Options(headers: {"Authorization": "Bearer $githubToken", "Accept": "application/octet-stream"}));
   }
 
-  final res = await InstallPlugin.install(savePath);
-  callback("Update ${res['isSuccess'] == true ? 'Succeeded' : 'Failed: ${res['errorMessage'] ?? ''}'}");
+  try {
+    final result = await OpenFilex.open(savePath);
+    if (result.type != ResultType.done) {
+      callback("Error opening APK: ${result.message}");
+    } else {
+      callback("APK opened successfully");
+    }
+  } catch (e) {
+    callback("Error opening APK: $e");
+  }
 }

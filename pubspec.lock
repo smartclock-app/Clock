@@ -280,15 +280,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
-  install_plugin:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: "9ce79cf"
-      resolved-ref: "9ce79cf81bb7d48b76153d73141d5b6aac292aeb"
-      url: "https://github.com/smartclock-app/flutter_install_plugin.git"
-    source: git
-    version: "2.1.0"
   intl:
     dependency: "direct main"
     description:
@@ -393,6 +384,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
+  open_filex:
+    dependency: "direct main"
+    description:
+      name: open_filex
+      sha256: dcb7bd3d32db8db5260253a62f1564c02c2c8df64bc0187cd213f65f827519bd
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.6.0"
   package_info_plus:
     dependency: "direct main"
     description:

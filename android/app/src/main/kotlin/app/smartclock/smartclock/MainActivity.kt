@@ -1,4 +1,4 @@
-package app.smartclock.clock
+package app.smartclock.smartclock
 
 import io.flutter.embedding.android.FlutterActivity
 

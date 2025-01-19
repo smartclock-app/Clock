@@ -159,11 +159,8 @@ class _UpdaterState extends State<Updater> {
                     updateInProgress = true;
                   });
                   final List<dynamic> assets = updateInfo!['assets'];
-                  logger.i(assets);
                   final apk = assets.firstWhere((e) => (e['name'] as String).endsWith(".apk"));
-                  logger.i(apk);
                   final url = apk['url'];
-                  logger.i(url);
                   installApk(url: url, onDownloadProgress: onDownloadProgress, callback: installCallback);
                 },
                 child: Text("Download Update", style: TextStyle(fontSize: config.sidebar.headingSize)),
