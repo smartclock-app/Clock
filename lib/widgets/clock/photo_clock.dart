@@ -129,6 +129,10 @@ class _PhotoClockState extends State<PhotoClock> {
         if (snapshot.hasData) {
           photoIndex %= snapshot.data!.length;
           image = snapshot.data![photoIndex];
+
+          final nextPhotoIndex = (photoIndex + 1) % snapshot.data!.length;
+          final nextImage = snapshot.data![nextPhotoIndex];
+          precacheImage(NetworkImage(nextImage), context);
         } else {
           image = null;
         }
