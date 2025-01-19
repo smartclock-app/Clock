@@ -28,6 +28,7 @@ class _PhotoClockState extends State<PhotoClock> {
   StreamSubscription<void>? _subscription;
   late Config config;
   Logger logger = LoggerUtil.logger;
+  String? image;
 
   String get _hour => widget.now.hour == 12 ? "12" : "${widget.now.hour % 12}".padLeft(2, "0");
   // ignore: non_constant_identifier_names
@@ -125,14 +126,16 @@ class _PhotoClockState extends State<PhotoClock> {
     return FutureBuilder(
       future: Future.value(_futureImages),
       builder: (context, snapshot) {
-        late final String? image;
         if (snapshot.hasData) {
           photoIndex %= snapshot.data!.length;
-          image = snapshot.data![photoIndex];
 
-          final nextPhotoIndex = (photoIndex + 1) % snapshot.data!.length;
-          final nextImage = snapshot.data![nextPhotoIndex];
-          precacheImage(NetworkImage(nextImage), context);
+          if (image != snapshot.data![photoIndex]) {
+            image = snapshot.data![photoIndex];
+            final nextPhotoIndex = (photoIndex + 1) % snapshot.data!.length;
+            final nextImage = snapshot.data![nextPhotoIndex];
+            logger.i("[Clock] Preloading next image: $nextImage");
+            precacheImage(NetworkImage(nextImage), context);
+          }
         } else {
           image = null;
         }
@@ -144,7 +147,7 @@ class _PhotoClockState extends State<PhotoClock> {
             borderRadius: BorderRadius.circular(config.sidebar.cardRadius),
             image: image != null
                 ? DecorationImage(
-                    image: NetworkImage(image),
+                    image: NetworkImage(image!),
                     fit: BoxFit.cover,
                     alignment: Alignment.center,
                   )

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
 class LoggerOutput extends LogOutput {
@@ -35,7 +36,7 @@ class LoggerOutput extends LogOutput {
   @override
   void output(OutputEvent event) {
     // Write to console
-    event.lines.forEach(print);
+    event.lines.forEach(debugPrint);
 
     // Write to stream
     if (shouldBroadcast) _streamController.add(event.lines);
