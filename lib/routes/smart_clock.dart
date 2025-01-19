@@ -103,7 +103,7 @@ class _SmartClockState extends State<SmartClock> {
 
                     return Stack(
                       children: [
-                        const Clock(),
+                        Clock(networkAvailable: networkAvailable),
                         if (config.sidebar.enabled) Sidebar(networkAvailable: networkAvailable),
                         if (config.weather.enabled && config.weather.type == WeatherType.floating && config.networkEnabled && networkAvailable) const Weather(type: WeatherType.floating),
                       ],

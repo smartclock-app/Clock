@@ -13,7 +13,9 @@ import 'package:smartclock/widgets/clock/photo_clock.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 
 class Clock extends StatefulWidget {
-  const Clock({super.key});
+  const Clock({super.key, required this.networkAvailable});
+
+  final bool networkAvailable;
 
   @override
   State<Clock> createState() => _ClockState();
@@ -95,7 +97,7 @@ class _ClockState extends State<Clock> {
             },
           );
         },
-        child: config.photos.enabled ? PhotoClock(now: now) : BasicClock(now: now, config: config),
+        child: config.photos.enabled && widget.networkAvailable ? PhotoClock(now: now) : BasicClock(now: now, config: config),
       ),
     );
   }

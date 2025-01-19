@@ -2,7 +2,7 @@ name: smartclock
 description: "SmartClock"
 publish_to: "none"
 repository: "https://www.github.com/smartclock-app/Clock"
-version: 1.0.1
+version: 1.0.2
 
 environment:
   sdk: ">=3.4.3 <4.0.0"
