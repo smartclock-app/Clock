@@ -32,7 +32,7 @@ class _ClockState extends State<Clock> {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final newNow = DateTime.now();
       if (newNow.second % 30 == 0) {
-        logger.t("Refetching Content...");
+        logger.t("[Clock] Sending refetch event...");
         // Notifies other widgets to refetch their content
         context.read<StreamController<ClockEvent>>().add((time: newNow, event: ClockEvents.refetch));
       }

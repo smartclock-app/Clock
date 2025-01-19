@@ -5,8 +5,8 @@
   "properties": {
     "version": {
       "type": "string",
-      "description": "The version of the config schema",
-      "const": "1.0.0"
+      "description": "SmartClock Version",
+      "pattern": "^[0-9]+.[0-9]+.[0-9]+$"
     },
     "orientation": {
       "type": "string",

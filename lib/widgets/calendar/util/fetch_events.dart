@@ -72,10 +72,10 @@ String? eventColor(String? colorId) {
 
 Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, required http.Client httpClient, required Database database, bool updateWl = false}) async {
   final logger = LoggerUtil.logger;
-  logger.t("Refetching calendar");
+  logger.t("[Calendar] Refetching calendar");
 
   if (config.google.accessToken.isEmpty || config.google.refreshToken.isEmpty || config.google.clientId.isEmpty || config.google.clientSecret.isEmpty) {
-    throw Exception("Calendar API credentials must be set in the config file.");
+    throw Exception("[Calendar] API credentials must be set in the config file.");
   }
 
   // Create Google auth client with credentials from config
@@ -92,19 +92,19 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   bool credentialsUpdated = false;
   client.credentialUpdates.listen((credentials) {
     if (credentials.accessToken.data != config.google.accessToken) {
-      logger.t("Updating calendar access token");
+      logger.t("[Calendar] Updating Google access token");
       config.google.accessToken = credentials.accessToken.data;
       credentialsUpdated = true;
     }
 
     if (credentials.refreshToken != config.google.refreshToken) {
-      logger.t("Updating calendar refresh token");
+      logger.t("[Calendar] Updating Google refresh token");
       config.google.refreshToken = credentials.refreshToken!;
       credentialsUpdated = true;
     }
 
     if (credentials.accessToken.expiry != config.google.tokenExpiry) {
-      logger.t("Updating calendar token expiry");
+      logger.t("[Calendar] Updating Google token expiry");
       config.google.tokenExpiry = credentials.accessToken.expiry;
       credentialsUpdated = true;
     }
@@ -180,7 +180,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
         config.watchlist.trakt.clientSecret.isEmpty ||
         config.watchlist.trakt.redirectUri.isEmpty ||
         config.watchlist.tmdbApiKey.isEmpty) {
-      throw Exception("Trakt & TMDb API credentials must be set in the config file.");
+      throw Exception("[Watchlist] Trakt & TMDb API credentials must be set in the config file.");
     }
 
     final trakt = TraktManager(
@@ -260,13 +260,13 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   // Update credentials in config if they have changed
   if (newTraktTokens != null) {
     if (newTraktTokens.$1 != config.watchlist.trakt.accessToken) {
-      logger.t("Updating Trakt access token");
+      logger.t("[Watchlist] Updating Trakt access token");
       config.watchlist.trakt.accessToken = newTraktTokens.$1;
       credentialsUpdated = true;
     }
 
     if (newTraktTokens.$2 != config.watchlist.trakt.refreshToken) {
-      logger.t("Updating Trakt refresh token");
+      logger.t("[Watchlist] Updating Trakt refresh token");
       config.watchlist.trakt.refreshToken = newTraktTokens.$2;
       credentialsUpdated = true;
     }

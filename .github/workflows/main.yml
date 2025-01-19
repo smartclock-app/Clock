@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
@@ -49,25 +49,16 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      - name: Build IPA
-        run: flutter build ipa --no-codesign
-
-      - name: Compress Archives and IPAs
-        run: |
-          cd build
-          tar -czf ios_build.tar.gz ios
-
-      - name: Upload Artifacts
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Releases
           path: |
             build/app/outputs/flutter-apk/app-release.apk
-            build/ios_build.tar.gz
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/flutter-apk/app-release.apk,build/ios_build.tar.gz"
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
           tag: v${{ steps.extract_version.outputs.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}

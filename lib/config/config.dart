@@ -83,6 +83,7 @@ class Config {
   final Orientation orientation;
   final bool interactive;
   final bool networkEnabled;
+  final bool updaterEnabled;
   final RemoteConfig remoteConfig;
   final Alexa alexa;
   final Calendar calendar;
@@ -101,6 +102,7 @@ class Config {
     required this.orientation,
     required this.interactive,
     required this.networkEnabled,
+    required this.updaterEnabled,
     required this.remoteConfig,
     required this.alexa,
     required this.calendar,
@@ -148,6 +150,7 @@ class Config {
         orientation: Orientation.landscape,
         interactive: false,
         networkEnabled: true,
+        updaterEnabled: true,
         remoteConfig: RemoteConfig.asDefault(),
         alexa: Alexa.asDefault(),
         calendar: Calendar.asDefault(),
@@ -171,6 +174,7 @@ class Config {
         orientation: json["orientation"] == "landscape" ? Orientation.landscape : Orientation.portrait,
         interactive: json["interactive"],
         networkEnabled: json["networkEnabled"],
+        updaterEnabled: json["updaterEnabled"],
         remoteConfig: RemoteConfig.fromJson(json["remoteConfig"]),
         alexa: Alexa.fromJson(json["alexa"]),
         calendar: Calendar.fromJson(json["calendar"]),
@@ -191,6 +195,7 @@ class Config {
         "orientation": orientation == Orientation.landscape ? "landscape" : "portrait",
         "interactive": interactive,
         "networkEnabled": networkEnabled,
+        "updaterEnabled": updaterEnabled,
         "remoteConfig": remoteConfig.toJson(),
         "alexa": alexa.toJson(),
         "calendar": calendar.toJson(),

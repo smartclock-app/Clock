@@ -26,13 +26,13 @@ class _NotificationsState extends State<Notifications> {
   late Config config;
 
   void getNotifications() async {
-    logger.t("Refetching notifications");
+    logger.t("[Alexa] Refetching notifications");
     final client = context.read<alexa.QueryClient>();
     late List<alexa.Notification> ns;
     try {
       ns = await client.getNotifications(config.alexa.userId);
     } catch (e) {
-      return logger.e("Failed to fetch notifications: $e");
+      return logger.e("[Alexa] Failed to fetch notifications: $e");
     }
 
     final allDevices = await client.getDevices(config.alexa.userId);

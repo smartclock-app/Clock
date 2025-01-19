@@ -34,13 +34,13 @@ class TraktManager {
 
   Future<TokenPair> refreshAccessToken() async {
     final url = Uri.https(_baseURL, "oauth/token");
-    final body = {
+    final body = jsonEncode({
       "refresh_token": refreshToken,
       "client_id": clientId,
       "client_secret": clientSecret,
       "redirect_uri": redirectURI,
-      "grant_type": "authorization_code",
-    };
+      "grant_type": "refresh_token",
+    });
     final response = await client.post(url, headers: {"Content-Type": "application/json"}, body: body);
 
     if (![200, 201, 204].contains(response.statusCode)) {

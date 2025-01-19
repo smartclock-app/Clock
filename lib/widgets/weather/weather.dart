@@ -26,9 +26,9 @@ class _WeatherState extends State<Weather> {
 
   Future<Map<String, String>> _fetchWeather() async {
     final logger = LoggerUtil.logger;
-    logger.t("Refetching weather");
+    logger.t("[Weather] Refetching weather data");
     if (config.weather.apiKey.isEmpty || config.weather.postcode.isEmpty || config.weather.country.isEmpty || config.weather.units.isEmpty) {
-      throw Exception("Weather API Key, Postcode, Country, and Units must be set in the config file.");
+      throw Exception("[Weather] API Key, Postcode, Country, and Units must be set in the config file.");
     }
 
     try {

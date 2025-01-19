@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class Updater extends StatefulWidget {
 class _UpdaterState extends State<Updater> {
   Map<String, dynamic>? updateInfo;
   bool updateInProgress = false;
+  String updateDismissed = "";
   double _progressValue = 0.0;
   StreamSubscription<ClockEvent>? _subscription;
   late Config config;
@@ -111,7 +113,7 @@ class _UpdaterState extends State<Updater> {
 
   @override
   Widget build(BuildContext context) {
-    if (updateInfo == null) return const SizedBox.shrink();
+    if (updateInfo == null || updateDismissed == updateInfo?['name']) return const SizedBox.shrink();
 
     if (updateInProgress) {
       return SidebarCard(
@@ -153,17 +155,27 @@ class _UpdaterState extends State<Updater> {
               ),
               const Divider(),
               const SizedBox(height: 16),
+              if (Platform.isAndroid) ...[
+                FilledButton(
+                  onPressed: () {
+                    setState(() {
+                      updateInProgress = true;
+                    });
+                    final List<dynamic> assets = updateInfo!['assets'];
+                    final apk = assets.firstWhere((e) => (e['name'] as String).endsWith(".apk"));
+                    final url = apk['url'];
+                    installApk(url: url, onDownloadProgress: onDownloadProgress, callback: installCallback);
+                  },
+                  child: Text("Download Update", style: TextStyle(fontSize: config.sidebar.headingSize)),
+                ),
+              ],
               FilledButton(
                 onPressed: () {
                   setState(() {
-                    updateInProgress = true;
+                    updateDismissed = updateInfo!['name'];
                   });
-                  final List<dynamic> assets = updateInfo!['assets'];
-                  final apk = assets.firstWhere((e) => (e['name'] as String).endsWith(".apk"));
-                  final url = apk['url'];
-                  installApk(url: url, onDownloadProgress: onDownloadProgress, callback: installCallback);
                 },
-                child: Text("Download Update", style: TextStyle(fontSize: config.sidebar.headingSize)),
+                child: Text("Skip", style: TextStyle(fontSize: config.sidebar.subheadingSize)),
               ),
             ],
           ),

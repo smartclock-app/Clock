@@ -51,7 +51,7 @@ class _PhotoClockState extends State<PhotoClock> {
       images = config.photos.images;
     } else {
       if (!config.photos.immichUrl.isAbsolute || config.photos.immichAccessToken.isEmpty || config.photos.immichAlbumId.isEmpty || config.photos.immichShareKey.isEmpty) {
-        logger.w("Cannot get images from Immich, missing required fields");
+        logger.w("[Clock] Cannot get images from Immich, missing required fields");
         return [];
       }
 
@@ -94,7 +94,7 @@ class _PhotoClockState extends State<PhotoClock> {
           });
 
           if (thirtyCount >= config.photos.interval) {
-            logger.i("Cycling clock image");
+            logger.i("[Clock] Cycling image");
             setState(() {
               thirtyCount = 0;
               photoIndex++;

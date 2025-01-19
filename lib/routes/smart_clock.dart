@@ -54,7 +54,7 @@ class _SmartClockState extends State<SmartClock> {
     try {
       result = await _connectivity.checkConnectivity();
     } on PlatformException catch (e) {
-      logger.w('Couldn\'t check connectivity status', error: e);
+      logger.w('[Network] Couldn\'t check connectivity status', error: e);
       return;
     }
 
@@ -71,7 +71,7 @@ class _SmartClockState extends State<SmartClock> {
     setState(() {
       networkAvailable = networkAvailable;
     });
-    logger.t('Connection\'s Available: $result');
+    logger.t('[Network] Connection\'s Available: $result');
   }
 
   @override
@@ -99,7 +99,7 @@ class _SmartClockState extends State<SmartClock> {
                     final resolution = constraints.biggest;
                     final width = (resolution.width).toInt();
                     final height = (resolution.height).toInt();
-                    logger.i("Safe Area Resolution: ${width}x$height");
+                    logger.i("[Safe Area Resolution] ${width}x$height");
 
                     return Stack(
                       children: [

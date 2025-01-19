@@ -44,7 +44,7 @@ class _NowPlayingState extends State<NowPlaying> {
   void getQueue() async {
     if (queue?.playerState == "REFRESHING") return;
 
-    logger.t("Refetching queue");
+    logger.t("[Alexa] Refetching queue");
     final config = configModel!.config;
     final database = context.read<sqlite3.Database>();
     final client = context.read<alexa.QueryClient>();
@@ -58,7 +58,7 @@ class _NowPlayingState extends State<NowPlaying> {
         }
       }
     } catch (e) {
-      return logger.e("Failed to fetch queue: $e");
+      return logger.e("[Alexa] Failed to fetch queue: $e");
     }
 
     if (radioProviders.contains(q.provider?.providerName ?? "Unknown Provider")) {

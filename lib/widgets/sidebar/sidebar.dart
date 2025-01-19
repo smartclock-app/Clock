@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +38,7 @@ class Sidebar extends StatelessWidget {
                     const InfoWidget(title: "Network", message: "No network connection available."),
                   ]
                 : [
-                    if (Platform.isAndroid) const Updater(),
+                    if (config.updaterEnabled) const Updater(),
                     if (config.alexa.enabled) ...[
                       if (config.alexa.features.nowplaying)
                         if (config.alexa.devices.isNotEmpty)
