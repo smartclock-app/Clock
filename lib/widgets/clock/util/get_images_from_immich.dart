@@ -15,7 +15,7 @@ Future<List<String>> getImagesFromImmich(Config config) async {
     final List<dynamic> assets = albumResponse.data["assets"];
     final images = assets.map((e) => "${config.photos.immichUrl}/api/assets/${e["id"]}/thumbnail?key=${config.photos.immichShareKey}&size=preview").toList();
 
-    logger.t("Fetched ${images.length} images from Immich");
+    logger.t("[Photos] Fetched ${images.length} images from Immich");
 
     return images;
   } catch (e) {

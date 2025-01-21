@@ -5,7 +5,7 @@ import 'package:smartclock/config/config.dart' show Config;
 
 Future<void> updateWatchlist({required Config config, required Set<String> items, required Database database}) async {
   final logger = LoggerUtil.logger;
-  logger.t("Refetching watchlist items");
+  logger.t("[Watchlist] Refetching list item details");
 
   database.execute("DELETE FROM watchlist");
   final insert = database.prepare("INSERT INTO watchlist (id, name, status, nextAirDate) VALUES (?, ?, ?, ?)");

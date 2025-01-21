@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:smartclock/config/config.dart';
 import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/util/logger_util.dart';
+import 'package:smartclock/websocket/commands/get_logs.dart';
 import 'package:smartclock/websocket/commands/toggle_display.dart';
 
 part 'websocket_handler.dart';
@@ -53,10 +54,9 @@ class WebSocketManager {
       configModel.setConfig(newConfig);
       return "Config updated";
     });
-    commands.addCommand('get_log', (command) {
+    commands.addCommand('get_logs', (command) {
       final file = File(path.join(configModel.appDir.path, "logs.txt"));
-      final log = file.readAsLinesSync();
-      return log.join("\n");
+      return getLogPage(command.data, file);
     });
 
     _initServer();
