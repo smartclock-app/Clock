@@ -71,7 +71,7 @@ class ConfigModel extends ChangeNotifier {
     clockKey = UniqueKey();
     if (_client.loginToken != config.alexa.token) {
       _client.loginToken = config.alexa.token;
-      logger.i("Updated Alexa loginToken: ${_client.loginToken}");
+      logger.i("Updated Alexa login token: ${_client.loginToken}");
     }
     super.notifyListeners();
   }
@@ -162,11 +162,7 @@ class Config {
         sidebar: Sidebar.asDefault(),
         watchlist: Watchlist.asDefault(),
         weather: Weather.asDefault(),
-        dimensions: {
-          "clock": Dimension.parse("0,0,800,800"),
-          "sidebar": Dimension.parse("784,0,496,800"),
-          "weather": Dimension.parse("64,64,672,100"),
-        },
+        dimensions: {},
       );
 
   factory Config.fromJson(File file, Map<String, dynamic> json) => Config(

@@ -32,7 +32,7 @@ class _EditorState extends State<Editor> {
             icon: const Icon(Icons.save),
             onPressed: () {
               final newConfig = jsonDecode(_controller!.text);
-              configModel.setConfig(Config.fromJson(configModel.config.file, newConfig));
+              configModel.setConfig(Config.fromJsonValidated(configModel.config.file, newConfig));
               Navigator.pop(context);
             },
           ),

@@ -25,14 +25,18 @@ class WeatherFloating extends StatelessWidget {
       left: config.dimensions["weather"]!.x,
       top: config.dimensions["weather"]!.y,
       width: config.dimensions["weather"]!.width,
-      height: config.dimensions["weather"]!.height,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Row(
             children: [
-              WeatherIcons.getIcon(weather["icon"] ?? "", size: config.weather.iconSize, color: fontColor, shadow: shadow),
+              WeatherIcons.getIcon(
+                weather["icon"] ?? "",
+                size: config.weather.iconSize,
+                color: fontColor,
+                shadow: config.photos.enabled ? shadow : null,
+              ),
               const SizedBox(width: 16),
               Text(
                 weather["temp"]!,
@@ -57,7 +61,12 @@ class WeatherFloating extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              WeatherIcons.getIcon("wind", size: config.weather.iconSize, color: fontColor, shadow: shadow),
+              WeatherIcons.getIcon(
+                "wind",
+                size: config.weather.iconSize,
+                color: fontColor,
+                shadow: config.photos.enabled ? shadow : null,
+              ),
             ],
           )
         ],

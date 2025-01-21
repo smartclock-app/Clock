@@ -10,6 +10,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, WeatherType;
 import 'package:smartclock/routes/editor.dart';
 import 'package:smartclock/routes/logs.dart';
+import 'package:smartclock/util/auto_dimensions.dart';
 import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/clock/clock.dart';
 import 'package:smartclock/widgets/sidebar/sidebar.dart';
@@ -97,9 +98,11 @@ class _SmartClockState extends State<SmartClock> {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final resolution = constraints.biggest;
-                    final width = (resolution.width).toInt();
-                    final height = (resolution.height).toInt();
-                    logger.i("[Resolution] Safe Area: ${width}x$height");
+                    final width = resolution.width;
+                    final height = resolution.height;
+                    logger.i("[Resolution] Safe Area: ${width.toInt()}x${height.toInt()}");
+
+                    computeDefaultDimensions(config: config, width: width, height: height);
 
                     return Stack(
                       children: [
