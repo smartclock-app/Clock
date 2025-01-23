@@ -20,12 +20,20 @@ class _LogViewerState extends State<LogViewer> {
   ScrollController scrollController = ScrollController();
   StreamSubscription? _logStream;
 
+  Future<void> readInitialLog(File file) async {
+    if (!await file.exists()) return;
+    final lines = await file.readAsLines();
+    setState(() => log = lines);
+  }
+
   @override
   void initState() {
     super.initState();
     final configModel = context.read<ConfigModel>();
     final file = File(path.join(configModel.appDir.path, "logs.txt"));
-    log = file.readAsLinesSync();
+
+    log = [];
+    readInitialLog(file);
 
     _logStream ??= LoggerOutput.stream.listen((lines) => setState(() => log.addAll(lines)));
   }
@@ -56,10 +64,11 @@ class _LogViewerState extends State<LogViewer> {
               text: TextSpan(
                 style: const TextStyle(fontSize: 16, color: Colors.black, height: 1.5, fontFamily: "RobotoMono"),
                 children: [
-                  for (String line in log) ...[
-                    TextSpan(text: line.substring(0, 36), style: const TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: "${line.substring(36)}\n"),
-                  ],
+                  for (String line in log)
+                    if (line.isNotEmpty) ...[
+                      TextSpan(text: line.substring(0, 36), style: const TextStyle(fontWeight: FontWeight.bold)),
+                      TextSpan(text: "${line.substring(36)}\n"),
+                    ],
                 ],
               ),
             ),

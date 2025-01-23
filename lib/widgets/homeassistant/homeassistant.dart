@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -33,8 +34,15 @@ class _HomeAssistantState extends State<HomeAssistant> {
   final Map<int, Camera> _messageIds = {};
   bool isConnected = false;
   int messageId = 1;
+  (DateTime?, int) _reconnectAttempt = (null, 0);
 
   final OverlayPortalController _cameraOverlayController = OverlayPortalController();
+
+  bool get shouldAttemptReconnect {
+    if (_reconnectAttempt.$1 == null) return true;
+    final diff = DateTime.now().difference(_reconnectAttempt.$1!);
+    return diff.inSeconds >= min(30 * _reconnectAttempt.$2, 300);
+  }
 
   void connectToHomeAssistant() async {
     final dio = Dio(BaseOptions(
@@ -48,8 +56,10 @@ class _HomeAssistantState extends State<HomeAssistant> {
         logger.w("[Home Assistant] Connection failed");
         return;
       }
-    } catch (e) {
-      logger.w("[Home Assistant] Connection failed: $e");
+    } on DioException catch (e) {
+      logger.w("[Home Assistant] Connection failed: ${e.response?.statusCode} ${e.response?.statusMessage}");
+      _reconnectAttempt = (DateTime.now(), _reconnectAttempt.$2 + 1);
+      logger.w("[Home Assistant] Waiting ${30 * _reconnectAttempt.$2} seconds before reconnecting");
       return;
     }
 
@@ -146,7 +156,7 @@ class _HomeAssistantState extends State<HomeAssistant> {
     final stream = context.read<StreamController<ClockEvent>>().stream;
     _eventSubscription?.cancel();
     _eventSubscription = stream.listen((event) {
-      if (event.event == ClockEvents.refetch && !isConnected) {
+      if (event.event == ClockEvents.refetch && !isConnected && shouldAttemptReconnect) {
         connectToHomeAssistant();
       }
     });
