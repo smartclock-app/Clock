@@ -50,7 +50,7 @@ class CalendarEvent extends StatelessWidget {
       dateString = startDay;
     } else if (isAllDay(oneDay: false)) {
       if (_start.month != _end.month) {
-        dateString = "$startDay — ${formatDate(_end.subtract(const Duration(days: 1)), "EEEE d'${getOrdinal(_end.day)}' MMM")}";
+        dateString = "$startDay — ${formatDate(_end.subtract(const Duration(days: 1)), "EEEE d'${getOrdinal(_end.day - 1)}' MMM")}";
       } else {
         dateString = "$startDay - ${formatDate(_end.subtract(const Duration(days: 1)), "EEEE d'${getOrdinal(_end.day - 1)}'")}";
       }

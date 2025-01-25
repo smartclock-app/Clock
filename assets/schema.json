@@ -46,7 +46,7 @@
           "description": "The path to a script used to toggle the display on and off\n\nExamples can be found in /assets/display"
         }
       },
-      "required": ["enabled", "port", "password", "useBonjour"]
+      "required": ["enabled", "port", "password", "useBonjour", "bonjourName", "toggleDisplayPath"]
     },
     "alexa": {
       "type": "object",

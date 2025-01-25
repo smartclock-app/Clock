@@ -6,7 +6,7 @@ class Alexa {
   final String userId;
   final String token;
   final List<String> devices;
-  List<String>? radioProviders;
+  final List<String> radioProviders;
   final double nowplayingImageSize;
   final double nowplayingFontSize;
   final double lyricsCurrentFontSize;
@@ -20,7 +20,7 @@ class Alexa {
     required this.userId,
     required this.token,
     required this.devices,
-    this.radioProviders,
+    required this.radioProviders,
     required this.nowplayingImageSize,
     required this.nowplayingFontSize,
     required this.lyricsCurrentFontSize,
@@ -40,6 +40,7 @@ class Alexa {
         userId: "",
         token: "",
         devices: [],
+        radioProviders: [],
         nowplayingImageSize: 146,
         nowplayingFontSize: 32,
         lyricsCurrentFontSize: 24,
@@ -59,7 +60,7 @@ class Alexa {
         userId: json["userId"],
         token: json["token"],
         devices: List<String>.from(json["devices"]),
-        radioProviders: json["radioProviders"] != null ? List<String>.from(json["radioProviders"]) : null,
+        radioProviders: List<String>.from(json["radioProviders"]),
         nowplayingImageSize: double.parse(json["nowplayingImageSize"].toString()),
         nowplayingFontSize: double.parse(json["nowplayingFontSize"].toString()),
         lyricsCurrentFontSize: double.parse(json["lyricsCurrentFontSize"].toString()),
@@ -79,7 +80,7 @@ class Alexa {
         "userId": userId,
         "token": token,
         "devices": List<dynamic>.from(devices),
-        if (radioProviders != null) 'radioProviders': List<dynamic>.from(radioProviders!),
+        "radioProviders": List<dynamic>.from(radioProviders),
         "nowplayingImageSize": nowplayingImageSize,
         "nowplayingFontSize": nowplayingFontSize,
         "lyricsCurrentFontSize": lyricsCurrentFontSize,
