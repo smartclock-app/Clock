@@ -81,7 +81,6 @@ class Config {
   File file;
   static String version = ""; // Version set in main.dart from PackageInfo
   final Orientation orientation;
-  final bool interactive;
   final bool networkEnabled;
   final bool updaterEnabled;
   final RemoteConfig remoteConfig;
@@ -100,7 +99,6 @@ class Config {
   Config({
     required this.file,
     required this.orientation,
-    required this.interactive,
     required this.networkEnabled,
     required this.updaterEnabled,
     required this.remoteConfig,
@@ -148,7 +146,6 @@ class Config {
   factory Config.asDefault(File? file) => Config(
         file: file ?? File(""),
         orientation: Orientation.landscape,
-        interactive: false,
         networkEnabled: true,
         updaterEnabled: true,
         remoteConfig: RemoteConfig.asDefault(),
@@ -168,7 +165,6 @@ class Config {
   factory Config.fromJson(File file, Map<String, dynamic> json) => Config(
         file: file,
         orientation: json["orientation"] == "landscape" ? Orientation.landscape : Orientation.portrait,
-        interactive: json["interactive"],
         networkEnabled: json["networkEnabled"],
         updaterEnabled: json["updaterEnabled"],
         remoteConfig: RemoteConfig.fromJson(json["remoteConfig"]),
@@ -189,7 +185,6 @@ class Config {
         "\$schema": "./schema.json",
         "version": version,
         "orientation": orientation == Orientation.landscape ? "landscape" : "portrait",
-        "interactive": interactive,
         "networkEnabled": networkEnabled,
         "updaterEnabled": updaterEnabled,
         "remoteConfig": remoteConfig.toJson(),
