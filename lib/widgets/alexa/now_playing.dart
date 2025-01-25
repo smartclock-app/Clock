@@ -35,8 +35,8 @@ class _NowPlayingState extends State<NowPlaying> {
 
   bool isRadio() {
     bool isRadio = false;
-    if (configModel!.config.alexa.radioProviders != null && queue?.provider?.providerName != null) {
-      isRadio = configModel!.config.alexa.radioProviders!.contains(queue?.provider?.providerName);
+    if (queue?.provider?.providerName != null) {
+      isRadio = configModel!.config.alexa.radioProviders.contains(queue?.provider?.providerName);
     }
     return isRadio || radioProviders.contains(queue?.provider?.providerName ?? "Unknown Provider");
   }

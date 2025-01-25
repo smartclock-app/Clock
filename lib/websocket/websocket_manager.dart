@@ -70,8 +70,9 @@ class WebSocketManager {
   Future<BonsoirBroadcast> _initBonjour(Config config) async {
     // LINUX BONJOUR DEPENDENCIES:
     // avahi-daemon avahi-discover avahi-utils libnss-mdns mdns-scan
+    final bonjourName = config.remoteConfig.bonjourName;
     BonsoirService service = BonsoirService(
-      name: config.remoteConfig.bonjourName ?? Platform.localHostname,
+      name: bonjourName.isEmpty ? Platform.localHostname : bonjourName,
       type: '_smartclock._tcp',
       port: config.remoteConfig.port,
       attributes: {

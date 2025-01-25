@@ -73,10 +73,7 @@ class TraktManager {
 
     final watchlistIds = watchlist.map((e) => e["id"]).toSet();
 
-    final itemTypes = <String>{"show", "episode", "movie"};
-    if (config.watchlist.trakt.includeEpisodesAsShow != null && config.watchlist.trakt.includeEpisodesAsShow == false) {
-      itemTypes.remove("episode");
-    }
+    final itemTypes = <String>{"show", "movie", if (config.watchlist.trakt.includeEpisodesAsShow) "episode"};
 
     final itemIds = items.where((e) => itemTypes.contains(e.type)).map((e) {
       if (e.type == "show" || e.type == "episode") {

@@ -27,7 +27,7 @@ void main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  Config.version = packageInfo.version;
+  Config.version = packageInfo.version.isEmpty ? '-unknown' : packageInfo.version;
 
   final Directory appDir = await getApplicationDirectory();
   if (!appDir.existsSync()) appDir.createSync(recursive: true);

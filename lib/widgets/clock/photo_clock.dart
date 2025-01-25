@@ -126,7 +126,7 @@ class _PhotoClockState extends State<PhotoClock> {
     return FutureBuilder(
       future: Future.value(_futureImages),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           photoIndex %= snapshot.data!.length;
 
           if (image != snapshot.data![photoIndex]) {
