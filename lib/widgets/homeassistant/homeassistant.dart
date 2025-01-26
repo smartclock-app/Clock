@@ -78,7 +78,7 @@ class _HomeAssistantState extends State<HomeAssistant> {
     );
   }
 
-  void handleMessage(dynamic message) {
+  void handleMessage(dynamic message) async {
     logger.t("[Home Assistant] $message");
 
     final data = jsonDecode(message);
@@ -117,9 +117,19 @@ class _HomeAssistantState extends State<HomeAssistant> {
         final state = trigger?['to_state']?['state'];
         if (state == "on") {
           final camera = config.homeAssistant.cameras.firstWhere((camera) => camera.trigger == entityId);
-          _messageIds[messageId] = camera; // Store camera with message id for use with result
-          _channel.sink.add(jsonEncode({"id": messageId, "type": "camera/stream", "entity_id": camera.id}));
+
+          if (camera.streamUri != null) {
+            final streamUri = Uri.parse(camera.streamUri!);
+            cameras.add((streamUri, camera));
+            _cameraOverlayController.show();
+          } else {
+            _messageIds[messageId] = camera; // Store camera with message id for use with result
+            _channel.sink.add(jsonEncode({"id": messageId, "type": "camera/stream", "entity_id": camera.id}));
+          }
         } else {
+          final waitTime = config.homeAssistant.cameraWaitTime;
+          await Future.delayed(Duration(seconds: waitTime));
+          if (!mounted) return;
           setState(() {
             cameras.removeWhere((camera) => camera.$2.trigger == entityId);
           });

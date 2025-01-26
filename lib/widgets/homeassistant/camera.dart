@@ -1,7 +1,7 @@
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 
-import 'package:video_player/video_player.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 class HomeAssistantCamera extends StatefulWidget {
   const HomeAssistantCamera({super.key, required this.streamUri, required this.aspectRatio});
@@ -14,20 +14,14 @@ class HomeAssistantCamera extends StatefulWidget {
 }
 
 class _HomeAssistantCameraState extends State<HomeAssistantCamera> {
-  late ChewieController _chewieController;
-  late VideoPlayerController _controller;
+  late final player = Player();
+  late final controller = VideoController(player);
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(widget.streamUri);
-    _chewieController = ChewieController(
-      videoPlayerController: _controller,
-      aspectRatio: widget.aspectRatio,
-      autoPlay: true,
-      showControls: false,
-    );
-    _chewieController.setVolume(0);
+    player.open(Media(widget.streamUri.toString()));
+    player.setVolume(0);
   }
 
   @override
@@ -35,7 +29,11 @@ class _HomeAssistantCameraState extends State<HomeAssistantCamera> {
     return Container(
       color: Colors.black,
       child: Center(
-        child: Chewie(controller: _chewieController),
+        child: Video(
+          controller: controller,
+          controls: NoVideoControls,
+          aspectRatio: widget.aspectRatio,
+        ),
       ),
     );
   }

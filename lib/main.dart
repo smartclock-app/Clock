@@ -6,13 +6,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:media_kit/media_kit.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:logger/logger.dart';
 import 'package:sqlite3/sqlite3.dart';
-// ignore: unused_import --- Needed for sqlite3 on android
-import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
@@ -24,6 +23,7 @@ import 'package:smartclock/util/file_utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   final PackageInfo packageInfo = await PackageInfo.fromPlatform();
