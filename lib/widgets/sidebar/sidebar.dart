@@ -9,7 +9,7 @@ import 'package:smartclock/widgets/calendar/calendar.dart';
 import 'package:smartclock/widgets/homeassistant/homeassistant.dart';
 import 'package:smartclock/widgets/sidebar/info_widget.dart';
 import 'package:smartclock/widgets/updater/updater.dart';
-import 'package:smartclock/widgets/weather/weather.dart';
+import 'package:smartclock/widgets/weather/ui.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key, required this.networkAvailable});
