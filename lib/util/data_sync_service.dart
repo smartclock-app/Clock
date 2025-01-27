@@ -1,4 +1,4 @@
-// services/data_sync_service.dart
+// util/data_sync_service.dart
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -55,7 +55,6 @@ class DataSyncService {
       _hostConnection!.stream.listen(
         (event) {
           final command = WebSocketCommand.fromEvent(event);
-
           if (command.command != 'sync') return;
 
           final endpoint = command.headers?['endpoint'];
@@ -64,6 +63,7 @@ class DataSyncService {
             return;
           }
 
+          logger.i("[Data Sync] Received sync from host for $endpoint");
           _handleSyncData(endpoint, command.data!);
         },
         onDone: () {
@@ -77,15 +77,12 @@ class DataSyncService {
       );
 
       // Request initial data for all current endpoints
-      for (var endpoint in _controllers.keys) {
-        _hostConnection!.sink.add(
-          WebSocketCommand(
-            command: 'sync',
-            headers: {'endpoint': 'get_initial_data'},
-            data: endpoint,
-          ).asResponse(),
-        );
-      }
+      _hostConnection!.sink.add(
+        WebSocketCommand(
+          command: 'sync',
+          headers: {'endpoint': 'get_initial_data'},
+        ).asResponse(),
+      );
 
       logger.i('Connected to host');
     } catch (e) {
@@ -99,23 +96,19 @@ class DataSyncService {
     required Future<T> Function() fetcher,
   }) {
     if (!_controllers.containsKey(endpoint)) {
-      _controllers[endpoint] = StreamController<T>.broadcast();
+      _controllers[endpoint] = StreamController<T>.broadcast(
+        onListen: () {
+          if (_data.containsKey(endpoint)) {
+            _controllers[endpoint]!.add(_data[endpoint]);
+          }
+        },
+      );
 
-      // If we're the host and there's no data, fetch it
-      if (_isHost && !_data.containsKey(endpoint)) {
+      // If we're the host or a client not connected to a host, and there's no data, fetch it
+      if ((_isHost || _hostConnection == null) && !_data.containsKey(endpoint)) {
         fetcher().then((data) {
           _updateData(endpoint, data);
         });
-      }
-      // If we're a client and connected to host, request initial data
-      else if (!_isHost && _hostConnection != null) {
-        _hostConnection!.sink.add(
-          WebSocketCommand(
-            command: 'sync',
-            headers: {'endpoint': 'get_initial_data'},
-            data: endpoint,
-          ).asResponse(),
-        );
       }
     }
 

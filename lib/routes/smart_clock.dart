@@ -46,7 +46,6 @@ class _SmartClockState extends State<SmartClock> {
   @override
   void dispose() {
     _connectivitySubscription.cancel();
-    _webSocketManager.dispose();
     super.dispose();
   }
 

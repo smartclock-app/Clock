@@ -23,7 +23,6 @@ class WebSocketManager {
 
   HttpServer? server;
   late ConfigModel configModel;
-  BonsoirBroadcast? _broadcast;
   final WebSocketHandler commands = WebSocketHandler();
   Logger logger = LoggerUtil.logger;
   final List<WebSocket> clients = [];
@@ -73,7 +72,7 @@ class WebSocketManager {
 
     final config = configModel.config;
     if (config.remoteConfig.useBonjour) {
-      _initBonjour(config).then((broadcast) => _broadcast = broadcast);
+      _initBonjour(config);
     }
   }
 
@@ -124,10 +123,5 @@ class WebSocketManager {
           logger.i("[Remote Config] WebSocket connection closed");
           clients.remove(webSocket);
         });
-  }
-
-  void dispose() {
-    server?.close(force: true);
-    _broadcast?.stop();
   }
 }

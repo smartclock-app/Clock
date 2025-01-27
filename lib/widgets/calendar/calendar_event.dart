@@ -3,15 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:smartclock/util/color_from_hex.dart';
 
-import 'package:smartclock/widgets/calendar/util/fetch_events.dart';
+import 'package:smartclock/widgets/calendar/calendar_event_model.dart';
 import 'package:smartclock/util/data_utils.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel;
 
 class CalendarEvent extends StatelessWidget {
   const CalendarEvent({super.key, required this.event});
 
-  final CalendarItem event;
+  final CalendarEventModel event;
 
   DateTime get _start => event.start;
   DateTime get _end => event.end;
@@ -72,7 +73,7 @@ class CalendarEvent extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: Platform.isLinux ? BorderRadius.zero : BorderRadius.circular(config.calendar.eventColorWidth),
         border: Border(
-          left: BorderSide(color: event.color, width: config.calendar.eventColorWidth),
+          left: BorderSide(color: event.color.toColor(), width: config.calendar.eventColorWidth),
         ),
       ),
       child: Column(
