@@ -18,17 +18,27 @@ import 'package:smartclock/websocket/commands/toggle_display.dart';
 part 'websocket_handler.dart';
 
 class WebSocketManager {
+  static final WebSocketManager _instance = WebSocketManager._internal();
+  factory WebSocketManager() => _instance;
+
   HttpServer? server;
   late ConfigModel configModel;
   BonsoirBroadcast? _broadcast;
-  late final WebSocketHandler commands;
+  final WebSocketHandler commands = WebSocketHandler();
   Logger logger = LoggerUtil.logger;
+  final List<WebSocket> clients = [];
+  bool isInitalised = false;
 
-  WebSocketManager(BuildContext context) {
+  WebSocketManager._internal();
+
+  void initialise(BuildContext context) {
+    if (isInitalised) return;
+    isInitalised = true;
+
     configModel = context.read<ConfigModel>();
-    commands = WebSocketHandler();
 
     commands.addCommand('echo', (command) => command.data ?? "No data provided");
+    commands.addCommand('get_commands', (command) => commands.commands.join('\n'));
     commands.addCommand('refresh', (command) {
       configModel.notifyListeners();
       return "Clock refreshed";
@@ -93,23 +103,27 @@ class WebSocketManager {
   }
 
   void onWebSocketData(WebSocket webSocket) {
+    clients.add(webSocket);
+
     webSocket.listen(
-      (event) async {
-        final command = WebSocketCommand.fromEvent(event);
-        logger.t("[Remote Config] Received ${command.command}");
+        (event) async {
+          final command = WebSocketCommand.fromEvent(event);
+          logger.t("[Remote Config] Received ${command.command}");
 
-        final config = configModel.config;
-        if (config.remoteConfig.password.isNotEmpty && command.headers?['password'] != config.remoteConfig.password) {
-          webSocket.add("Invalid password");
-          return;
-        }
+          final config = configModel.config;
+          if (config.remoteConfig.password.isNotEmpty && command.headers?['password'] != config.remoteConfig.password) {
+            webSocket.add("Invalid password");
+            return;
+          }
 
-        final response = await commands.handle(command);
-        webSocket.add(response);
-      },
-      onError: (error) => logger.e("[Remote Config] WebSocket error: $error"),
-      onDone: () => logger.i("[Remote Config] WebSocket connection closed"),
-    );
+          final response = await commands.handle(command);
+          webSocket.add(response);
+        },
+        onError: (error) => logger.e("[Remote Config] WebSocket error: $error"),
+        onDone: () {
+          logger.i("[Remote Config] WebSocket connection closed");
+          clients.remove(webSocket);
+        });
   }
 
   void dispose() {

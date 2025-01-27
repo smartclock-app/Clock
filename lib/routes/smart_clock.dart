@@ -28,7 +28,7 @@ class _SmartClockState extends State<SmartClock> {
   bool networkAvailable = false;
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
-  WebSocketManager? _webSocketManager;
+  final WebSocketManager _webSocketManager = WebSocketManager();
   Logger logger = LoggerUtil.logger;
 
   @override
@@ -39,14 +39,14 @@ class _SmartClockState extends State<SmartClock> {
 
     final configModel = context.read<ConfigModel>();
     if (configModel.config.remoteConfig.enabled) {
-      _webSocketManager = WebSocketManager(context);
+      _webSocketManager.initialise(context);
     }
   }
 
   @override
   void dispose() {
     _connectivitySubscription.cancel();
-    _webSocketManager?.dispose();
+    _webSocketManager.dispose();
     super.dispose();
   }
 

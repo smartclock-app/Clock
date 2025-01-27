@@ -32,6 +32,18 @@ class WebSocketCommand {
       headers: headers.isNotEmpty ? headers : null,
     );
   }
+
+  String asResponse() {
+    final lines = <String>[];
+    lines.add("command: $command");
+    if (data != null) lines.add("data: $data");
+    if (headers != null) {
+      for (final entry in headers!.entries) {
+        lines.add("${entry.key}: ${entry.value}");
+      }
+    }
+    return lines.join("\n");
+  }
 }
 
 typedef WebSocketCommandHandler = FutureOr<String?> Function(WebSocketCommand command);

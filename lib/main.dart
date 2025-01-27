@@ -11,6 +11,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:logger/logger.dart';
+import 'package:smartclock/util/data_sync_service.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
@@ -99,6 +100,9 @@ void main() async {
       }
     },
   );
+
+  final dataSyncService = DataSyncService();
+  await dataSyncService.initialize(isHost: config.dataSync.isHost, hostUri: config.dataSync.hostUri);
 
   if (config.orientation == Orientation.landscape) {
     await SystemChrome.setPreferredOrientations([
