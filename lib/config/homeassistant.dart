@@ -20,7 +20,7 @@ class HomeAssistant {
         url: "",
         token: "",
         cameras: [],
-        cameraWaitTime: 30,
+        cameraWaitTime: 5,
       );
 
   factory HomeAssistant.fromJson(Map<String, dynamic> json) => HomeAssistant(

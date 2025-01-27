@@ -11,9 +11,7 @@ void installApk({required String url, required void Function(int, int) onDownloa
   String savePath = "${appDocDir.path}/smartclock-$urlHash.apk";
 
   if (!File(savePath).existsSync()) {
-    // Doesn't matter if the token is leaked, only has read access to a repo that will soon become public
-    const githubToken = "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";
-    await Dio().download(url, savePath, onReceiveProgress: onDownloadProgress, options: Options(headers: {"Authorization": "Bearer $githubToken", "Accept": "application/octet-stream"}));
+    await Dio().download(url, savePath, onReceiveProgress: onDownloadProgress, options: Options(headers: {"Accept": "application/octet-stream"}));
   }
 
   try {

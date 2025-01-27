@@ -46,14 +46,11 @@ class _UpdaterState extends State<Updater> {
 
   void checkForUpdates() async {
     logger.i("[Updater] Checking for updates");
-    // Doesn't matter if the token is leaked, only has read access to a repo that will soon become public
-    const githubToken = "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";
     const url = "https://api.github.com/repos/smartclock-app/Clock/releases/latest";
 
     final response = await Dio().get(
       url,
       options: Options(headers: {
-        "Authorization": "Bearer $githubToken",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
       }),
