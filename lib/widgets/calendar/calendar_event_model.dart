@@ -13,26 +13,4 @@ class CalendarEventModel {
     required this.end,
     required this.color,
   });
-
-  // From JSON constructor
-  factory CalendarEventModel.fromJson(Map<String, dynamic> json) {
-    return CalendarEventModel(
-      id: json['id'],
-      title: json['title'],
-      start: DateTime.parse(json['start']),
-      end: DateTime.parse(json['end']),
-      color: json['color'],
-    );
-  }
-
-  // To JSON method
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'start': start.toIso8601String(),
-      'end': end.toIso8601String(),
-      'color': color,
-    };
-  }
 }

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:smartclock/util/color_from_hex.dart';
 
 import 'package:smartclock/widgets/calendar/calendar_event_model.dart';
-import 'package:smartclock/util/data_utils.dart';
+import 'package:smartclock/widgets/clock/util/get_ordinal.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel;
 
 class CalendarEvent extends StatelessWidget {
@@ -46,21 +46,16 @@ class CalendarEvent extends StatelessWidget {
 
     late final String dateString;
     final startDay = formatDate(_start, "EEEE d'${getOrdinal(_start.day)}'");
+    final isSameMonth = _start.month == _end.month;
 
     if (isAllDay()) {
       dateString = startDay;
     } else if (isAllDay(oneDay: false)) {
-      if (_start.month != _end.month) {
-        dateString = "$startDay — ${formatDate(_end.subtract(const Duration(days: 1)), "EEEE d'${getOrdinal(_end.day - 1)}' MMM")}";
-      } else {
-        dateString = "$startDay - ${formatDate(_end.subtract(const Duration(days: 1)), "EEEE d'${getOrdinal(_end.day - 1)}'")}";
-      }
+      final format = "EEEE d'${getOrdinal(_end.day - 1)}'${!isSameMonth ? " MMM" : ""}";
+      dateString = "$startDay — ${formatDate(_end.subtract(const Duration(days: 1)), format)}";
     } else if (!DateUtils.isSameDay(_start, _end)) {
-      if (_start.month != _end.month) {
-        dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${formatDate(_end, "EEEE d'${getOrdinal(_end.day)}' MMM")} (${DateFormat("HH:mm").format(_end)})";
-      } else {
-        dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${formatDate(_end, "EEEE d'${getOrdinal(_end.day)}'")} (${DateFormat("HH:mm").format(_end)})";
-      }
+      final format = "EEEE d'${getOrdinal(_end.day)}'${!isSameMonth ? " MMM" : ""}";
+      dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${formatDate(_end, format)} (${DateFormat("HH:mm").format(_end)})";
     } else if (_start.isAtSameMomentAs(_end)) {
       dateString = "$startDay (${DateFormat("HH:mm").format(_start)})";
     } else {

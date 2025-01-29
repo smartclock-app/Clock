@@ -14,7 +14,7 @@ import 'package:smartclock/util/auto_dimensions.dart';
 import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/clock/clock.dart';
 import 'package:smartclock/widgets/sidebar/sidebar.dart';
-import 'package:smartclock/widgets/weather/ui.dart';
+import 'package:smartclock/widgets/weather/weather.dart';
 import 'package:smartclock/websocket/websocket_manager.dart';
 
 class SmartClock extends StatefulWidget {

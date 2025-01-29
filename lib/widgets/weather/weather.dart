@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config, WeatherType;
 import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/util/logger_util.dart';
-import 'package:smartclock/widgets/weather/ui_card.dart';
-import 'package:smartclock/widgets/weather/ui_floating.dart';
+import 'package:smartclock/widgets/weather/weather_card.dart';
+import 'package:smartclock/widgets/weather/weather_floating.dart';
 
 class Weather extends StatefulWidget {
   const Weather({super.key, required this.type});
