@@ -8,7 +8,6 @@ import 'package:logger/logger.dart';
 import 'package:smartclock/util/color_from_hex.dart';
 import 'package:smartclock/util/logger_util.dart';
 
-part 'data_sync.dart';
 part 'remote_config.dart';
 part 'alexa.dart';
 part 'calendar.dart';
@@ -84,7 +83,6 @@ class Config {
   final Orientation orientation;
   final bool networkEnabled;
   final bool updaterEnabled;
-  final DataSync dataSync;
   final RemoteConfig remoteConfig;
   final Alexa alexa;
   final Calendar calendar;
@@ -103,7 +101,6 @@ class Config {
     required this.orientation,
     required this.networkEnabled,
     required this.updaterEnabled,
-    required this.dataSync,
     required this.remoteConfig,
     required this.alexa,
     required this.calendar,
@@ -151,7 +148,6 @@ class Config {
         orientation: Orientation.landscape,
         networkEnabled: true,
         updaterEnabled: true,
-        dataSync: DataSync.asDefault(),
         remoteConfig: RemoteConfig.asDefault(),
         alexa: Alexa.asDefault(),
         calendar: Calendar.asDefault(),
@@ -171,7 +167,6 @@ class Config {
         orientation: json["orientation"] == "landscape" ? Orientation.landscape : Orientation.portrait,
         networkEnabled: json["networkEnabled"],
         updaterEnabled: json["updaterEnabled"],
-        dataSync: DataSync.fromJson(json["dataSync"]),
         remoteConfig: RemoteConfig.fromJson(json["remoteConfig"]),
         alexa: Alexa.fromJson(json["alexa"]),
         calendar: Calendar.fromJson(json["calendar"]),
@@ -192,7 +187,6 @@ class Config {
         "orientation": orientation == Orientation.landscape ? "landscape" : "portrait",
         "networkEnabled": networkEnabled,
         "updaterEnabled": updaterEnabled,
-        "dataSync": dataSync.toJson(),
         "remoteConfig": remoteConfig.toJson(),
         "alexa": alexa.toJson(),
         "calendar": calendar.toJson(),
