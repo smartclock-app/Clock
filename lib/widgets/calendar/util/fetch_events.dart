@@ -9,25 +9,10 @@ import 'package:smartclock/util/color_from_hex.dart';
 import 'package:smartclock/util/logger_util.dart';
 import 'package:sqlite3/sqlite3.dart';
 
+import 'package:smartclock/widgets/calendar/calendar_event_model.dart';
 import 'package:smartclock/widgets/watchlist/update_watchlist.dart';
 import 'package:smartclock/widgets/watchlist/trakt_manager.dart';
 import 'package:smartclock/config/config.dart' show Config;
-
-class CalendarItem {
-  final String id;
-  final String title;
-  final DateTime start;
-  final DateTime end;
-  final Color color;
-
-  const CalendarItem({
-    required this.id,
-    required this.title,
-    required this.start,
-    required this.end,
-    required this.color,
-  });
-}
 
 /// Calculates number of weeks for a given year as per https://en.wikipedia.org/wiki/ISO_week_date#Weeks_per_year
 int numOfWeeks(int year) {
@@ -70,7 +55,7 @@ String? eventColor(String? colorId) {
   return colours[id - 1];
 }
 
-Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, required http.Client httpClient, required Database database, bool updateWl = false}) async {
+Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config config, required http.Client httpClient, required Database database, bool updateWl = false}) async {
   final logger = LoggerUtil.logger;
   logger.t("[Calendar] Refetching calendar");
 
@@ -114,7 +99,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
 
   final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  List<CalendarItem> allEvents = [];
+  List<CalendarEventModel> allEvents = [];
 
   // Fetch all calendar lists
   final calendarList = await calendarApi.calendarList.list();
@@ -131,7 +116,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
       maxResults: config.calendar.maxEvents,
     );
 
-    // For each event, create a CalendarItem
+    // For each event, create a CalendarEventModel
     for (final event in events.items!) {
       late final DateTime startDate;
       late final DateTime endDate;
@@ -159,15 +144,15 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
         recurringEvents.add(event.summary!);
       }
 
-      final calendarItem = CalendarItem(
+      final calendarEventModel = CalendarEventModel(
         id: event.id!,
         title: event.summary!,
         start: startDate,
         end: endDate,
-        color: (eventColor(event.colorId) ?? color).toColor(),
+        color: eventColor(event.colorId) ?? color,
       );
 
-      allEvents.add(calendarItem);
+      allEvents.add(calendarEventModel);
     }
   }
 
@@ -218,12 +203,12 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
 
       item.value.sort();
 
-      final event = CalendarItem(
+      final event = CalendarEventModel(
         id: UniqueKey().toString(),
         title: config.watchlist.prefix.isNotEmpty ? "${config.watchlist.prefix}\n${item.value.join("\n")}" : item.value.join("\n"),
         start: start,
         end: end,
-        color: config.watchlist.color,
+        color: config.watchlist.color.toHex(),
       );
       allEvents.add(event);
     }
@@ -233,7 +218,7 @@ Future<Map<String, List<CalendarItem>>> fetchEvents({required Config config, req
   allEvents.sort((a, b) => a.start.compareTo(b.start));
 
   // Sort events by month
-  final Map<String, List<CalendarItem>> sortedEvents = {};
+  final Map<String, List<CalendarEventModel>> sortedEvents = {};
   final currentTime = DateTime.now();
   final currentWeek = weekNumber(currentTime);
   final weekReference = DateTime(2024, 1, 1); // Must be a Monday for isEven calculation below

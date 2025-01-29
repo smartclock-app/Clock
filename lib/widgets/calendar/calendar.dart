@@ -10,6 +10,7 @@ import 'package:smartclock/widgets/sidebar/info_widget.dart';
 import 'package:smartclock/widgets/sidebar/error_info_widget.dart';
 import 'package:smartclock/widgets/sidebar/sidebar_card.dart';
 import 'package:smartclock/widgets/calendar/calendar_event.dart';
+import 'package:smartclock/widgets/calendar/calendar_event_model.dart';
 import 'package:smartclock/widgets/calendar/util/fetch_events.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 
@@ -24,7 +25,7 @@ class _CalendarState extends State<Calendar> {
   StreamSubscription<void>? _subscription;
   late Config config;
   late sqlite3.Database database;
-  late Future<Map<String, List<CalendarItem>>> _futureEvents;
+  late Future<Map<String, List<CalendarEventModel>>> _futureEvents;
   final _client = http.Client();
 
   @override

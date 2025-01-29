@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
-import 'package:smartclock/util/data_utils.dart';
+import 'package:smartclock/widgets/clock/util/get_ordinal.dart';
 import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/clock/photo_clock.dart';

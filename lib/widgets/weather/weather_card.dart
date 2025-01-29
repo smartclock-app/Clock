@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smartclock/widgets/sidebar/sidebar_card.dart';
 
-import 'package:smartclock/widgets/weather/util/weather_icons.dart';
+import 'package:smartclock/widgets/weather/weather_icons.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 
 class WeatherCard extends StatelessWidget {

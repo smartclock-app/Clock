@@ -10,16 +10,26 @@ import 'package:media_kit/media_kit.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:logger/logger.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:alexaquery_dart/alexaquery_dart.dart' as alexa;
 
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 import 'package:smartclock/routes/smart_clock.dart';
-import 'package:smartclock/util/logger_output.dart';
 import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/util/event_utils.dart';
-import 'package:smartclock/util/file_utils.dart';
+
+Future<Directory> getApplicationDirectory() async {
+  if ((Platform.isMacOS || Platform.isLinux) && Platform.environment['HOME'] != null) {
+    return Directory(path.join(Platform.environment['HOME']!, '.smartclock'));
+  } else if (Platform.isWindows && Platform.environment['APPDATA'] != null) {
+    return Directory(path.join(Platform.environment['APPDATA']!, 'SmartClock'));
+  } else {
+    final documentsDir = await getApplicationDocumentsDirectory();
+    return Directory(path.join(documentsDir.path, 'SmartClock'));
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

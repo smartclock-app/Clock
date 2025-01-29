@@ -70,7 +70,7 @@ class _EnergyState extends State<Energy> {
     _subscription?.cancel();
     _subscription = stream.listen((event) {
       // Refetch every half hour
-      if (event.event == ClockEvents.refetch && (event.time.minute == 0 || event.time.minute == 30) && event.time.second == 0) {
+      if (event.event == ClockEvents.refetch && event.time.minute % 30 == 0 && event.time.second == 0) {
         setState(() {
           _data = _fetchData();
         });

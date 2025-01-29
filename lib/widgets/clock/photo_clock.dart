@@ -7,7 +7,7 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smartclock/config/config.dart';
-import 'package:smartclock/util/data_utils.dart';
+import 'package:smartclock/widgets/clock/util/get_ordinal.dart';
 import 'package:smartclock/util/event_utils.dart';
 import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/clock/util/get_images_from_immich.dart';
@@ -89,18 +89,12 @@ class _PhotoClockState extends State<PhotoClock> {
       }
 
       if (event.event == ClockEvents.refetch) {
-        if (event.time.second % 30 == 0) {
+        if (++thirtyCount >= config.photos.interval) {
+          logger.i("[Clock] Cycling image");
           setState(() {
-            thirtyCount++;
+            thirtyCount = 0;
+            photoIndex++;
           });
-
-          if (thirtyCount >= config.photos.interval) {
-            logger.i("[Clock] Cycling image");
-            setState(() {
-              thirtyCount = 0;
-              photoIndex++;
-            });
-          }
         }
 
         // Refetch images every 6 hours

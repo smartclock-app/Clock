@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:smartclock/config/config.dart' show ConfigModel;
-import 'package:smartclock/util/logger_output.dart';
+import 'package:smartclock/util/logger_util.dart';
 
 class LogViewer extends StatefulWidget {
   const LogViewer({super.key});
