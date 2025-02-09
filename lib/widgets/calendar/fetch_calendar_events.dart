@@ -158,70 +158,88 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
 
   // Get watchlist
   (String, String)? newTraktTokens;
-  if (config.watchlist.enabled) {
-    if (config.watchlist.trakt.accessToken.isEmpty ||
-        config.watchlist.trakt.refreshToken.isEmpty ||
-        config.watchlist.trakt.clientId.isEmpty ||
-        config.watchlist.trakt.clientSecret.isEmpty ||
-        config.watchlist.trakt.redirectUri.isEmpty ||
-        config.watchlist.tmdbApiKey.isEmpty) {
-      throw Exception("[Watchlist] Trakt & TMDb API credentials must be set in the config file.");
-    }
-
-    final trakt = TraktManager(
-      clientId: config.watchlist.trakt.clientId,
-      clientSecret: config.watchlist.trakt.clientSecret,
-      redirectURI: config.watchlist.trakt.redirectUri,
-      accessToken: config.watchlist.trakt.accessToken,
-      refreshToken: config.watchlist.trakt.refreshToken,
-    );
-
-    final currentWatchlist = database.select("SELECT * FROM watchlist");
-    final (watchlistChanged, itemIds, tokens) = await trakt.getClockList(config: config, watchlist: currentWatchlist);
-    if (watchlistChanged || updateWl) await updateWatchlist(config: config, items: itemIds, database: database);
-    if (tokens != null) newTraktTokens = (tokens.accessToken, tokens.refreshToken);
-
-    int count = 0;
-    final watchlist = database.select("SELECT * FROM watchlist WHERE nextAirDate IS NOT NULL ORDER BY nextAirDate");
-    Map<DateTime, List<String>> watchlistEvents = {};
-    for (final item in watchlist) {
-      if ((item["nextAirDate"] as String?) == null) continue;
-
-      final DateTime start = DateTime.parse(item["nextAirDate"] as String);
-      if (start.isBefore(DateUtils.dateOnly(DateTime.now()))) continue;
-
-      if (!watchlistEvents.containsKey(start)) {
-        if (++count > config.watchlist.maxItems) break;
-        watchlistEvents[start] = [];
+  Object? watchlistError;
+  try {
+    if (config.watchlist.enabled) {
+      if (config.watchlist.trakt.accessToken.isEmpty ||
+          config.watchlist.trakt.refreshToken.isEmpty ||
+          config.watchlist.trakt.clientId.isEmpty ||
+          config.watchlist.trakt.clientSecret.isEmpty ||
+          config.watchlist.trakt.redirectUri.isEmpty ||
+          config.watchlist.tmdbApiKey.isEmpty) {
+        throw Exception("[Watchlist] Trakt & TMDb API credentials must be set in the config file.");
       }
-      watchlistEvents[start]!.add(item["name"] as String);
-    }
 
-    for (final item in watchlistEvents.entries) {
-      final DateTime start = item.key;
-      final DateTime end = start.add(const Duration(days: 1));
-
-      item.value.sort();
-
-      final event = CalendarEventModel(
-        id: UniqueKey().toString(),
-        title: config.watchlist.prefix.isNotEmpty ? "${config.watchlist.prefix}\n${item.value.join("\n")}" : item.value.join("\n"),
-        start: start,
-        end: end,
-        color: config.watchlist.color.toHex(),
+      final trakt = TraktManager(
+        clientId: config.watchlist.trakt.clientId,
+        clientSecret: config.watchlist.trakt.clientSecret,
+        redirectURI: config.watchlist.trakt.redirectUri,
+        accessToken: config.watchlist.trakt.accessToken,
+        refreshToken: config.watchlist.trakt.refreshToken,
       );
-      allEvents.add(event);
+
+      final currentWatchlist = database.select("SELECT * FROM watchlist");
+      final (watchlistChanged, itemIds, tokens) = await trakt.getClockList(config: config, watchlist: currentWatchlist);
+      if (watchlistChanged || updateWl) await updateWatchlist(config: config, items: itemIds, database: database);
+      if (tokens != null) newTraktTokens = (tokens.accessToken, tokens.refreshToken);
+
+      int count = 0;
+      final watchlist = database.select("SELECT * FROM watchlist WHERE nextAirDate IS NOT NULL ORDER BY nextAirDate");
+      Map<DateTime, List<String>> watchlistEvents = {};
+      for (final item in watchlist) {
+        if ((item["nextAirDate"] as String?) == null) continue;
+
+        final DateTime start = DateTime.parse(item["nextAirDate"] as String);
+        if (start.isBefore(DateUtils.dateOnly(DateTime.now()))) continue;
+
+        if (!watchlistEvents.containsKey(start)) {
+          if (++count > config.watchlist.maxItems) break;
+          watchlistEvents[start] = [];
+        }
+        watchlistEvents[start]!.add(item["name"] as String);
+      }
+
+      for (final item in watchlistEvents.entries) {
+        final DateTime start = item.key;
+        final DateTime end = start.add(const Duration(days: 1));
+
+        item.value.sort();
+
+        final event = CalendarEventModel(
+          id: UniqueKey().toString(),
+          title: config.watchlist.prefix.isNotEmpty ? "${config.watchlist.prefix}\n${item.value.join("\n")}" : item.value.join("\n"),
+          start: start,
+          end: end,
+          color: config.watchlist.color.toHex(),
+        );
+        allEvents.add(event);
+      }
     }
+  } catch (e) {
+    watchlistError = e;
+    logger.e("[Watchlist] Error fetching watchlist: $e");
   }
 
   // Sort events by start date
   allEvents.sort((a, b) => a.start.compareTo(b.start));
 
   // Sort events by month
-  final Map<String, List<CalendarEventModel>> sortedEvents = {};
   final currentTime = DateTime.now();
   final currentWeek = weekNumber(currentTime);
   final weekReference = DateTime(2024, 1, 1); // Must be a Monday for isEven calculation below
+  final Map<String, List<CalendarEventModel>> sortedEvents = {
+    if (watchlistError != null)
+      "Watchlist": [
+        CalendarEventModel(
+          id: UniqueKey().toString(),
+          title: "Error fetching watchlist",
+          start: currentTime,
+          end: currentTime,
+          color: Colors.red.toHex(),
+        ),
+      ],
+  };
+
   for (final event in allEvents.take(config.calendar.maxEvents)) {
     final eventMonth = months[event.start.month - 1];
     final eventYear = event.start.year;

@@ -11,7 +11,7 @@ import 'package:smartclock/widgets/sidebar/error_info_widget.dart';
 import 'package:smartclock/widgets/sidebar/sidebar_card.dart';
 import 'package:smartclock/widgets/calendar/calendar_event.dart';
 import 'package:smartclock/widgets/calendar/calendar_event_model.dart';
-import 'package:smartclock/widgets/calendar/util/fetch_events.dart';
+import 'package:smartclock/widgets/calendar/fetch_calendar_events.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel, Config;
 
 class Calendar extends StatefulWidget {
