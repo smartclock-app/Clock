@@ -1,3 +1,4 @@
+// homeassistant.dart
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -120,7 +121,7 @@ class _HomeAssistantState extends State<HomeAssistant> {
 
           if (camera.streamUri != null) {
             final streamUri = Uri.parse(camera.streamUri!);
-            cameras.add((streamUri, camera));
+            setState(() => cameras.add((streamUri, camera)));
             _cameraOverlayController.show();
           } else {
             _messageIds[messageId] = camera; // Store camera with message id for use with result
@@ -149,6 +150,10 @@ class _HomeAssistantState extends State<HomeAssistant> {
           _messageIds.remove(id); // Clear message id after use
         }
         break;
+
+      default:
+        logger.w("[Home Assistant] Unhandled message type: ${data['type']}");
+        break;
     }
   }
 
@@ -174,6 +179,7 @@ class _HomeAssistantState extends State<HomeAssistant> {
 
   @override
   void dispose() {
+    _cameraOverlayController.hide();
     _webSocketSubscription?.cancel();
     super.dispose();
   }
@@ -190,7 +196,13 @@ class _HomeAssistantState extends State<HomeAssistant> {
         return Row(
           children: [
             for (final camera in cameras) ...[
-              Expanded(child: HomeAssistantCamera(streamUri: camera.$1, aspectRatio: camera.$2.aspectRatio)),
+              Expanded(
+                child: HomeAssistantCamera(
+                  key: ValueKey(camera.$2.id),
+                  streamUri: camera.$1,
+                  aspectRatio: camera.$2.aspectRatio,
+                ),
+              ),
             ]
           ],
         );

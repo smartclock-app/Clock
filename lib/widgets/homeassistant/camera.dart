@@ -1,3 +1,4 @@
+// camera.dart
 import 'package:flutter/material.dart';
 
 import 'package:media_kit/media_kit.dart';
@@ -22,6 +23,12 @@ class _HomeAssistantCameraState extends State<HomeAssistantCamera> {
     super.initState();
     player.open(Media(widget.streamUri.toString()));
     player.setVolume(0);
+  }
+
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
   }
 
   @override
