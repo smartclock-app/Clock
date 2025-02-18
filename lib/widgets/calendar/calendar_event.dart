@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -64,31 +62,43 @@ class CalendarEvent extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.only(top: config.clock.padding),
-      padding: const EdgeInsets.only(left: 8),
-      decoration: BoxDecoration(
-        borderRadius: Platform.isLinux ? BorderRadius.zero : BorderRadius.circular(config.calendar.eventColorWidth),
-        border: Border(
-          left: BorderSide(color: event.color.toColor(), width: config.calendar.eventColorWidth),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
         children: [
-          Text(
-            event.title,
-            style: TextStyle(
-              fontSize: config.sidebar.headingSize,
-              fontWeight: FontWeight.bold,
-              overflow: TextOverflow.ellipsis,
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: config.calendar.eventColorWidth,
+              decoration: BoxDecoration(
+                color: event.color.toColor(),
+                borderRadius: BorderRadius.circular(config.calendar.eventColorWidth / 2),
+              ),
             ),
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(dateString, style: TextStyle(fontSize: config.sidebar.subheadingSize), textAlign: TextAlign.left),
+          Padding(
+            padding: EdgeInsets.only(left: config.calendar.eventColorWidth + 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  event.title,
+                  style: TextStyle(
+                    fontSize: config.sidebar.headingSize,
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(dateString, style: TextStyle(fontSize: config.sidebar.subheadingSize), textAlign: TextAlign.left),
+                  ),
+                )
+              ],
             ),
-          )
+          ),
         ],
       ),
     );
