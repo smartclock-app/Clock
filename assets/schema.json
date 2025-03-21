@@ -448,11 +448,11 @@
           "type": "string",
           "description": "The TMDb API key"
         },
-        "region": {
+        "timezone": {
           "type": "string",
-          "description": "The TMDb release date region",
-          "format": "region",
-          "examples": ["GB", "US"]
+          "description": "The watchlist timezone",
+          "pattern": "^$|^[A-Za-z0-9/_-]+$",
+          "examples": ["Europe/London", "America/New_York"]
         },
         "prefix": {
           "type": "string",

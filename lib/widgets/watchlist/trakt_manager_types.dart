@@ -65,13 +65,67 @@ class ListItem {
 }
 
 class ListItemType {
-  final ({int tmdb}) ids;
+  final ({
+    int tmdb,
+    String slug,
+  }) ids;
 
   ListItemType({
     required this.ids,
   });
 
   factory ListItemType.fromJson(Map<String, dynamic> json) {
-    return ListItemType(ids: (tmdb: json["ids"]["tmdb"]));
+    return ListItemType(ids: (
+      tmdb: json["ids"]["tmdb"],
+      slug: json["ids"]["slug"],
+    ));
+  }
+}
+
+class ShowAirs {
+  final String day;
+  final String time;
+  final String timezone;
+
+  ShowAirs({
+    required this.day,
+    required this.time,
+    required this.timezone,
+  });
+
+  factory ShowAirs.fromJson(Map<String, dynamic> json) {
+    return ShowAirs(
+      day: json["day"],
+      time: json["time"],
+      timezone: json["timezone"],
+    );
+  }
+}
+
+class ShowSummary {
+  final ShowAirs airs;
+
+  ShowSummary({
+    required this.airs,
+  });
+
+  factory ShowSummary.fromJson(Map<String, dynamic> json) {
+    return ShowSummary(
+      airs: ShowAirs.fromJson(json["airs"]),
+    );
+  }
+}
+
+class MovieSummary {
+  final String released;
+
+  MovieSummary({
+    required this.released,
+  });
+
+  factory MovieSummary.fromJson(Map<String, dynamic> json) {
+    return MovieSummary(
+      released: json["released"],
+    );
   }
 }

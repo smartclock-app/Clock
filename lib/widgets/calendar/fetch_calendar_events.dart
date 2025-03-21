@@ -180,7 +180,7 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
 
       final currentWatchlist = database.select("SELECT * FROM watchlist");
       final (watchlistChanged, itemIds, tokens) = await trakt.getClockList(config: config, watchlist: currentWatchlist);
-      if (watchlistChanged || updateWl) await updateWatchlist(config: config, items: itemIds, database: database);
+      if (watchlistChanged || updateWl) await updateWatchlist(config: config, trakt: trakt, items: itemIds, database: database);
       if (tokens != null) newTraktTokens = (tokens.accessToken, tokens.refreshToken);
 
       int count = 0;
@@ -189,8 +189,15 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
       for (final item in watchlist) {
         if ((item["nextAirDate"] as String?) == null) continue;
 
-        final DateTime start = DateTime.parse(item["nextAirDate"] as String);
-        if (start.isBefore(DateUtils.dateOnly(DateTime.now()))) continue;
+        final DateTime nextAirDate = DateTime.parse(item["nextAirDate"] as String);
+        if (nextAirDate.isBefore(DateUtils.dateOnly(DateTime.now()))) continue;
+
+        late final DateTime start;
+        if (nextAirDate.isBefore(DateTime.now().add(Duration(days: 1)))) {
+          start = nextAirDate;
+        } else {
+          start = DateUtils.dateOnly(nextAirDate);
+        }
 
         if (!watchlistEvents.containsKey(start)) {
           if (++count > config.watchlist.maxItems) break;
@@ -201,7 +208,13 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
 
       for (final item in watchlistEvents.entries) {
         final DateTime start = item.key;
-        final DateTime end = start.add(const Duration(days: 1));
+        late final DateTime end;
+
+        if (item.key.isBefore(DateTime.now().add(Duration(days: 1)))) {
+          end = start;
+        } else {
+          end = start.add(Duration(days: 1));
+        }
 
         item.value.sort();
 
@@ -215,9 +228,10 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
         allEvents.add(event);
       }
     }
-  } catch (e) {
+  } catch (e, stack) {
     watchlistError = e;
     logger.e("[Watchlist] Error fetching watchlist: $e");
+    logger.e(stack);
   }
 
   // Sort events by start date

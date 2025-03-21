@@ -77,9 +77,9 @@ class TraktManager {
 
     final itemIds = items.where((e) => itemTypes.contains(e.type)).map((e) {
       if (e.type == "show" || e.type == "episode") {
-        return "tv-${e.show!.ids.tmdb}";
+        return "tv--${e.show?.ids.tmdb}--${e.show?.ids.slug}";
       } else {
-        return "movie-${e.movie!.ids.tmdb}";
+        return "movie--${e.movie?.ids.tmdb}--${e.movie?.ids.slug}";
       }
     }).toSet();
 
@@ -105,5 +105,37 @@ class TraktManager {
       return jsonResult.map((e) => ListItem.fromJson(e)).toList();
     }
     return [];
+  }
+
+  Future<ShowSummary> getShowSummary(String id) async {
+    final request = "shows/$id";
+    final headers = _headers;
+    headers["Authorization"] = "Bearer $accessToken";
+
+    final url = Uri.https(_baseURL, request, {"extended": "full"});
+    final response = await client.get(url, headers: _headers);
+
+    if (![200, 201, 204].contains(response.statusCode)) {
+      throw TraktManagerAPIError(response.statusCode, response.reasonPhrase, response);
+    }
+
+    final jsonResult = jsonDecode(response.body);
+    return ShowSummary.fromJson(jsonResult);
+  }
+
+  Future<MovieSummary> getMovieSummary(String id) async {
+    final request = "movies/$id";
+    final headers = _headers;
+    headers["Authorization"] = "Bearer $accessToken";
+
+    final url = Uri.https(_baseURL, request, {"extended": "full"});
+    final response = await client.get(url, headers: _headers);
+
+    if (![200, 201, 204].contains(response.statusCode)) {
+      throw TraktManagerAPIError(response.statusCode, response.reasonPhrase, response);
+    }
+
+    final jsonResult = jsonDecode(response.body);
+    return MovieSummary.fromJson(jsonResult);
   }
 }

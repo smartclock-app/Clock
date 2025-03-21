@@ -4,7 +4,7 @@ class Watchlist {
   final bool enabled;
   final Trakt trakt;
   final String tmdbApiKey;
-  final String region;
+  final String timezone;
   final String prefix;
   final Color color;
   final int maxItems;
@@ -13,7 +13,7 @@ class Watchlist {
     required this.enabled,
     required this.trakt,
     required this.tmdbApiKey,
-    required this.region,
+    required this.timezone,
     required this.prefix,
     required this.color,
     required this.maxItems,
@@ -23,7 +23,7 @@ class Watchlist {
         enabled: false,
         trakt: Trakt.asDefault(),
         tmdbApiKey: "",
-        region: "GB",
+        timezone: "Europe/London",
         prefix: "Watchlist: ",
         color: "#f5511d".toColor(),
         maxItems: 4,
@@ -33,7 +33,7 @@ class Watchlist {
         enabled: json["enabled"],
         trakt: Trakt.fromJson(json["trakt"]),
         tmdbApiKey: json["tmdbApiKey"],
-        region: json["region"],
+        timezone: json["timezone"],
         prefix: json["prefix"],
         color: (json["color"] as String).toColor(),
         maxItems: json["maxItems"],
@@ -43,7 +43,7 @@ class Watchlist {
         "enabled": enabled,
         "trakt": trakt.toJson(),
         "tmdbApiKey": tmdbApiKey,
-        "region": region,
+        "timezone": timezone,
         "prefix": prefix,
         "color": color.toHex(),
         "maxItems": maxItems,
