@@ -15,13 +15,15 @@ class CalendarEvent extends StatelessWidget {
   DateTime get _start => event.start;
   DateTime get _end => event.end;
 
+  DateTime dateOnlyUtc(DateTime date) => DateTime.utc(date.year, date.month, date.day);
+
   /// Check if the event is an all-day event
   ///
   /// If [oneDay] is true (default), it will only return true if the event is exactly one day long
   ///
   /// If [oneDay] is false, it will return true if the event starts and ends at midnight
   bool isAllDay({bool oneDay = true}) {
-    final bool isOneDay = _end.difference(_start).inDays == 1;
+    final bool isOneDay = dateOnlyUtc(_end).difference(dateOnlyUtc(_start)).inDays == 1;
     final bool startsMidnight = _start.hour == 0 && _start.minute == 0;
     final bool endsMidnight = _end.hour == 0 && _end.minute == 0;
 
@@ -30,7 +32,7 @@ class CalendarEvent extends StatelessWidget {
 
   String formatDate(DateTime date, String format) {
     final DateTime now = DateTime.now();
-    final Duration difference = date.difference(DateTime(now.year, now.month, now.day));
+    final Duration difference = date.difference(dateOnlyUtc(now));
 
     if (difference.inDays < 1 && difference.inDays >= 0) return 'Today';
     if (difference.inDays < 2 && difference.inDays >= 1) return 'Tomorrow';
