@@ -16,6 +16,7 @@ class CalendarEvent extends StatelessWidget {
   DateTime get _end => event.end;
 
   DateTime dateOnlyUtc(DateTime date) => DateTime.utc(date.year, date.month, date.day);
+  DateTime dateTimeUtc(DateTime date) => DateTime.utc(date.year, date.month, date.day, date.hour, date.minute);
 
   /// Check if the event is an all-day event
   ///
@@ -31,8 +32,7 @@ class CalendarEvent extends StatelessWidget {
   }
 
   String formatDate(DateTime date, String format) {
-    final DateTime now = DateTime.now();
-    final Duration difference = date.difference(dateOnlyUtc(now));
+    final Duration difference = dateTimeUtc(date).difference(dateOnlyUtc(DateTime.now()));
 
     if (difference.inDays < 1 && difference.inDays >= 0) return 'Today';
     if (difference.inDays < 2 && difference.inDays >= 1) return 'Tomorrow';

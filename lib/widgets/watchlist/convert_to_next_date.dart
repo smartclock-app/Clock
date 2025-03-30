@@ -28,9 +28,7 @@ DateTime convertToNextDate(ShowAirs showAirs, String targetTimezone) {
 
   // Calculate days to add to reach the next occurrence of target day
   int daysToAdd = targetDayNum - currentDayNum;
-  if (daysToAdd <= 0 || (daysToAdd == 0 && (now.hour > hour || (now.hour == hour && now.minute >= minute)))) {
-    daysToAdd += 7; // Move to next week if today's target time has passed or day is in the past
-  }
+  if (daysToAdd < 0) daysToAdd += 7; // Move to next week if day is in the past
 
   // Create the next target date in source timezone
   final nextTargetDateSource = tz.TZDateTime(sourceLocation, now.year, now.month, now.day + daysToAdd, hour, minute);
@@ -51,19 +49,3 @@ DateTime convertToNextDate(ShowAirs showAirs, String targetTimezone) {
     nextTargetDateTarget.microsecond,
   );
 }
-
-// // Example usage
-// void main() {
-//   Map<String, String> schedule = {
-//     "day": "Friday",
-//     "time": "03:00",
-//     "timezone": "America/New_York"
-//   };
-  
-//   DateTime nextDate = convertToNextDate(schedule, "Europe/London");
-//   print("Next occurrence in London: $nextDate");
-  
-//   // You can now use it with any timezone
-//   DateTime nextDateTokyo = convertToNextDate(schedule, "Asia/Tokyo");
-//   print("Next occurrence in Tokyo: $nextDateTokyo");
-// }

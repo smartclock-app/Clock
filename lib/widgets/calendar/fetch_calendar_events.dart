@@ -190,7 +190,7 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
         if ((item["nextAirDate"] as String?) == null) continue;
 
         final DateTime nextAirDate = DateTime.parse(item["nextAirDate"] as String);
-        if (nextAirDate.isBefore(DateUtils.dateOnly(DateTime.now()))) continue;
+        if (DateUtils.dateOnly(nextAirDate).isBefore(DateUtils.dateOnly(DateTime.now()))) continue;
 
         late final DateTime start;
         if (nextAirDate.isBefore(DateTime.now().add(Duration(days: 1)))) {
