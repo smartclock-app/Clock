@@ -468,7 +468,7 @@
           "description": "The maximum number of watchlist items to display"
         }
       },
-      "required": ["enabled", "trakt", "tmdbApiKey", "region", "prefix", "color", "maxItems"]
+      "required": ["enabled", "trakt", "tmdbApiKey", "timezone", "prefix", "color", "maxItems"]
     },
     "weather": {
       "type": "object",

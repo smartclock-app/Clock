@@ -30,10 +30,11 @@ Future<void> updateWatchlist({required Config config, required TraktManager trak
           "nextAirDate": summary.released,
         };
       } else {
-        // Set the date to the next episode air date, ensuring the time is 00:00:00Z
+        // Check if there is a next episode to air within the next week
         final date = details.data["next_episode_to_air"]?["air_date"];
-        if (date == null || DateTime.parse(date).isAfter(DateTime.now().add(Duration(days: 7)))) continue;
+        if (date == null || DateTime.parse(date).isAfter(DateTime.now().add(Duration(days: 6)))) continue;
 
+        // Fetch the show summary to get the exact next air date and time
         final summary = await trakt.getShowSummary(slug);
         final airDate = convertToNextDate(summary.airs, config.watchlist.timezone);
 
@@ -47,9 +48,9 @@ Future<void> updateWatchlist({required Config config, required TraktManager trak
 
       insert.execute([data["id"], data["name"], data["status"], data["nextAirDate"]]);
     } on DioException catch (e) {
-      logger.t("Failed to fetch '${e.response?.realUri}': ${e.response?.statusCode} ${e.type}");
+      logger.t("[Watchlist] Failed to fetch '${e.response?.realUri}': ${e.response?.statusCode} ${e.type}");
     } on SqliteException catch (e) {
-      logger.e("Failed to insert watchlist item: $e");
+      logger.e("[Watchlist] Failed to insert item: $e");
     }
   }
 
