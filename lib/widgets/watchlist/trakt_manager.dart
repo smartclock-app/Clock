@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:smartclock/config/config.dart';
+import 'package:smartclock/util/logger_util.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 part 'trakt_manager_types.dart';
 
@@ -77,9 +79,9 @@ class TraktManager {
 
     final itemIds = items.where((e) => itemTypes.contains(e.type)).map((e) {
       if (e.type == "show" || e.type == "episode") {
-        return "tv--${e.show?.ids.tmdb}--${e.show?.ids.slug}";
+        return "tv--${e.show?.ids.slug}";
       } else {
-        return "movie--${e.movie?.ids.tmdb}--${e.movie?.ids.slug}";
+        return "movie--${e.movie?.ids.slug}";
       }
     }).toSet();
 
@@ -107,8 +109,8 @@ class TraktManager {
     return [];
   }
 
-  Future<ShowSummary> getShowSummary(String id) async {
-    final request = "shows/$id";
+  Future<ShowSummary> getShowSummary(String slug) async {
+    final request = "shows/$slug";
     final headers = _headers;
     headers["Authorization"] = "Bearer $accessToken";
 
@@ -123,8 +125,28 @@ class TraktManager {
     return ShowSummary.fromJson(jsonResult);
   }
 
-  Future<MovieSummary> getMovieSummary(String id) async {
-    final request = "movies/$id";
+  Future<String?> getShowNextEpisode(String slug) async {
+    final request = "shows/$slug/next_episode";
+    final headers = _headers;
+    headers["Authorization"] = "Bearer $accessToken";
+
+    final url = Uri.https(_baseURL, request, {"extended": "full"});
+    final response = await client.get(url, headers: _headers);
+
+    if (response.statusCode == 204) {
+      return null;
+    }
+
+    if (![200, 201].contains(response.statusCode)) {
+      throw TraktManagerAPIError(response.statusCode, response.reasonPhrase, response);
+    }
+
+    final jsonResult = jsonDecode(response.body);
+    return jsonResult["first_aired"];
+  }
+
+  Future<MovieSummary> getMovieSummary(String slug) async {
+    final request = "movies/$slug";
     final headers = _headers;
     headers["Authorization"] = "Bearer $accessToken";
 
@@ -137,5 +159,49 @@ class TraktManager {
 
     final jsonResult = jsonDecode(response.body);
     return MovieSummary.fromJson(jsonResult);
+  }
+
+  Future<void> updateWatchlist({required Config config, required Set<String> items, required Database database}) async {
+    final logger = LoggerUtil.logger;
+    logger.t("[Watchlist] Refetching list item details");
+
+    database.execute("DELETE FROM watchlist");
+    final insert = database.prepare("INSERT INTO watchlist (id, name, status, nextAirDate) VALUES (?, ?, ?, ?)");
+
+    for (final item in items) {
+      final [type, slug] = item.split("--");
+
+      late final Map<String, dynamic> data;
+      try {
+        if (type == 'movie') {
+          final summary = await getMovieSummary(slug);
+
+          data = {
+            "id": item,
+            "name": summary.title,
+            "status": summary.status,
+            "nextAirDate": summary.released,
+          };
+        } else {
+          final nextEpisode = await getShowNextEpisode(slug);
+          if (nextEpisode == null) continue;
+
+          final summary = await getShowSummary(slug);
+
+          data = {
+            "id": item,
+            "name": summary.title,
+            "status": summary.status,
+            "nextAirDate": nextEpisode,
+          };
+        }
+
+        insert.execute([data["id"], data["name"], data["status"], data["nextAirDate"]]);
+      } on SqliteException catch (e) {
+        logger.e("[Watchlist] Failed to insert item: $e");
+      }
+    }
+
+    insert.dispose();
   }
 }

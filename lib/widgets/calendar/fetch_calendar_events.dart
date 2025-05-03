@@ -5,13 +5,12 @@ import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:googleapis_auth/googleapis_auth.dart' as auth;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:smartclock/util/color_from_hex.dart';
-import 'package:smartclock/util/logger_util.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 import 'package:smartclock/widgets/calendar/calendar_event_model.dart';
-import 'package:smartclock/widgets/watchlist/update_watchlist.dart';
 import 'package:smartclock/widgets/watchlist/trakt_manager.dart';
+import 'package:smartclock/util/color_from_hex.dart';
+import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/config/config.dart' show Config;
 
 /// Calculates number of weeks for a given year as per https://en.wikipedia.org/wiki/ISO_week_date#Weeks_per_year
@@ -165,8 +164,7 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
           config.watchlist.trakt.refreshToken.isEmpty ||
           config.watchlist.trakt.clientId.isEmpty ||
           config.watchlist.trakt.clientSecret.isEmpty ||
-          config.watchlist.trakt.redirectUri.isEmpty ||
-          config.watchlist.tmdbApiKey.isEmpty) {
+          config.watchlist.trakt.redirectUri.isEmpty) {
         throw Exception("[Watchlist] Trakt & TMDb API credentials must be set in the config file.");
       }
 
@@ -180,7 +178,7 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
 
       final currentWatchlist = database.select("SELECT * FROM watchlist");
       final (watchlistChanged, itemIds, tokens) = await trakt.getClockList(config: config, watchlist: currentWatchlist);
-      if (watchlistChanged || updateWl) await updateWatchlist(config: config, trakt: trakt, items: itemIds, database: database);
+      if (watchlistChanged || updateWl) await trakt.updateWatchlist(config: config, items: itemIds, database: database);
       if (tokens != null) newTraktTokens = (tokens.accessToken, tokens.refreshToken);
 
       int count = 0;

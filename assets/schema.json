@@ -444,16 +444,6 @@
           },
           "required": ["clientId", "clientSecret", "accessToken", "refreshToken", "redirectUri", "listId"]
         },
-        "tmdbApiKey": {
-          "type": "string",
-          "description": "The TMDb API key"
-        },
-        "timezone": {
-          "type": "string",
-          "description": "The watchlist timezone",
-          "pattern": "^$|^[A-Za-z0-9/_-]+$",
-          "examples": ["Europe/London", "America/New_York"]
-        },
         "prefix": {
           "type": "string",
           "description": "The prefix for watchlist items on the calendar"
@@ -468,7 +458,7 @@
           "description": "The maximum number of watchlist items to display"
         }
       },
-      "required": ["enabled", "trakt", "tmdbApiKey", "timezone", "prefix", "color", "maxItems"]
+      "required": ["enabled", "trakt", "prefix", "color", "maxItems"]
     },
     "weather": {
       "type": "object",

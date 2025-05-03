@@ -55,11 +55,11 @@ class CalendarEvent extends StatelessWidget {
       dateString = "$startDay — ${formatDate(_end.subtract(const Duration(days: 1)), format)}";
     } else if (!DateUtils.isSameDay(_start, _end)) {
       final format = "EEEE d'${getOrdinal(_end.day)}'${!isSameMonth ? " MMM" : ""}";
-      dateString = "$startDay (${DateFormat("HH:mm").format(_start)}) - ${formatDate(_end, format)} (${DateFormat("HH:mm").format(_end)})";
+      dateString = "$startDay (${DateFormat("HH:mm").format(_start.toLocal())}) - ${formatDate(_end, format)} (${DateFormat("HH:mm").format(_end.toLocal())})";
     } else if (_start.isAtSameMomentAs(_end)) {
-      dateString = "$startDay (${DateFormat("HH:mm").format(_start)})";
+      dateString = "$startDay (${DateFormat("HH:mm").format(_start.toLocal())})";
     } else {
-      dateString = "$startDay (${DateFormat("HH:mm").format(_start)} - ${DateFormat("HH:mm").format(_end)})";
+      dateString = "$startDay (${DateFormat("HH:mm").format(_start.toLocal())} - ${DateFormat("HH:mm").format(_end.toLocal())})";
     }
 
     return Container(

@@ -82,50 +82,39 @@ class ListItemType {
   }
 }
 
-class ShowAirs {
-  final String day;
-  final String time;
-  final String timezone;
-
-  ShowAirs({
-    required this.day,
-    required this.time,
-    required this.timezone,
-  });
-
-  factory ShowAirs.fromJson(Map<String, dynamic> json) {
-    return ShowAirs(
-      day: json["day"],
-      time: json["time"],
-      timezone: json["timezone"],
-    );
-  }
-}
-
 class ShowSummary {
-  final ShowAirs airs;
+  final String title;
+  final String status;
 
   ShowSummary({
-    required this.airs,
+    required this.title,
+    required this.status,
   });
 
   factory ShowSummary.fromJson(Map<String, dynamic> json) {
     return ShowSummary(
-      airs: ShowAirs.fromJson(json["airs"]),
+      title: json["title"],
+      status: json["status"],
     );
   }
 }
 
 class MovieSummary {
+  final String title;
   final String released;
+  final String status;
 
   MovieSummary({
+    required this.title,
     required this.released,
+    required this.status,
   });
 
   factory MovieSummary.fromJson(Map<String, dynamic> json) {
     return MovieSummary(
+      title: json["title"],
       released: json["released"],
+      status: json["status"],
     );
   }
 }
