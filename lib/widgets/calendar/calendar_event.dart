@@ -24,7 +24,7 @@ class CalendarEvent extends StatelessWidget {
   ///
   /// If [oneDay] is false, it will return true if the event starts and ends at midnight
   bool isAllDay({bool oneDay = true}) {
-    final bool isOneDay = dateOnlyUtc(_end).difference(dateOnlyUtc(_start)).inDays == 1;
+    final bool isOneDay = dateOnlyUtc(_end).difference(dateOnlyUtc(_start)).inDays == 1 || dateTimeUtc(_start) == dateTimeUtc(_end);
     final bool startsMidnight = _start.hour == 0 && _start.minute == 0;
     final bool endsMidnight = _end.hour == 0 && _end.minute == 0;
 
