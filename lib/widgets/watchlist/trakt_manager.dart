@@ -73,6 +73,13 @@ class TraktManager {
       items = await getListItems(listId);
     }
 
+    if (config.watchlist.trakt.includeWatchlist) {
+      final watchlistItems = await getWatchlistItems();
+      if (watchlistItems.isNotEmpty) {
+        items.addAll(watchlistItems);
+      }
+    }
+
     final watchlistIds = watchlist.map((e) => e["id"]).toSet();
 
     final itemTypes = <String>{"show", "movie", if (config.watchlist.trakt.includeEpisodesAsShow) "episode"};
@@ -161,6 +168,26 @@ class TraktManager {
     return MovieSummary.fromJson(jsonResult);
   }
 
+  Future<List<ListItem>> getWatchlistItems() async {
+    final request = "sync/watchlist/all/released/desc";
+    final headers = _headers;
+    headers["Authorization"] = "Bearer $accessToken";
+
+    final url = Uri.https(_baseURL, request);
+    final response = await client.get(url, headers: headers);
+
+    if (![200, 201, 204].contains(response.statusCode)) {
+      throw TraktManagerAPIError(response.statusCode, response.reasonPhrase, response);
+    }
+
+    final jsonResult = jsonDecode(response.body);
+    if (jsonResult is Iterable) {
+      return jsonResult.map((e) => ListItem.fromJson(e)).toList();
+    }
+
+    return [];
+  }
+
   Future<void> updateWatchlist({required Config config, required Set<String> items, required Database database}) async {
     final logger = LoggerUtil.logger;
     logger.t("[Watchlist] Refetching list item details");
@@ -184,8 +211,6 @@ class TraktManager {
           };
         } else {
           final nextEpisode = await getShowNextEpisode(slug);
-          if (nextEpisode == null) continue;
-
           final summary = await getShowSummary(slug);
 
           data = {

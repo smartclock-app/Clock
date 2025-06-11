@@ -7,6 +7,7 @@ class Trakt {
   String refreshToken;
   final String redirectUri;
   final String listId;
+  final bool includeWatchlist;
   final bool includeEpisodesAsShow;
 
   Trakt({
@@ -16,6 +17,7 @@ class Trakt {
     required this.refreshToken,
     required this.redirectUri,
     required this.listId,
+    required this.includeWatchlist,
     required this.includeEpisodesAsShow,
   });
 
@@ -26,6 +28,7 @@ class Trakt {
         refreshToken: "",
         redirectUri: "",
         listId: "",
+        includeWatchlist: false,
         includeEpisodesAsShow: false,
       );
 
@@ -36,6 +39,7 @@ class Trakt {
         refreshToken: json["refreshToken"],
         redirectUri: json["redirectUri"],
         listId: json["listId"],
+        includeWatchlist: json["includeWatchlist"],
         includeEpisodesAsShow: json["includeEpisodesAsShow"],
       );
 
@@ -46,6 +50,7 @@ class Trakt {
         "refreshToken": refreshToken,
         "redirectUri": redirectUri,
         "listId": listId,
+        "includeWatchlist": includeWatchlist,
         "includeEpisodesAsShow": includeEpisodesAsShow,
       };
 }

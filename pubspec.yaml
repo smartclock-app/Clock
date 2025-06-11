@@ -2,7 +2,7 @@ name: smartclock
 description: "SmartClock"
 publish_to: "none"
 repository: "https://www.github.com/smartclock-app/Clock"
-version: 1.0.21
+version: 1.1.0
 
 environment:
   sdk: ">=3.4.3 <4.0.0"
@@ -19,12 +19,12 @@ dependencies:
   googleapis_auth: ^1.6.0
   http: ^1.2.2
   dio: ^5.7.0
-  sqlite3: ^2.4.7
+  sqlite3: ^2.7.6
+  sqlite3_flutter_libs: ^0.5.34
   path: ^1.9.0
   logger: ^2.4.0
   connectivity_plus: ^6.1.0
   bonsoir: ^5.1.10
-  sqlite3_flutter_libs: ^0.5.26
   html: ^0.15.5
   web_socket_channel: ^3.0.1
   media_kit: ^1.1.11

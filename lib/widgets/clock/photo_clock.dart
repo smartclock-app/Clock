@@ -139,68 +139,74 @@ class _PhotoClockState extends State<PhotoClock> {
           decoration: BoxDecoration(
             color: config.sidebar.cardColor,
             borderRadius: BorderRadius.circular(config.sidebar.cardRadius),
-            image: image != null
-                ? DecorationImage(
-                    image: NetworkImage(image!),
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                  )
-                : null,
           ),
           clipBehavior: Clip.hardEdge,
-          child: Column(
+          child: Stack(
             children: [
-              const Expanded(flex: 1, child: SizedBox.expand()),
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color.fromARGB(255, 0, 0, 0), Color.fromARGB(100, 0, 0, 0), Colors.transparent],
-                    stops: [0, 0.9, 1],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
+              if (image != null)
+                Positioned.fill(
+                  child: Image.network(
+                    image!,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
+                    gaplessPlayback: true,
                   ),
                 ),
-                child: Column(
-                  textBaseline: TextBaseline.alphabetic,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: config.clock.dateGap),
-                    Row(
+              Column(
+                children: [
+                  const Expanded(flex: 1, child: SizedBox.expand()),
+                  Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color.fromARGB(255, 0, 0, 0), Color.fromARGB(100, 0, 0, 0), Colors.transparent],
+                        stops: [0, 0.9, 1],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
+                    ),
+                    child: Column(
+                      textBaseline: TextBaseline.alphabetic,
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        SizedBox(height: config.clock.dateGap),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${config.clock.twentyFourHour ? _24Hour : _hour}:$_minute",
+                              style: TextStyle(fontSize: config.clock.mainSize, height: 0.8, color: Colors.white),
+                              softWrap: false,
+                            ),
+                            if (config.clock.showSeconds) ...[
+                              // Ensure section is always the same width to prevent layout shifts
+                              SizedBox(
+                                width: _textSize(_period, smallStyle).width + config.clock.smallGap,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  verticalDirection: config.clock.twentyFourHour ? VerticalDirection.up : VerticalDirection.down,
+                                  children: [
+                                    Text(_second, style: smallStyle, softWrap: false),
+                                    SizedBox(height: config.clock.smallGap),
+                                    Text(!config.clock.twentyFourHour ? _period : "", style: smallStyle, softWrap: false),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        SizedBox(height: config.clock.dateGap),
                         Text(
-                          "${config.clock.twentyFourHour ? _24Hour : _hour}:$_minute",
-                          style: TextStyle(fontSize: config.clock.mainSize, height: 0.8, color: Colors.white),
+                          intl.DateFormat("EEEE d'${getOrdinal(widget.now.day)}' MMMM yyyy").format(widget.now),
+                          style: TextStyle(fontSize: config.clock.dateSize, height: 0.8, color: Colors.white),
+                          textAlign: TextAlign.center,
                           softWrap: false,
                         ),
-                        if (config.clock.showSeconds) ...[
-                          // Ensure section is always the same width to prevent layout shifts
-                          SizedBox(
-                            width: _textSize(_period, smallStyle).width + config.clock.smallGap,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              verticalDirection: config.clock.twentyFourHour ? VerticalDirection.up : VerticalDirection.down,
-                              children: [
-                                Text(_second, style: smallStyle, softWrap: false),
-                                SizedBox(height: config.clock.smallGap),
-                                Text(!config.clock.twentyFourHour ? _period : "", style: smallStyle, softWrap: false),
-                              ],
-                            ),
-                          ),
-                        ],
+                        SizedBox(height: config.clock.dateGap),
                       ],
                     ),
-                    SizedBox(height: config.clock.dateGap),
-                    Text(
-                      intl.DateFormat("EEEE d'${getOrdinal(widget.now.day)}' MMMM yyyy").format(widget.now),
-                      style: TextStyle(fontSize: config.clock.dateSize, height: 0.8, color: Colors.white),
-                      textAlign: TextAlign.center,
-                      softWrap: false,
-                    ),
-                    SizedBox(height: config.clock.dateGap),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
