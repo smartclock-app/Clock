@@ -7,7 +7,7 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-import 'package:smartclock/config/config.dart' show ConfigModel, WeatherType;
+import 'package:smartclock/config/config.dart' show Config, ConfigModel, WeatherType;
 import 'package:smartclock/routes/editor.dart';
 import 'package:smartclock/routes/logs.dart';
 import 'package:smartclock/util/auto_dimensions.dart';
@@ -25,17 +25,23 @@ class SmartClock extends StatefulWidget {
 }
 
 class _SmartClockState extends State<SmartClock> {
-  bool networkAvailable = false;
+  bool networkAvailable = true;
+  late final Config config;
   final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   final WebSocketManager _webSocketManager = WebSocketManager();
   Logger logger = LoggerUtil.logger;
 
   @override
   void initState() {
     super.initState();
-    initConnectivity();
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+
+    config = context.read<ConfigModel>().config;
+
+    if (config.checkNetwork) {
+      initConnectivity();
+      _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    }
 
     final configModel = context.read<ConfigModel>();
     if (configModel.config.remoteConfig.enabled) {
@@ -45,7 +51,7 @@ class _SmartClockState extends State<SmartClock> {
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
+    _connectivitySubscription?.cancel();
     super.dispose();
   }
 
@@ -76,8 +82,6 @@ class _SmartClockState extends State<SmartClock> {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.read<ConfigModel>().config;
-
     return MaterialApp(
       title: 'SmartClock',
       theme: ThemeData(scaffoldBackgroundColor: Colors.black, fontFamily: "Poppins"),
@@ -107,7 +111,7 @@ class _SmartClockState extends State<SmartClock> {
                       children: [
                         Clock(networkAvailable: networkAvailable),
                         if (config.sidebar.enabled) Sidebar(networkAvailable: networkAvailable),
-                        if (config.weather.enabled && config.weather.type == WeatherType.floating && config.networkEnabled && networkAvailable) const Weather(type: WeatherType.floating),
+                        if (config.weather.enabled && config.weather.type == WeatherType.floating && networkAvailable) const Weather(type: WeatherType.floating),
                       ],
                     );
                   },

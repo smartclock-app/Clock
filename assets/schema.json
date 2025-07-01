@@ -13,9 +13,9 @@
       "description": "The orientation of the display",
       "enum": ["landscape", "portrait"]
     },
-    "networkEnabled": {
+    "checkNetwork": {
       "type": "boolean",
-      "description": "Whether to enable network features"
+      "description": "Whether to check for network connectivity"
     },
     "remoteConfig": {
       "type": "object",

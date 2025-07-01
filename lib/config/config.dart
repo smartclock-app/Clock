@@ -81,7 +81,7 @@ class Config {
   File file;
   static String version = ""; // Version set in main.dart from PackageInfo
   final Orientation orientation;
-  final bool networkEnabled;
+  final bool checkNetwork;
   final bool updaterEnabled;
   final RemoteConfig remoteConfig;
   final Alexa alexa;
@@ -99,7 +99,7 @@ class Config {
   Config({
     required this.file,
     required this.orientation,
-    required this.networkEnabled,
+    required this.checkNetwork,
     required this.updaterEnabled,
     required this.remoteConfig,
     required this.alexa,
@@ -146,7 +146,7 @@ class Config {
   factory Config.asDefault(File? file) => Config(
         file: file ?? File(""),
         orientation: Orientation.landscape,
-        networkEnabled: true,
+        checkNetwork: true,
         updaterEnabled: true,
         remoteConfig: RemoteConfig.asDefault(),
         alexa: Alexa.asDefault(),
@@ -165,7 +165,7 @@ class Config {
   factory Config.fromJson(File file, Map<String, dynamic> json) => Config(
         file: file,
         orientation: json["orientation"] == "landscape" ? Orientation.landscape : Orientation.portrait,
-        networkEnabled: json["networkEnabled"],
+        checkNetwork: json["checkNetwork"],
         updaterEnabled: json["updaterEnabled"],
         remoteConfig: RemoteConfig.fromJson(json["remoteConfig"]),
         alexa: Alexa.fromJson(json["alexa"]),
@@ -185,7 +185,7 @@ class Config {
         "\$schema": "./schema.json",
         "version": version,
         "orientation": orientation == Orientation.landscape ? "landscape" : "portrait",
-        "networkEnabled": networkEnabled,
+        "checkNetwork": checkNetwork,
         "updaterEnabled": updaterEnabled,
         "remoteConfig": remoteConfig.toJson(),
         "alexa": alexa.toJson(),
