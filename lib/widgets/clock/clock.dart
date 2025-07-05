@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' as intl; // Must be named as conflicted TextDirection
@@ -91,6 +92,15 @@ class _ClockState extends State<Clock> {
                         Navigator.of(context).pushNamed("/editor");
                       },
                     ),
+                    if (!Platform.isIOS) // SystemNavigator.pop() does nothing on iOS
+                      ListTile(
+                        title: const Text("Close SmartClock"),
+                        onTap: () {
+                          Navigator.pop(context);
+                          logger.t("[Clock] Closing SmartClock...");
+                          SystemNavigator.pop();
+                        },
+                      ),
                   ],
                 ),
               );
