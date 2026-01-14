@@ -66,8 +66,14 @@ class _ClockState extends State<Clock> {
           showDialog(
             context: context,
             builder: (context) {
+              Timer(const Duration(seconds: 10), () {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              });
+
               return AlertDialog(
-                title: const Text("Debug"),
+                title: const Text("Settings"),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
