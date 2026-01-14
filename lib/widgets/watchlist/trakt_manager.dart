@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:smartclock/config/config.dart';
 import 'package:smartclock/util/logger_util.dart';
@@ -152,6 +153,61 @@ class TraktManager {
     return jsonResult["first_aired"];
   }
 
+  Future<String?> getTodayEpisode(String slug) async {
+    final request = "shows/$slug/last_episode";
+    final headers = _headers;
+    headers["Authorization"] = "Bearer $accessToken";
+
+    final url = Uri.https(_baseURL, request, {"extended": "full"});
+    final response = await client.get(url, headers: _headers);
+
+    if (response.statusCode == 204) {
+      return null;
+    }
+
+    if (![200, 201].contains(response.statusCode)) {
+      throw TraktManagerAPIError(response.statusCode, response.reasonPhrase, response);
+    }
+
+    final jsonResult = jsonDecode(response.body);
+    final airedDate = jsonResult["first_aired"];
+
+    // if (await isEpisodeWatched(jsonResult["ids"]["trakt"])) {
+    //   return null;
+    // }
+
+    if (DateUtils.dateOnly(DateTime.parse(airedDate)) != DateUtils.dateOnly(DateTime.now())) {
+      return null;
+    }
+
+    return airedDate;
+  }
+
+  ///
+  /// Plans to use this function to remove episodes from the watchlist once watched.
+  /// Currently not used as it would require frequent polling of the Trakt API to check if episodes have been watched.
+  ///
+
+  // Future<bool> isEpisodeWatched(int traktId) async {
+  //   final request = "sync/history/episodes/$traktId";
+  //   final headers = _headers;
+  //   headers["Authorization"] = "Bearer $accessToken";
+
+  //   final url = Uri.https(_baseURL, request, {"extended": "full"});
+  //   final response = await client.get(url, headers: _headers);
+
+  //   if (response.statusCode == 204) {
+  //     return false;
+  //   }
+
+  //   if (![200, 201].contains(response.statusCode)) {
+  //     throw TraktManagerAPIError(response.statusCode, response.reasonPhrase, response);
+  //   }
+
+  //   final jsonResult = jsonDecode(response.body);
+  //   return (jsonResult is Iterable && jsonResult.isNotEmpty);
+  // }
+
   Future<MovieSummary> getMovieSummary(String slug) async {
     final request = "movies/$slug";
     final headers = _headers;
@@ -210,6 +266,7 @@ class TraktManager {
             "nextAirDate": summary.released,
           };
         } else {
+          final todayEpisode = await getTodayEpisode(slug);
           final nextEpisode = await getShowNextEpisode(slug);
           final summary = await getShowSummary(slug);
 
@@ -217,7 +274,7 @@ class TraktManager {
             "id": item,
             "name": summary.title,
             "status": summary.status,
-            "nextAirDate": nextEpisode,
+            "nextAirDate": todayEpisode ?? nextEpisode,
           };
         }
 
