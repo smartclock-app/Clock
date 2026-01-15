@@ -251,7 +251,7 @@ class TraktManager {
     database.execute("DELETE FROM watchlist");
     final insert = database.prepare("INSERT INTO watchlist (id, name, status, nextAirDate) VALUES (?, ?, ?, ?)");
 
-    for (final item in items) {
+    await Future.wait(items.map((item) async {
       final [type, slug] = item.split("--");
 
       late final Map<String, dynamic> data;
@@ -266,9 +266,11 @@ class TraktManager {
             "nextAirDate": summary.released,
           };
         } else {
-          final todayEpisode = await getTodayEpisode(slug);
-          final nextEpisode = await getShowNextEpisode(slug);
-          final summary = await getShowSummary(slug);
+          final [todayEpisode, nextEpisode, summary] = await Future.wait([
+            getTodayEpisode(slug),
+            getShowNextEpisode(slug),
+            getShowSummary(slug),
+          ]) as List<dynamic>;
 
           data = {
             "id": item,
@@ -282,7 +284,7 @@ class TraktManager {
       } on SqliteException catch (e) {
         logger.e("[Watchlist] Failed to insert item: $e");
       }
-    }
+    }));
 
     insert.dispose();
   }

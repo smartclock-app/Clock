@@ -103,8 +103,8 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
   // Fetch all calendar lists
   final calendarList = await calendarApi.calendarList.list();
 
-  // For each calendar list, fetch all events
-  for (final calendarListEntry in calendarList.items!) {
+  // For each calendar list, fetch all events concurrently
+  await Future.wait(calendarList.items!.map((calendarListEntry) async {
     final Set<String> recurringEvents = HashSet();
     final color = calendarListEntry.backgroundColor ?? "#1a1a1a";
     final events = await calendarApi.events.list(
@@ -153,7 +153,7 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
 
       allEvents.add(calendarEventModel);
     }
-  }
+  }));
 
   // Get watchlist
   (String, String)? newTraktTokens;
