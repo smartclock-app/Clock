@@ -15,7 +15,7 @@ import 'package:smartclock/widgets/alexa/util/fetch_lyrics.dart';
 import 'package:smartclock/widgets/alexa/util/lrc.dart';
 import 'package:smartclock/config/config.dart' show ConfigModel;
 
-const radioProviders = ["Unknown Provider", "PLANET_RADIO", "TuneIn", "Global Player"];
+const radioProviders = ["", "Unknown Provider", "PLANET_RADIO", "TuneIn", "Global Player"];
 
 class NowPlaying extends StatefulWidget {
   const NowPlaying({super.key});
