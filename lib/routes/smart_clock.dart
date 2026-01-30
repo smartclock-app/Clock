@@ -15,7 +15,8 @@ import 'package:smartclock/util/logger_util.dart';
 import 'package:smartclock/widgets/clock/clock.dart';
 import 'package:smartclock/widgets/sidebar/sidebar.dart';
 import 'package:smartclock/widgets/weather/weather.dart';
-import 'package:smartclock/websocket/websocket_manager.dart';
+import 'package:smartclock/remote/http_server.dart';
+import 'package:smartclock/remote/command_service.dart';
 
 class SmartClock extends StatefulWidget {
   const SmartClock({super.key});
@@ -29,7 +30,6 @@ class _SmartClockState extends State<SmartClock> {
   late final Config config;
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
-  final WebSocketManager _webSocketManager = WebSocketManager();
   Logger logger = LoggerUtil.logger;
 
   @override
@@ -45,13 +45,19 @@ class _SmartClockState extends State<SmartClock> {
 
     final configModel = context.read<ConfigModel>();
     if (configModel.config.remoteConfig.enabled) {
-      _webSocketManager.initialise(context);
+      // Start the HTTP-based remoteConfig server (JSON + Basic Auth)
+      remoteConfigHttpServer.start(context);
+      // Wire app-specific command handlers into the transport-agnostic CommandService
+      // so existing commands remain available over HTTP.
+      commandService.registerAppBindings(context);
     }
   }
 
   @override
   void dispose() {
     _connectivitySubscription?.cancel();
+    // Ensure the remote config HTTP server is stopped when the widget is disposed.
+    remoteConfigHttpServer.stop();
     super.dispose();
   }
 

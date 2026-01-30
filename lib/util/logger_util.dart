@@ -55,12 +55,36 @@ class LoggerOutput extends LogOutput {
     // Write to console
     event.lines.forEach(debugPrint);
 
-    // Write to stream
-    if (shouldBroadcast) _streamController.add(event.lines);
+    // Write to stream (in-memory broadcast). Guard to avoid exceptions
+    try {
+      if (shouldBroadcast) {
+        // Dispatch asynchronously to avoid re-entrancy that can cause
+        // downstream consumers (for example SSE handlers) to write to
+        // HTTP responses while the logger is still in the middle of
+        // handling an event. Scheduling on the microtask queue decouples
+        // the emission and prevents "StreamSink is bound to a stream"
+        // style errors caused by synchronous re-entry.
+        scheduleMicrotask(() {
+          try {
+            _streamController.add(event.lines);
+          } catch (e) {
+            debugPrint('LoggerOutput: failed to broadcast to stream async: $e');
+          }
+        });
+      }
+    } catch (e) {
+      // Swallow stream errors to avoid crashing the app; print to console for diagnostics.
+      debugPrint('LoggerOutput: failed to schedule broadcast: $e');
+    }
 
-    // Write to file
-    _sink?.writeAll(event.lines, '\n');
-    _sink?.writeln();
+    // Write to file. Wrap in try/catch because underlying IOSink may throw
+    // (for example if bound to a stream via addStream elsewhere).
+    try {
+      _sink?.writeAll(event.lines, '\n');
+      _sink?.writeln();
+    } catch (e, st) {
+      debugPrint('LoggerOutput: failed to write to file sink: $e\n$st');
+    }
   }
 
   @override
