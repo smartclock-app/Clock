@@ -232,10 +232,14 @@ Future<Map<String, List<CalendarEventModel>>> fetchEvents({required Config confi
     logger.e(stack);
   }
 
-  // Sort events by start date
-  allEvents.sort((a, b) => a.start.compareTo(b.start));
+  // Sort events by calendar then alphabetically by title
+  allEvents.sort((a, b) {
+    final startComparison = a.start.compareTo(b.start);
+    if (startComparison != 0) return startComparison;
+    return a.title.compareTo(b.title);
+  });
 
-  // Sort events by month
+  // Group events by month
   final currentTime = DateTime.now();
   final currentWeek = weekNumber(currentTime);
   final weekReference = DateTime(2024, 1, 1); // Must be a Monday for isEven calculation below
